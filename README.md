@@ -1,225 +1,206 @@
 <div align="center">
 
-# Get Things Done (GTD)
+# ⚡ Get Things Done (GTD) Enterprise Skill Pack
 
-**The autonomous execution and work modeling engine for AI agents.**  
-*Convert messy, unclear ideas into verifiable, executable work models and deliver real outcomes.*
+**Autonomous Work Modeling, Deterministic Delivery & Governance Engine for AI Agents.**  
+*Transforming unstructured intent into verified, auditable, and production-ready outcomes across enterprise teams.*
 
 [![CI](https://github.com/imMamdouhaboammar/get-things-done-skillpack/actions/workflows/ci.yml/badge.svg)](https://github.com/imMamdouhaboammar/get-things-done-skillpack/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
-[![Agent Skills Compatible](https://img.shields.io/badge/Agent_Skills-OpenAI_%7C_Claude_%7C_Gemini_%7C_Antigravity-7c3aed.svg)](skills/)
+[![Enterprise Ready](https://img.shields.io/badge/Enterprise-Air--Gapped_%7C_Zero--Telemetry-059669.svg)](skills/)
+[![Multi-Host Compatible](https://img.shields.io/badge/Platform-Claude_Code_%7C_ChatGPT_%7C_Codex_%7C_Gemini_%7C_Antigravity-7c3aed.svg)](skills/)
 
 </div>
 
 ---
 
-## 🎯 Overview
+## 🏢 Executive Summary
 
-**Get Things Done** is an open, multi-agent skill pack that bridges the gap between high-level human ambiguity and deterministic, verifiable execution. 
+Modern enterprise AI deployments face a recurring challenge: **AI models generate plausible-sounding plans but fail at deterministic execution, hallucinate completion, and obscure critical project unknowns.**
 
-Unlike traditional task managers or superficial chat bots, this skill pack equips AI agents (Claude Code, ChatGPT, Codex, Gemini CLI, Google Antigravity, OpenClaw) with a rigorous operational loop:
-1. **Separating Problem from Solution**: Clarifying the real outcome before prescribing code or actions.
-2. **Four-Quadrant Knowledge Ledger**: Explicitly tracking **Facts**, **Assumptions**, **Decisions**, and **Unknowns**.
-3. **Definition of Ready (DoR)**: Gating execution until blockers and critical decisions are resolved.
-4. **Definition of Done (DoD)**: Requiring observable, empirical evidence before claiming completion (eliminating "fake-done" hallucinations).
-5. **Domain Extensibility**: Inheriting domain packs (Software, Marketing, Product, Research, etc.) without forking core invariants.
+The **Get Things Done (GTD) Skill Pack** provides a standardized, schema-driven operational runtime that enforces rigorous governance, strict quality gating, and empirical verification across any LLM or AI agent harness.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                            ENTERPRISE CORE VALUE                            │
+├───────────────────────┬────────────────────────────┬────────────────────────┤
+│  Zero "Fake-Done"     │  Knowledge Isolation       │  Domain Governance     │
+│  Empirical proof is   │  Facts, Assumptions,       │  Extensible domain     │
+│  mandated before any  │  Decisions & Unknowns      │  packs without         │
+│  task is marked done. │  are strictly tracked.     │  forking core rules.   │
+└───────────────────────┴────────────────────────────┴────────────────────────┘
+```
+
+---
+
+## 🏛️ Core Architectural Pillars
+
+### 1. Four-Quadrant Knowledge Ledger
+Ambiguity is decomposed into four discrete, auditable categories before execution begins:
+- **Facts**: Verified truths backed by inspectable environment or codebase evidence.
+- **Assumptions**: Reversible, low-risk operational choices made without user interruption.
+- **Decisions**: Irreversible or high-impact branching points requiring explicit stakeholder approval.
+- **Unknowns**: Identified gaps that must be resolved prior to advancing work.
+
+### 2. Dual Quality Gating
+- **Definition of Ready (DoR)**: Prevents premature execution by verifying scope containment, stakeholder decisions, and dependency availability.
+- **Definition of Done (DoD)**: Forbids conversational or subjective completion assertions. An outcome is only marked complete when backed by executable verification and observable evidence.
+
+### 3. Isolated Domain Governance
+Domain packs (Software Engineering, Product Management, Marketing Strategy, Research & Analytics) inherit the core governance contract without code modification, establishing standardized domain vocabulary, specialized diagnostic questions, and custom completion criteria.
+
+### 4. Universal Host Interoperability
+Engineered as native Agent Skills and packaged with standardized OpenAI and Claude manifests, GTD integrates seamlessly with **Claude Code**, **ChatGPT Enterprise / GPTs**, **Codex**, **Gemini CLI**, **Google Antigravity**, and **OpenClaw**.
 
 ---
 
 ## 📦 The Skill Catalog
 
-This repository contains two production-grade, independently packaged Agent Skills styled and validated under the **Skill Catalog Stylist** standard:
-
-| Skill | Logo | Category | Brand Color | Description |
+| Skill | Logo | Focus Area | Brand Hex | Enterprise Interface |
 |---|:---:|---|---|---|
-| [`get-things-done`](skills/get-things-done) | <img src="skills/get-things-done/assets/small-logo.svg" width="48" height="48" alt="GTD Logo" /> | Strategic Execution | `#2563EB` | Converts fuzzy, chaotic requests into executable work models and drives verifiable completion. |
-| [`building-gtd-domain-packs`](skills/building-gtd-domain-packs) | <img src="skills/building-gtd-domain-packs/assets/small-logo.svg" width="48" height="48" alt="Builder Logo" /> | Architecture & Extensibility | `#059669` | Author and validate domain packs that extend GTD vocabulary and checks without modifying core invariants. |
+| **[`get-things-done`](skills/get-things-done)** | <img src="skills/get-things-done/assets/small-logo.svg" width="44" height="44" alt="GTD Logo" /> | Strategic Execution & Delivery | `#2563EB` | Schema-driven work modeling, diagnostic routing, and verified task delivery. |
+| **[`building-gtd-domain-packs`](skills/building-gtd-domain-packs)** | <img src="skills/building-gtd-domain-packs/assets/small-logo.svg" width="44" height="44" alt="Builder Logo" /> | Extension Architecture | `#059669` | Enterprise framework for creating organizational and field-specific domain packs. |
 
 ---
 
-## 🔄 The GTD Execution Loop
+## 🔄 Enterprise Execution Lifecycle
 
 ```mermaid
 flowchart TD
-    A["💡 Fuzzy Request / Messy Idea"] --> B["1. Capture Intent & Actor"]
-    B --> C["2. Route Diagnostic Mode"]
-    C --> D["3. Build Knowledge Ledger\n(Facts | Assumptions | Decisions | Unknowns)"]
-    D --> E{"4. Gate on Definition of Ready?"}
-    E -- "Missing Blocking Info" --> F["Ask Smallest Blocking Decision Set"]
-    F --> D
-    E -- "Ready" --> G["5. Model Workstreams & Deliverables"]
-    G --> H{"Delivery Requested & Tools Available?"}
-    H -- "Planning Only" --> I["Produce Structured Execution Brief"]
-    H -- "Execute" --> J["6. Drive Atomic Tool Actions"]
-    J --> K["7. Multi-Lens Review\n(Outcome | Domain | Execution | Verification)"]
-    K --> L{"8. Definition of Done Passed\nwith Empirical Evidence?"}
-    L -- "Gap Found" --> J
-    L -- "Verified" --> M["🏁 Verifiable Outcome & Handoff"]
+    classDef start fill:#1E293B,stroke:#38BDF8,stroke-width:2px,color:#F8FAFC;
+    classDef process fill:#0F172A,stroke:#2563EB,stroke-width:2px,color:#F8FAFC;
+    classDef gate fill:#312E81,stroke:#818CF8,stroke-width:2px,color:#F8FAFC;
+    classDef finish fill:#064E3B,stroke:#34D399,stroke-width:2px,color:#F8FAFC;
+
+    A["🎯 Business Request / Complex Problem"]:::start --> B["1. Capture Objective & Scope Boundaries"]:::process
+    B --> C["2. Establish 4-Quadrant Knowledge Ledger\n(Facts · Assumptions · Decisions · Unknowns)"]:::process
+    C --> D{"3. Definition of Ready (DoR) Gate"}:::gate
+    D -- "Blocking Decisions Required" --> E["Prompt Smallest Decision Set"]:::process
+    E --> C
+    D -- "Approved & Unblocked" --> F["4. Synthesize Auditable Execution Brief"]:::process
+    F --> G{"Execution Mode Requested?"}:::gate
+    G -- "Planning & Governance Only" --> H["Produce Machine-Readable Artifacts"]:::finish
+    G -- "Automated Delivery" --> I["5. Execute Atomic Actions via Tool Harness"]:::process
+    I --> J["6. Multi-Lens Verification Review\n(Outcome · Domain · Security · Evidence)"]:::process
+    J --> K{"7. Definition of Done (DoD) Gate\nBacked by Empirical Proof?"}:::gate
+    K -- "Evidence Gap Detected" --> I
+    K -- "Formally Verified" --> L["🏁 Verified Outcome & Audit Handoff"]:::finish
 ```
 
 ---
 
-## 🗂️ Repository Structure
+## 📋 The Execution Brief Artifact
 
-```
-get-things-done-skillpack/
-├── skills/
-│   ├── get-things-done/                   # Canonical runtime skill
-│   │   ├── SKILL.md                       # Agent instructions & prompt contract
-│   │   ├── assets/                        # High-contrast 128px & 512px SVG brand assets
-│   │   │   ├── small-logo.svg
-│   │   │   └── large-logo.svg
-│   │   ├── agents/
-│   │   │   └── openai.yaml                # OpenAI / ChatGPT plugin manifest
-│   │   ├── domains/                       # Pre-baked domain packs
-│   │   │   ├── software.md
-│   │   │   ├── marketing.md
-│   │   │   ├── product.md
-│   │   │   └── research.md
-│   │   ├── references/                    # Schemas and specifications
-│   │   │   ├── core-contract.md
-│   │   │   ├── domain-pack-spec.md
-│   │   │   └── execution-brief.schema.json
-│   │   ├── templates/                     # Markdown report templates
-│   │   │   └── execution-brief.md
-│   │   └── scripts/
-│   │       └── gtd.py                     # Canonical deterministic CLI
-│   └── building-gtd-domain-packs/         # Extension authoring skill
-│       ├── SKILL.md
-│       ├── assets/
-│       │   ├── small-logo.svg
-│       │   └── large-logo.svg
-│       ├── agents/
-│       │   └── openai.yaml
-│       ├── references/
-│       │   ├── core-contract.md
-│       │   └── domain-pack-spec.md
-│       └── templates/
-│           └── domain-pack-template.md
-├── scripts/
-│   ├── gtd.py                             # Pack-level CLI wrapper
-│   ├── catalog_stylist.py                 # Skill Catalog Stylist generator & validator
-│   └── package_skills.py                  # Standalone ZIP builder for ChatGPT / Codex
-├── evals/
-│   ├── cases.jsonl                        # Pressure-testing behavioral evals
-│   └── README.md
-├── examples/                              # Validated example execution briefs
-│   ├── software-brief.json
-│   └── marketing-brief.json
-├── tests/                                 # Automated Pytest suite
-│   ├── test_pack.py
-│   └── test_catalog_assets.py
-├── .github/workflows/                     # CI & Release automation
-│   ├── ci.yml
-│   └── release.yml
-├── install.sh                             # Cross-agent installer script
-├── pyproject.toml                         # Standard Python packaging configuration
-└── LICENSE                                # MIT License
+Every substantial project state is captured in a typed, schema-validated **Execution Brief** (`v1.0`). This artifact provides a reproducible audit trail for compliance and handoff across human teams and agent systems:
+
+```json
+{
+  "version": "1.0",
+  "title": "Production Auth & RBAC Hardening",
+  "status": "ready",
+  "domain": "software",
+  "intent": {
+    "problem": "Legacy token validation lacks granular scope verification.",
+    "desired_outcome": "Zero-trust session authorization with automated revoke tests.",
+    "actor": "Security Engineering"
+  },
+  "knowledge": {
+    "facts": ["Existing service runs Python 3.12 with FastAPI."],
+    "assumptions": ["Redis session store maintains < 5ms latency SLA."],
+    "unknowns": []
+  },
+  "verification": {
+    "success_criteria": ["All auth unit and integration tests pass green."],
+    "evidence": ["test_rbac_revocation: PASSED (24 assertions)"]
+  }
+}
 ```
 
 ---
 
-## 🚀 Quickstart & CLI Reference
+## ⚡ Enterprise CLI Reference
 
-The deterministic CLI provides instant validation, scaffolding, and packaging utilities:
+The GTD CLI provides automated validation, brief scaffolding, and packaging utilities for enterprise automation pipelines:
 
-### 1. Run Health Check
+### System Diagnostics & Health Check
 ```bash
+# Verify integrity of core contracts, schemas, and loaded domain packs
 python scripts/gtd.py doctor
 ```
 
-### 2. List Supported Domain Packs
+### Governance & Schema Validation
 ```bash
-python scripts/gtd.py list-domains
-```
-
-### 3. Scaffold & Validate an Execution Brief
-```bash
-# Generate a clean execution brief scaffold
-python scripts/gtd.py new-brief --title "Refactor Auth Pipeline" --domain software --out brief.json
-
-# Validate against the strict JSON schema and loaded domain
+# Validate an Execution Brief against the strict JSON Schema and loaded domain
 python scripts/gtd.py validate-brief brief.json
 
-# Render into human-friendly markdown
-python scripts/gtd.py render-brief brief.json --out brief.md
+# Render an Execution Brief into an executive Markdown report
+python scripts/gtd.py render-brief brief.json --out executive-brief.md
 ```
 
-### 4. Create a New Domain Pack
+### Domain Pack Scaffolding
 ```bash
-python scripts/gtd.py new-domain devops --name "DevOps & SRE" --output skills/get-things-done/domains/devops.md
+# Scaffold an organization-specific domain pack conforming to core contracts
+python scripts/gtd.py new-domain compliance --name "Regulatory Compliance" --output skills/get-things-done/domains/compliance.md
 ```
 
-### 5. Build Standalone Distribution ZIP Bundles
+### Distribution Packaging
 ```bash
+# Build standalone, zero-dependency ZIP archives for ChatGPT Enterprise / Codex
 python scripts/gtd.py package --out ./dist
 ```
 
 ---
 
-## 🎨 Skill Catalog Stylist & Store Compliance
+## 🚀 Deployment & Integration
 
-Both skills strictly adhere to public plugin and skill store quality standards:
-- **Small SVG Logo (`128x128`)**: Retina-ready, high-contrast geometric glyph with squircle backdrop.
-- **Large SVG Logo (`512x512`)**: Detailed vector composition with gradient illumination and precision geometry.
-- **OpenAI Agent Manifest (`agents/openai.yaml`)**:
-  - `display_name` $\le 40$ characters.
-  - `short_description` $\le 80$ characters.
-  - `default_prompt` single line $\le 128$ characters.
-  - `brand_color` 6-character hex strictly mapped to SVG palette.
+### 1. Enterprise Agent Workspaces (Centralized / Fleet)
 
-You can validate all assets at any time with:
-```bash
-python scripts/catalog_stylist.py --validate
-```
-
----
-
-## 📥 Installation
-
-### Fast Local Install (Script)
-
-Install into standard agent skills directories:
+Deploy GTD directly into user or shared agent skill directories:
 
 ```bash
-# Install to ~/.agents/skills (Claude Code, Gemini CLI, Antigravity, OpenClaw)
+# Deploy to universal agent registry (~/.agents/skills)
 ./install.sh --agents
 
-# Install to ~/.claude/skills (Claude Code)
+# Deploy to Claude Code (~/.claude/skills)
 ./install.sh --claude
 
-# Install to both locations
-./install.sh --both
-
-# Force overwrite existing installations
+# Deploy to both registries with forced sync
 ./install.sh --both --force
 ```
 
-### ChatGPT & OpenAI Codex
+### 2. ChatGPT Enterprise & OpenAI Codex
 
-1. Run `python scripts/gtd.py package --out dist/` to generate `dist/get-things-done.zip` and `dist/building-gtd-domain-packs.zip`.
-2. In ChatGPT, navigate to **Explore GPTs > Create > Configure > Skills / Upload Files**.
-3. Upload the standalone `get-things-done.zip`.
+1. Generate distribution archives:
+   ```bash
+   python scripts/gtd.py package --out dist/
+   ```
+2. In your ChatGPT Enterprise workspace or GPT builder, upload `dist/get-things-done.zip`.
+3. The bundle includes full standalone domain packs, execution schemas, templates, and SVG assets.
 
----
+### 3. CI/CD Governance Pipeline
 
-## 🧪 Testing & Behavioral Evals
+Integrate brief validation directly into GitHub Actions, GitLab CI, or Jenkins:
 
-```bash
-# Run complete test suite (unit + catalog stylist preflight)
-pytest -v
-
-# Run with coverage
-pytest --cov=scripts --cov=skills
+```yaml
+- name: Verify Execution Brief
+  run: |
+    python scripts/gtd.py validate-brief ./docs/plans/project-brief.json
 ```
 
-Pressure test cases covering **fake-done prevention**, **wrong-domain rejection**, and **messy inputs** are located in [`evals/cases.jsonl`](evals/cases.jsonl).
+---
+
+## 🔒 Security, Privacy & Compliance
+
+- **Zero Outbound Telemetry**: Operates entirely within your local execution environment or private agent harness.
+- **Air-Gapped Compatible**: Self-contained with no external runtime API or network dependencies.
+- **No Credential Exposure**: Never requires or stores API keys, database credentials, or sensitive tokens.
+- **Auditable Artifacts**: All decisions, assumptions, and proofs are recorded in plain-text markdown and JSON.
 
 ---
 
-## 📄 License
+## 📄 License & Attribution
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for terms.
 
-Developed with ❤️ by [Mamdouh Aboammar](https://github.com/imMamdouhaboammar).
+Authored & Maintained by [Mamdouh Aboammar](https://github.com/imMamdouhaboammar).
