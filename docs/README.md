@@ -5,6 +5,7 @@ Use these docs based on what you are trying to do
 | Guide | Use it for |
 |---|---|
 | [Quickstart](quickstart.md) | Start from a messy idea and produce a usable Execution Brief |
+| [Execution Brief](execution-brief.md) | Understand the durable work artifact and its Ready and Done relationship |
 | [Architecture](architecture.md) | Understand the core contract, state model, domain packs, and deterministic boundaries |
 | [Domain packs](domain-packs.md) | Adapt GTD to a new field without copying or weakening the core |
 | [Evaluation](evaluation.md) | Run repository checks and design behavioral agent evaluations |
