@@ -9,6 +9,7 @@ Use these docs based on what you are trying to do
 | [Architecture](architecture.md) | Understand the core contract, state model, domain packs, and deterministic boundaries |
 | [Domain packs](domain-packs.md) | Adapt GTD to a new field without copying or weakening the core |
 | [Evaluation](evaluation.md) | Run repository checks and design behavioral agent evaluations |
+| [v1.1 change notes](changelog-v1.1.md) | Review the behavior and documentation changes in this release candidate |
 
 ## Reference contracts
 
