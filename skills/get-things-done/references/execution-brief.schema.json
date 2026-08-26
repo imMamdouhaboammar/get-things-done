@@ -18,211 +18,82 @@
     "next_action"
   ],
   "properties": {
-    "version": {
-      "const": "1.0"
-    },
-    "title": {
-      "type": "string",
-      "minLength": 1
-    },
-    "domain": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
+    "version": {"const": "1.0"},
+    "title": {"type": "string", "minLength": 1},
+    "domain": {"type": ["string", "null"]},
     "intent": {
       "type": "object",
-      "required": [
-        "problem",
-        "desired_outcome",
-        "actor"
-      ],
+      "required": ["problem", "desired_outcome", "actor"],
       "additionalProperties": false,
       "properties": {
-        "problem": {
-          "type": "string"
-        },
-        "desired_outcome": {
-          "type": "string"
-        },
-        "actor": {
-          "type": [
-            "string",
-            "null"
-          ]
-        }
+        "problem": {"type": "string"},
+        "desired_outcome": {"type": "string"},
+        "actor": {"type": ["string", "null"]}
       }
     },
     "status": {
-      "enum": [
-        "captured",
-        "clarifying",
-        "researching",
-        "modeling",
-        "ready",
-        "executing",
-        "verifying",
-        "done",
-        "blocked"
-      ]
+      "enum": ["captured", "clarifying", "researching", "modeling", "ready", "executing", "verifying", "done", "blocked"]
     },
     "scope": {
       "type": "object",
-      "required": [
-        "in",
-        "out",
-        "constraints"
-      ],
+      "required": ["in", "out", "constraints"],
       "additionalProperties": false,
       "properties": {
-        "in": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "out": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "constraints": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
+        "in": {"type": "array", "items": {"type": "string"}},
+        "out": {"type": "array", "items": {"type": "string"}},
+        "constraints": {"type": "array", "items": {"type": "string"}}
       }
     },
     "knowledge": {
       "type": "object",
-      "required": [
-        "facts",
-        "assumptions",
-        "unknowns"
-      ],
+      "required": ["facts", "assumptions", "unknowns"],
       "additionalProperties": false,
       "properties": {
-        "facts": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "assumptions": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "unknowns": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
+        "facts": {"type": "array", "items": {"type": "string"}},
+        "assumptions": {"type": "array", "items": {"type": "string"}},
+        "unknowns": {"type": "array", "items": {"type": "string"}}
       }
     },
     "decisions": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": [
-          "decision",
-          "rationale",
-          "reversible"
-        ],
+        "required": ["decision", "rationale", "reversible"],
         "additionalProperties": false,
         "properties": {
-          "decision": {
-            "type": "string"
-          },
-          "rationale": {
-            "type": "string"
-          },
-          "reversible": {
-            "type": "boolean"
-          }
+          "decision": {"type": "string"},
+          "rationale": {"type": "string"},
+          "reversible": {"type": "boolean"}
         }
       }
     },
+    "open_decisions": {"type": "array", "items": {"type": "string"}},
     "workstreams": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": [
-          "name",
-          "outcome",
-          "dependencies"
-        ],
+        "required": ["name", "outcome", "dependencies"],
         "additionalProperties": false,
         "properties": {
-          "name": {
-            "type": "string"
-          },
-          "outcome": {
-            "type": "string"
-          },
-          "dependencies": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
+          "name": {"type": "string"},
+          "outcome": {"type": "string"},
+          "dependencies": {"type": "array", "items": {"type": "string"}}
         }
       }
     },
-    "deliverables": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "risks": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
-    "domain_data": {
-      "type": "object",
-      "additionalProperties": true
-    },
+    "deliverables": {"type": "array", "items": {"type": "string"}},
+    "risks": {"type": "array", "items": {"type": "string"}},
+    "domain_data": {"type": "object", "additionalProperties": true},
     "verification": {
       "type": "object",
-      "required": [
-        "success_criteria",
-        "evidence"
-      ],
+      "required": ["success_criteria", "evidence"],
       "additionalProperties": false,
       "properties": {
-        "success_criteria": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "evidence": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
+        "success_criteria": {"type": "array", "items": {"type": "string"}},
+        "evidence": {"type": "array", "items": {"type": "string"}}
       }
     },
-    "next_action": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "blockers": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    }
+    "next_action": {"type": ["string", "null"]},
+    "blockers": {"type": "array", "items": {"type": "string"}}
   }
 }
