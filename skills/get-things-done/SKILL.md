@@ -1,43 +1,73 @@
 ---
 name: get-things-done
-description: Use when a user has a messy, unclear, broad, incomplete, or partially formed idea and needs it turned into work that can actually be decided, executed, verified, or handed off across domains
+description: Use when a user has a messy, unclear, broad, incomplete, contradictory, or partially formed idea and needs help turning it into work that can be decided, executed, verified, or handed off across domains
 ---
 
 # Get Things Done
 
-Convert ambiguity into an executable work model, then continue through delivery when the user asked for execution and the runtime can act
+Turn unclear intent into an executable work model, then continue through delivery when execution was requested and the runtime can act
 
 **REQUIRED REFERENCE:** Read `references/core-contract.md`
 
-Load one matching file from `domains/` when the task clearly belongs to a supported domain. If none fits, use the core alone. Never force a domain
+Load one matching pack from `domains/` only when task intent clearly belongs to a supported field. If selection is ambiguous, stay on the core until evidence favors a domain. Never force a domain from keywords alone
 
-## Run
+## Operating loop
 
-1. **Capture** the user's intended outcome and separate it from proposed solutions
-2. **Diagnose** the current blocker with the core mode router. Do not run every mode
-3. **Maintain** an Execution Brief using `references/execution-brief.schema.json`. In chat-only environments, preserve the same fields conceptually
-4. **Resolve the frontier**. Find discoverable Facts yourself. Make only reversible, low-risk Assumptions. Ask only for blocking Decisions that materially change the outcome
-5. **Model** scope, dependencies, risks, deliverables, and one next executable action
-6. **Gate on Ready** using the core Definition of Ready plus loaded domain additions
-7. **Execute when requested**. If the user asked only for clarity or planning, stop at the executable model. If delivery was requested and tools are available, act instead of only describing action
-8. **Review** through Outcome, Domain, Execution, and Verification lenses plus loaded domain checks
-9. **Verify** against observable success criteria. Never claim completion from confidence language
-10. **Finish or hand off** with evidence, remaining limitations, blockers, and the next executable action
+1. **Capture the outcome**
+   Separate the user's desired result from the solution they happened to propose
 
-## Interaction rules
+2. **Classify the current blocker**
+   Choose one active mode from the router in `core-contract.md`: clarify, research, decompose, decide, validate, model, execute, or verify
 
-Do not interrogate the user for information you can obtain yourself
+3. **Maintain the work model**
+   For substantial work, keep an Execution Brief compatible with `references/execution-brief.schema.json`. In chat-only contexts, preserve the same concepts without pretending a file exists
 
-Do not dump a long questionnaire. Ask only the smallest blocking decision set
+4. **Resolve only the current frontier**
+   Discover Facts yourself when tools or sources can answer them. Make reversible low-risk Assumptions explicitly. Ask the user only for blocking Decisions that materially change scope, cost, risk, preference, or outcome
 
-Do not hide uncertainty. Label Facts, Assumptions, Decisions, and Unknowns when the distinction matters
+5. **Create an executable unit**
+   Bound scope, dependencies, risks, deliverables, success criteria, and one next action that can actually be performed
 
-Do not pretend a tool, source, file, or action was used when it was unavailable
+6. **Pass the Ready gate**
+   Do not call work ready while a blocking Decision, blocker, unverifiable outcome, or missing next action remains
 
-A plan is not progress. Prefer a concrete Decision, artifact, executed action, or verification result each cycle
+7. **Act when action was requested**
+   If the user asked only for clarification or planning, stop at the executable model. If they asked for delivery and tools are available, perform the next action instead of narrating it
 
-## Outputs
+8. **Review the result**
+   Review through Outcome, Domain, Execution, and Verification lenses plus any loaded domain checks
 
-For small tasks, answer directly with the clarified outcome and next executable action
+9. **Prove completion**
+   Record observable evidence against success criteria. A confident explanation, plan, generated draft, or agent report is not proof by itself
 
-For substantial tasks, produce or update an Execution Brief. Use `templates/execution-brief.md` for human output and JSON when a machine-readable handoff is useful
+10. **Finish, continue, or hand off**
+    Mark Done only when the completion contract is satisfied. Otherwise preserve blockers, limitations, evidence, and the next executable action
+
+## Interaction policy
+
+- Do not interrogate the user for discoverable information
+- Do not dump a generic questionnaire
+- Do not ask questions whose answers will not change the work
+- Do not silently promote an Unknown into a Fact
+- Do not hide trade-offs inside recommendations
+- Do not claim a file, connector, command, website, or external action was used when it was unavailable
+- Do not confuse analysis volume with progress
+
+## Progress rule
+
+Each meaningful cycle should produce at least one of these
+
+- a Decision settled
+- an artifact created or changed
+- an external action executed
+- verification evidence collected
+
+If none happened, the cycle remained analysis
+
+## Output profiles
+
+**Small task:** clarified outcome, relevant assumptions, and next executable action
+
+**Substantial task:** updated Execution Brief plus the active blocker or next action
+
+**Handoff:** current outcome, status, scope, knowledge ledger, decisions, artifacts, evidence, blockers, and next action without duplicating existing artifacts
