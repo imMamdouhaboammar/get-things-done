@@ -1,37 +1,52 @@
 ---
 name: building-gtd-domain-packs
-description: Use when Get Things Done needs to be adapted to a new professional field, discipline, organization practice, or specialized workflow without forking the core skill
+description: Use when Get Things Done needs adaptation for a professional field, discipline, organization practice, or specialized workflow without forking the core skill
 ---
 
 # Building GTD Domain Packs
 
-Create a domain extension that inherits the Get Things Done core instead of copying it
+Create a focused domain extension that inherits Get Things Done instead of copying it
 
-**REQUIRED REFERENCE:** Read local `references/domain-pack-spec.md` and `references/core-contract.md`
+**REQUIRED REFERENCES:** Read local `references/domain-pack-spec.md` and `references/core-contract.md`
 
-## Method
+## Build method
 
-1. Name the field at the level where terminology and completion criteria meaningfully differ
-2. Collect real task examples that fail for different reasons
-3. Extract canonical vocabulary and important distinctions
-4. Keep only diagnostic questions that can change scope, Decisions, execution, or verification
-5. Define optional `domain_data` fields rather than modifying the core schema
-6. Add field-specific Definition of Ready checks
-7. Add 2 to 4 reusable workstream patterns
-8. Add review checks that catch field-specific failure
-9. Define observable Completion checks
-10. Add Common traps from real failure patterns
-11. Validate every required heading in the domain pack specification
-12. Test one messy idea, one well-formed task, one deceptive near-complete task, and one task that should not select this domain
+1. **Collect failure examples first**
+   Gather at least four realistic tasks: messy in-domain, well-formed in-domain, deceptive near-complete, and adjacent out-of-domain
 
-Use `templates/domain-pack-template.md`
+2. **Prove the core is insufficient**
+   Identify which field-specific vocabulary, readiness, review, or completion behavior is missing. If the core already handles the examples, do not create a pack
+
+3. **Define selection boundaries**
+   Write positive and negative selection signals based on intent and artifacts, not isolated keywords
+
+4. **Extract only consequential vocabulary**
+   Keep terms whose confusion would change decisions, execution, or verification
+
+5. **Add diagnostic candidates**
+   Include only questions that can change material work. Do not make them mandatory
+
+6. **Extend the brief safely**
+   Put optional field data under `domain_data`. Never fork core fields
+
+7. **Add stricter gates where needed**
+   Define domain-specific readiness checks, 2 to 4 workstream patterns, specialist review checks, and observable completion evidence
+
+8. **Test routing collisions**
+   The adjacent out-of-domain case must remain outside this pack. Tighten selection signals until it does
+
+9. **Test deceptive completion**
+   A plausible deliverable without field-specific proof must not pass Done
+
+10. **Validate the contract**
+    Confirm every required heading appears exactly once and the pack does not weaken the core
+
+Use `templates/domain-pack-template.md` as the output shape
 
 ## Rules
 
-Do not copy the core workflow into the domain pack
-
-Do not turn field knowledge into a mandatory questionnaire
-
-Do not create a new domain when an existing pack only needs additive vocabulary or checks
-
-A domain pack can be stricter than core. It cannot weaken decision authority, evidence requirements, readiness, completion, handoff, or tool honesty
+- Do not copy the core workflow into the domain pack
+- Do not turn field knowledge into a questionnaire
+- Do not create a new domain for branding or naming alone
+- Do not weaken decision authority, readiness, evidence, completion, handoff, or tool honesty
+- Do not claim a domain is validated until the four collision cases were actually exercised
