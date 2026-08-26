@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGradBuilderSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#064E3B" />
+    </linearGradient>
+  </defs>
+
+  <!-- Base Squircle -->
+  <rect x="40" y="40" width="432" height="432" rx="96" fill="url(#bgGradBuilderSmall)" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="6" />
+
+  <!-- Bold Simplified Isometric Modular Stack -->
+  <!-- Base Tier -->
+  <polygon points="256,360 380,290 256,220 132,290" fill="#047857" stroke="#6EE7B7" stroke-width="6" />
+  <polygon points="132,290 256,360 256,395 132,325" fill="#065F46" />
+  <polygon points="256,360 380,290 380,325 256,395" fill="#064E3B" />
+
+  <!-- Top Floating Prism -->
+  <polygon points="256,230 350,175 256,120 162,175" fill="#FFFFFF" stroke="#6EE7B7" stroke-width="6" />
+  <polygon points="162,175 256,230 256,270 162,215" fill="#34D399" />
+  <polygon points="256,230 350,175 350,215 256,270" fill="#10B981" />
+
+  <circle cx="256" cy="175" r="14" fill="#064E3B" />
+  <circle cx="256" cy="175" r="7" fill="#FFFFFF" />
+</svg>

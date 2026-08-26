@@ -1,0 +1,80 @@
+{
+  "version": "1.0",
+  "title": "Brand-aware agent review layer",
+  "domain": "software",
+  "intent": {
+    "problem": "Agent outputs drift from a defined brand across sessions",
+    "desired_outcome": "Provide a reusable review layer that detects and corrects brand drift before delivery",
+    "actor": "Creative and engineering teams using agentic clients"
+  },
+  "status": "ready",
+  "scope": {
+    "in": [
+      "brand context contract",
+      "review rules",
+      "cross-session handoff"
+    ],
+    "out": [
+      "training a new foundation model"
+    ],
+    "constraints": [
+      "must remain model-agnostic",
+      "must use original brand assets when available"
+    ]
+  },
+  "knowledge": {
+    "facts": [
+      "Different sessions can start with different context"
+    ],
+    "assumptions": [
+      "A hybrid rules plus examples representation is sufficient for v1"
+    ],
+    "unknowns": [
+      "Which visual similarity checks are available in every target runtime"
+    ]
+  },
+  "decisions": [
+    {
+      "decision": "Use a hybrid brand representation",
+      "rationale": "Rules cover hard constraints while examples preserve taste",
+      "reversible": true
+    }
+  ],
+  "workstreams": [
+    {
+      "name": "Brand contract",
+      "outcome": "Canonical machine-readable brand context",
+      "dependencies": []
+    },
+    {
+      "name": "Review layer",
+      "outcome": "Detect violations and return corrections",
+      "dependencies": [
+        "Brand contract"
+      ]
+    }
+  ],
+  "deliverables": [
+    "Brand context contract v1",
+    "Review rubric v1"
+  ],
+  "risks": [
+    "Overfitting to a small reference set"
+  ],
+  "domain_data": {
+    "interfaces": [
+      "brand context in",
+      "review report out"
+    ],
+    "test_strategy": "golden fixtures plus violation cases"
+  },
+  "verification": {
+    "success_criteria": [
+      "Known violation fixtures are rejected",
+      "Valid fixtures are not falsely rejected"
+    ],
+    "evidence": []
+  },
+  "next_action": "Write failing contract fixtures for allowed and disallowed brand outputs",
+  "blockers": []
+}

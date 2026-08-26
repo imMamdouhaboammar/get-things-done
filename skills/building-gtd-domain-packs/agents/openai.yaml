@@ -1,0 +1,9 @@
+schema_version: v1
+name: building-gtd-domain-packs
+display_name: GTD Domain Pack Builder
+short_description: Build domain-specific GTD extensions without forking the core contract.
+default_prompt: 'Help me design a new domain pack extension for Get Things Done:'
+brand_color: '#059669'
+categories:
+- developer-tools
+- productivity

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGradGTDSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+    <linearGradient id="glyphGradGTDSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+  </defs>
+
+  <!-- Squircle Base -->
+  <rect x="40" y="40" width="432" height="432" rx="96" fill="url(#bgGradGTDSmall)" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="6" />
+
+  <!-- Bold High-Contrast Execution Glyph -->
+  <path d="M140 256 H270 M210 196 L270 256 L210 316" stroke="#38BDF8" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" opacity="0.8" />
+  <path d="M210 270 L265 325 L375 175" stroke="#FFFFFF" stroke-width="38" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <circle cx="256" cy="256" r="160" stroke="#38BDF8" stroke-opacity="0.3" stroke-width="6" stroke-dasharray="16 16" />
+</svg>

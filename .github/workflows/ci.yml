@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test & Validate Skill Pack (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml pytest pytest-cov
+
+      - name: Run Test Suite
+        run: |
+          pytest -v
+
+      - name: Validate Skill Catalog Assets & Invariants
+        run: |
+          python scripts/catalog_stylist.py --validate
+
+      - name: Run GTD CLI Doctor
+        run: |
+          python scripts/gtd.py doctor
+
+      - name: Verify Packaging Pipeline
+        run: |
+          python scripts/gtd.py package --out ./dist
+          test -f ./dist/get-things-done.zip
+          test -f ./dist/building-gtd-domain-packs.zip
+
+      - name: Verify Install Script Syntax
+        run: |
+          bash -n install.sh

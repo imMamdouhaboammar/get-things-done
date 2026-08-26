@@ -1,0 +1,10 @@
+schema_version: v1
+name: get-things-done
+display_name: Get Things Done
+short_description: Convert messy, unclear ideas into verifiable, executable work models and action.
+default_prompt: 'Turn this idea into an executable work model with clear facts, decisions, and actions:'
+brand_color: '#2563EB'
+categories:
+- productivity
+- project-management
+- workflow-automation

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGradBuilder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#064E3B" />
+    </linearGradient>
+    <linearGradient id="topFaceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6EE7B7" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+    <linearGradient id="leftFaceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="rightFaceGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#047857" />
+      <stop offset="100%" stop-color="#065F46" />
+    </linearGradient>
+    <radialGradient id="glowBuilder" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#34D399" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#059669" stop-opacity="0" />
+    </radialGradient>
+    <filter id="dropShadowBuilder" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#047857" flood-opacity="0.4" />
+    </filter>
+  </defs>
+
+  <!-- Base Squircle -->
+  <rect x="40" y="40" width="432" height="432" rx="96" fill="url(#bgGradBuilder)" stroke="#FFFFFF" stroke-opacity="0.18" stroke-width="4" />
+  <circle cx="256" cy="256" r="180" fill="url(#glowBuilder)" />
+
+  <!-- Blueprint Architectural Grid Lines -->
+  <g opacity="0.22" stroke="#6EE7B7" stroke-width="1.5">
+    <line x1="120" y1="180" x2="392" y2="336" stroke-dasharray="6 6" />
+    <line x1="392" y1="180" x2="120" y2="336" stroke-dasharray="6 6" />
+    <line x1="256" y1="100" x2="256" y2="412" stroke-dasharray="6 6" />
+    <circle cx="256" cy="256" r="140" fill="none" stroke-width="1" />
+  </g>
+
+  <!-- 3D Isometric Domain Architecture Stack -->
+  <g filter="url(#dropShadowBuilder)">
+    <!-- Layer 1: Core Foundation Base Plate (Inherited GTD Contract) -->
+    <g transform="translate(0, 70)">
+      <polygon points="256,230 360,170 256,110 152,170" fill="#047857" stroke="#6EE7B7" stroke-width="2" stroke-opacity="0.6" />
+      <polygon points="152,170 256,230 256,255 152,195" fill="#065F46" />
+      <polygon points="256,230 360,170 360,195 256,255" fill="#064E3B" />
+    </g>
+
+    <!-- Layer 2: Domain Extension Tier (Vocabulary & Rules) -->
+    <g transform="translate(0, 10)">
+      <polygon points="256,215 345,165 256,115 167,165" fill="url(#topFaceGrad)" stroke="#FFFFFF" stroke-width="2.5" stroke-opacity="0.8" />
+      <polygon points="167,165 256,215 256,242 167,192" fill="url(#leftFaceGrad)" />
+      <polygon points="256,215 345,165 345,192 256,242" fill="url(#rightFaceGrad)" />
+    </g>
+
+    <!-- Layer 3: Floating Modular Plugin Block / Diamond Nexus -->
+    <g transform="translate(0, -55)">
+      <polygon points="256,190 320,150 256,110 192,150" fill="#FFFFFF" stroke="#6EE7B7" stroke-width="3" />
+      <polygon points="192,150 256,190 256,215 192,175" fill="#34D399" />
+      <polygon points="256,190 320,150 320,175 256,215" fill="#10B981" />
+      
+      <!-- Center Core Pulse -->
+      <circle cx="256" cy="150" r="8" fill="#059669" />
+      <circle cx="256" cy="150" r="4" fill="#FFFFFF" />
+    </g>
+  </g>
+
+  <!-- Architectural Corner Nodes -->
+  <circle cx="152" cy="240" r="4" fill="#6EE7B7" />
+  <circle cx="360" cy="240" r="4" fill="#6EE7B7" />
+  <circle cx="256" cy="95" r="5" fill="#FFFFFF" />
+</svg>

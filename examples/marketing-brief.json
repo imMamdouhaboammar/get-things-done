@@ -1,0 +1,79 @@
+{
+  "version": "1.0",
+  "title": "Lead generation campaign reset",
+  "domain": "marketing",
+  "intent": {
+    "problem": "Campaign activity is high but qualified lead volume is flat",
+    "desired_outcome": "Increase qualified lead volume with measurable channel and message tests",
+    "actor": "B2B marketing team"
+  },
+  "status": "ready",
+  "scope": {
+    "in": [
+      "audience diagnosis",
+      "offer/message hypotheses",
+      "paid channel tests",
+      "measurement"
+    ],
+    "out": [
+      "full website redesign"
+    ],
+    "constraints": [
+      "fixed monthly media budget",
+      "sales qualification definition must remain unchanged"
+    ]
+  },
+  "knowledge": {
+    "facts": [
+      "Qualified lead volume is the business outcome"
+    ],
+    "assumptions": [
+      "Message-market mismatch is a plausible contributor"
+    ],
+    "unknowns": [
+      "Current lead-to-opportunity rate by campaign"
+    ]
+  },
+  "decisions": [
+    {
+      "decision": "Use qualified leads as primary campaign decision metric",
+      "rationale": "It is closer to the business outcome than click volume",
+      "reversible": true
+    }
+  ],
+  "workstreams": [
+    {
+      "name": "Measurement audit",
+      "outcome": "Reliable baseline and test readout",
+      "dependencies": []
+    },
+    {
+      "name": "Offer and message tests",
+      "outcome": "Identify combinations that increase qualified response",
+      "dependencies": [
+        "Measurement audit"
+      ]
+    }
+  ],
+  "deliverables": [
+    "Measurement audit",
+    "Test matrix",
+    "Campaign readout rule"
+  ],
+  "risks": [
+    "Sales follow-up differences could confound lead quality"
+  ],
+  "domain_data": {
+    "audience": "Priority B2B decision makers",
+    "measurement": "qualified lead volume and lead-to-opportunity rate"
+  },
+  "verification": {
+    "success_criteria": [
+      "Every test has a decision rule before launch",
+      "Qualified lead tracking is reconciled with sales data"
+    ],
+    "evidence": []
+  },
+  "next_action": "Audit campaign-to-CRM qualified lead mapping before drafting new creative",
+  "blockers": []
+}
