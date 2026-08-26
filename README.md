@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ Get Things Done (GTD) Skill Pack
+# Get Things Done (GTD)
 
 **The autonomous execution and work modeling engine for AI agents.**  
 *Convert messy, unclear ideas into verifiable, executable work models and deliver real outcomes.*
