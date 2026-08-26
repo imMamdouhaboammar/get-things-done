@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ Get Things Done (GTD) Enterprise Skill Pack
+# Get Things Done (GTD)
 
 **Autonomous Work Modeling, Deterministic Delivery & Governance Engine for AI Agents.**  
 *Transforming unstructured intent into verified, auditable, and production-ready outcomes across enterprise teams.*
