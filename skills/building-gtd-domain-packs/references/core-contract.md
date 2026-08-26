@@ -1,111 +1,205 @@
 # GTD Core Contract
 
-This contract is inherited by every domain pack
+Every domain pack inherits this contract
 
-## Canonical distinctions
+## 1. Canonical knowledge ledger
 
-Every important statement belongs to exactly one bucket
+Every important statement belongs to one category
 
-- **Fact**: supported by observed evidence, a trusted source, or the user's explicit statement
-- **Assumption**: a provisional belief used to keep work moving
-- **Decision**: a chosen option that changes what will be done
-- **Unknown**: information not yet known and not yet accepted as an Assumption
+- **Fact**: supported by observed evidence, a trusted source, or an explicit user statement
+- **Assumption**: a provisional belief accepted to keep work moving
+- **Decision**: a selected option that changes what will be done
+- **Unknown**: information not yet known and not accepted as an Assumption
 
 Never silently move an Unknown to Fact
 
-## Decision authority
+When evidence contradicts an existing Fact, downgrade the old statement and resolve the conflict before depending on it
 
-Facts are the agent's job to discover when tools or sources are available
+## 2. Decision authority
 
-The agent may choose a reversible, low-risk Assumption when waiting costs more than being wrong. Mark it as an Assumption and state how it could be corrected
+Discover Facts yourself when the environment, files, code, connected tools, or current public sources can answer them
 
-Ask the user for a Decision when the choice is high-impact, hard to reverse, preference-heavy, financially material, publicly committing, identity-sensitive, or changes the requested outcome
+The agent may select an Assumption only when all are true
 
-If the user asks for best effort without questions, select the safest reasonable Assumption and keep it explicit
+1. the choice is reversible
+2. the downside of being wrong is limited
+3. waiting costs more than correction
+4. the Assumption is recorded visibly
 
-## Work states
+Ask the user for a Decision when the choice is high impact, hard to reverse, preference heavy, financially material, publicly committing, identity sensitive, safety sensitive, or changes the requested outcome
 
-Use one current status:
+If the user explicitly requests best effort without questions, choose the safest reasonable reversible Assumption and record it
+
+## 3. Work states
+
+Use one current status
 
 `captured`, `clarifying`, `researching`, `modeling`, `ready`, `executing`, `verifying`, `done`, `blocked`
 
-## Mode router
+### State meanings
 
-| Signal | Mode |
+| State | Meaning | Exit condition |
+|---|---|---|
+| captured | intent received but not yet modeled | blocker classified |
+| clarifying | desired outcome or material meaning is unclear | blocking ambiguity resolved |
+| researching | a discoverable Fact is missing | evidence collected or research blocker recorded |
+| modeling | work structure is being made executable | Definition of Ready passes |
+| ready | next action can be executed safely | execution requested or handoff produced |
+| executing | actions are changing artifacts or external state | deliverable exists or a new blocker appears |
+| verifying | result exists and is being checked | Definition of Done passes or gaps return to execution |
+| done | promised outcome has evidence-backed completion | terminal unless scope changes |
+| blocked | progress requires unavailable authority, dependency, evidence, or capability | blocker removed |
+
+Do not use state changes as decoration. A state change must correspond to changed evidence or changed executability
+
+## 4. Mode router
+
+Select the smallest mode that addresses the current blocker
+
+| Signal | Active mode |
 |---|---|
-| desired outcome is unclear | clarify |
+| desired outcome or meaning is materially unclear | clarify |
 | a discoverable fact is missing | research |
-| scope contains multiple independent outcomes | decompose |
-| alternatives conflict | decide |
-| feasibility is uncertain | validate |
-| enough context exists | model |
-| model is ready and delivery is requested | execute |
-| deliverable exists | verify |
+| scope contains multiple independently valuable outcomes | decompose |
+| alternatives conflict and choice changes the work | decide |
+| feasibility, risk, or success is uncertain | validate |
+| enough context exists but work is not executable yet | model |
+| Ready passes and delivery was requested | execute |
+| a deliverable exists and needs proof | verify |
 
 Do not run every mode by default
 
-## Question policy
+After each cycle, classify again. The next blocker may require a different mode
 
-Do not question-dump
+## 5. Question policy
 
-Ask only when the answer blocks material progress. Prefer one blocking decision at a time. If the user asks for an interview or several independent blocking decisions exist, batch only the current decision frontier
+Ask only when the answer blocks material progress
 
-Do not ask the user to find a Fact the agent can obtain from files, code, tools, connectors, or current public sources
+Prefer one blocking Decision at a time. Batch questions only when they belong to the same current decision frontier and are independent of each other
 
-## Definition of Ready
+A question should pass this test before asking
 
-Work is Ready when all are true:
+- Can I obtain the answer myself
+- Will the answer change scope, execution, risk, cost, preference, or verification
+- Is the decision required before the next executable action
 
-1. Outcome is understandable
-2. Actor, beneficiary, or target is known when relevant
-3. Scope is bounded enough for the next executable action
-4. Critical constraints are visible
-5. Blocking Decisions are resolved
-6. Critical Assumptions are visible
-7. Success can be checked
-8. A next executable action exists
+If the first answer is yes, research instead of asking
 
-Not every Unknown must be resolved. Only blocking Unknowns prevent Ready
+## 6. Decomposition rule
 
-## Execution rule
+Split work when one brief contains multiple outcomes that could be accepted, rejected, or delivered independently
 
-A plan is not progress by itself
+A workstream should have
 
-Every execution cycle should end in at least one concrete result: a Decision made, an artifact produced or changed, an external action executed, or evidence collected
+- one observable outcome
+- explicit dependencies
+- a completion check
+- a clear reason it belongs inside the current scope
 
-If none happened, the cycle remained analysis
+Do not decompose by arbitrary technical layers when the pieces cannot deliver value independently
 
-## Review lenses
+## 7. Definition of Ready
 
-Before execution or final completion, review through:
+Work is Ready when all are true
 
-1. Outcome
-2. Domain
-3. Execution
-4. Verification
+1. desired outcome is understandable
+2. actor, beneficiary, or target is known when relevant
+3. scope is bounded enough for the next action
+4. critical constraints are visible
+5. blocking Decisions are resolved
+6. critical Assumptions are visible
+7. blocking Unknowns are represented as blockers rather than hidden
+8. success can be checked
+9. one next executable action exists
 
-Domain packs may add lenses but must not remove these
+Not every Unknown must disappear. Only blocking Unknowns prevent Ready
 
-## Definition of Done
+## 8. Execution contract
 
-Work is Done only when:
+A plan is not execution
 
-1. Promised deliverables exist
-2. Verification evidence is recorded
-3. Remaining limitations, risks, and rejected checks are explicit
-4. The result can be understood without reconstructing hidden reasoning
-5. A next executable action or clean Handoff exists when more work remains
+Every execution cycle should end with at least one concrete progress unit
+
+- Decision made
+- artifact produced or changed
+- external action executed
+- evidence collected
+
+Prefer the smallest action that materially reduces uncertainty or moves the requested outcome
+
+If the runtime cannot perform the requested action, return the executable model, exact blocker, and next executable action rather than implying completion
+
+## 9. Review protocol
+
+Review substantial work through four mandatory lenses
+
+### Outcome
+
+Does the result solve the requested problem rather than merely satisfy the proposed solution
+
+### Domain
+
+Does it respect field-specific vocabulary, constraints, risks, and quality checks
+
+### Execution
+
+Are dependencies, ordering, ownership, interfaces, failure paths, and next actions coherent
+
+### Verification
+
+Can success be observed, reproduced, or inspected, and does the evidence actually support the claim
+
+Domain packs may add lenses but cannot remove these four
+
+## 10. Evidence discipline
+
+Prefer direct evidence over confidence language
+
+Useful evidence includes
+
+- command output
+- passing tests
+- inspected file contents
+- validated schema output
+- screenshots or rendered artifacts where visual correctness matters
+- external action receipts or returned IDs
+- measured metrics against an explicit baseline
+- cited source evidence for research claims
+
+Agent statements such as "done", "looks good", "should work", or "implemented" are not evidence
+
+## 11. Definition of Done
+
+Work is Done only when all are true
+
+1. promised deliverables exist
+2. required success criteria have supporting evidence
+3. unresolved blockers are empty
+4. remaining limitations, risks, and intentionally skipped checks are explicit
+5. the result can be understood without hidden reasoning
+6. more work, if any, has a next executable action or clean handoff
 
 Never claim Done from confidence alone
 
-## Handoff contract
+If a deliverable exists but proof is incomplete, use `verifying`, not `done`
 
-A Handoff preserves the current outcome, status, scope, important Facts, Assumptions, Decisions and Unknowns, artifacts or paths, verification evidence, blockers, and the next executable action
+## 12. Handoff contract
+
+A handoff preserves
+
+- current outcome and status
+- in-scope and out-of-scope boundaries
+- important Facts, Assumptions, Decisions, Unknowns
+- artifacts, paths, URLs, or external IDs
+- verification evidence and missing checks
+- blockers and their owners when known
+- next executable action
+- suggested domain or specialist skills when useful
 
 Reference existing artifacts instead of duplicating them
 
-## Tool honesty
+## 13. Tool honesty
 
-Never imply that a file, connector, repository, website, command, or external action was accessed when it was not
+Never imply that a file, connector, repository, website, command, source, or external action was accessed when it was not
 
-If execution is unavailable, return the executable model, blocker, and next executable action
+Never fabricate tool output, test results, IDs, metrics, citations, or completion evidence
