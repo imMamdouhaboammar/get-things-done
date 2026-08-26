@@ -10,8 +10,31 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-STATUSES = {"captured", "clarifying", "researching", "modeling", "ready", "executing", "verifying", "done", "blocked"}
-REQUIRED_TOP = ["version", "title", "domain", "intent", "status", "scope", "knowledge", "decisions", "workstreams", "deliverables", "verification", "next_action"]
+STATUSES = {
+    "captured",
+    "clarifying",
+    "researching",
+    "modeling",
+    "ready",
+    "executing",
+    "verifying",
+    "done",
+    "blocked",
+}
+REQUIRED_TOP = [
+    "version",
+    "title",
+    "domain",
+    "intent",
+    "status",
+    "scope",
+    "knowledge",
+    "decisions",
+    "workstreams",
+    "deliverables",
+    "verification",
+    "next_action",
+]
 NESTED_REQUIRED = {
     "intent": ["problem", "desired_outcome", "actor"],
     "scope": ["in", "out", "constraints"],
@@ -74,10 +97,65 @@ def validate_brief(payload: Any) -> list[str]:
         for key in keys:
             if key not in obj:
                 errors.append(f"missing required field: {parent}.{key}")
-    for key in ("decisions", "workstreams", "deliverables"):
-        if not isinstance(payload.get(key), list):
+    for key in ("decisions", "open_decisions", "workstreams", "deliverables", "risks", "blockers"):
+        if key in payload and not isinstance(payload.get(key), list):
             errors.append(f"{key} must be an array")
     return errors
+
+
+def _nonempty_text(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def readiness_gaps(payload: dict[str, Any]) -> list[str]:
+    """Return deterministic structural gaps for the core Definition of Ready."""
+    gaps: list[str] = []
+    intent = payload.get("intent") if isinstance(payload.get("intent"), dict) else {}
+    scope = payload.get("scope") if isinstance(payload.get("scope"), dict) else {}
+    verification = payload.get("verification") if isinstance(payload.get("verification"), dict) else {}
+
+    if not _nonempty_text(intent.get("desired_outcome")):
+        gaps.append("desired outcome is empty")
+    if not scope.get("in"):
+        gaps.append("in-scope work is empty")
+    if payload.get("open_decisions"):
+        gaps.append("blocking decisions remain open")
+    if payload.get("blockers"):
+        gaps.append("blockers remain")
+    if not verification.get("success_criteria"):
+        gaps.append("success criteria are empty")
+    if not _nonempty_text(payload.get("next_action")):
+        gaps.append("next executable action is missing")
+    return gaps
+
+
+def done_gaps(payload: dict[str, Any]) -> list[str]:
+    """Return deterministic structural gaps for the core Definition of Done."""
+    gaps: list[str] = []
+    verification = payload.get("verification") if isinstance(payload.get("verification"), dict) else {}
+
+    if not payload.get("deliverables"):
+        gaps.append("deliverables are empty")
+    if not verification.get("success_criteria"):
+        gaps.append("success criteria are empty")
+    if not verification.get("evidence"):
+        gaps.append("verification evidence is empty")
+    if payload.get("open_decisions"):
+        gaps.append("blocking decisions remain open")
+    if payload.get("blockers"):
+        gaps.append("blockers remain")
+    return gaps
+
+
+def assess_brief(payload: dict[str, Any]) -> dict[str, Any]:
+    ready_gaps = readiness_gaps(payload)
+    completion_gaps = done_gaps(payload)
+    return {
+        "ready": not ready_gaps,
+        "done": not completion_gaps,
+        "ready_gaps": ready_gaps,
+        "done_gaps": completion_gaps,
+    }
 
 
 def cmd_doctor(args: argparse.Namespace) -> int:
@@ -90,8 +168,6 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         skill / "references/execution-brief.schema.json",
         skill / "templates/execution-brief.md",
     ]
-    # In a full bundle also verify the companion builder, but do not require it
-    # when this skill is installed or uploaded by itself.
     builder = root / "skills/building-gtd-domain-packs/SKILL.md"
     if (root / "skills").is_dir():
         required.append(builder)
@@ -131,17 +207,50 @@ def valid_slug(value: str) -> str:
 
 def domain_template(slug: str, name: str) -> str:
     lines = [
-        "---", f"domain: {slug}", "version: 1", "extends: gtd-core-v1", "---", "",
-        f"# GTD Domain Pack: {name}", "", "## Selection signals", "",
-        "Describe tasks and intent patterns that indicate this field", "", "## Domain vocabulary", "",
-        "List concepts that must remain distinct", "", "## Diagnostic questions", "",
-        "List only questions whose answers can materially change the work", "", "## Extra brief fields", "",
-        "List optional keys stored under `domain_data`", "", "## Readiness additions", "",
-        "List extra checks before execution", "", "## Workstream patterns", "",
-        "List 2 to 4 reusable decompositions", "", "## Review additions", "",
-        "List field-specific review lenses", "", "## Completion checks", "",
-        "List observable evidence required for completion", "", "## Common traps", "",
-        "List productive-looking failure patterns", "",
+        "---",
+        f"domain: {slug}",
+        "version: 1",
+        "extends: gtd-core-v1",
+        "---",
+        "",
+        f"# GTD Domain Pack: {name}",
+        "",
+        "## Selection signals",
+        "",
+        "Describe tasks and intent patterns that indicate this field, plus at least one non-selection signal",
+        "",
+        "## Domain vocabulary",
+        "",
+        "List concepts that must remain distinct because confusing them changes the work",
+        "",
+        "## Diagnostic questions",
+        "",
+        "List only questions whose answers can materially change scope, decisions, execution, risk, or verification",
+        "",
+        "## Extra brief fields",
+        "",
+        "List optional keys stored under `domain_data`",
+        "",
+        "## Readiness additions",
+        "",
+        "List observable extra checks before execution",
+        "",
+        "## Workstream patterns",
+        "",
+        "List 2 to 4 reusable decompositions with outcomes and dependency edges",
+        "",
+        "## Review additions",
+        "",
+        "List field-specific checks that catch plausible near-misses",
+        "",
+        "## Completion checks",
+        "",
+        "List observable evidence required for completion",
+        "",
+        "## Common traps",
+        "",
+        "List productive-looking failure patterns",
+        "",
     ]
     return "\n".join(lines)
 
@@ -165,15 +274,22 @@ def cmd_new_domain(args: argparse.Namespace) -> int:
 
 def blank_brief(title: str, domain: str | None) -> dict[str, Any]:
     return {
-        "version": "1.0", "title": title, "domain": domain,
+        "version": "1.0",
+        "title": title,
+        "domain": domain,
         "intent": {"problem": "", "desired_outcome": "", "actor": None},
         "status": "captured",
         "scope": {"in": [], "out": [], "constraints": []},
         "knowledge": {"facts": [], "assumptions": [], "unknowns": []},
-        "decisions": [], "workstreams": [], "deliverables": [], "risks": [],
+        "decisions": [],
+        "open_decisions": [],
+        "workstreams": [],
+        "deliverables": [],
+        "risks": [],
         "domain_data": {},
         "verification": {"success_criteria": [], "evidence": []},
-        "next_action": None, "blockers": [],
+        "next_action": None,
+        "blockers": [],
     }
 
 
@@ -209,26 +325,109 @@ def cmd_validate_brief(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_assess_brief(args: argparse.Namespace) -> int:
+    path = Path(args.path).expanduser().resolve()
+    try:
+        payload = read_json(path)
+    except Exception as exc:
+        print(f"INVALID: cannot read JSON: {exc}")
+        return 1
+    errors = validate_brief(payload)
+    if errors:
+        print("INVALID")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+
+    assessment = assess_brief(payload)
+    if args.json:
+        print(json.dumps(assessment, indent=2))
+    else:
+        print(f"READY: {'YES' if assessment['ready'] else 'NO'}")
+        for gap in assessment["ready_gaps"]:
+            print(f"- ready gap: {gap}")
+        print(f"DONE: {'YES' if assessment['done'] else 'NO'}")
+        for gap in assessment["done_gaps"]:
+            print(f"- done gap: {gap}")
+    return 0
+
+
 def render_brief(payload: dict[str, Any]) -> str:
     def bullets(items: list[Any]) -> str:
         return "\n".join(f"- {item}" for item in items) if items else "- None recorded"
+
     intent, scope = payload["intent"], payload["scope"]
     knowledge, verification = payload["knowledge"], payload["verification"]
     decisions = payload.get("decisions", [])
     workstreams = payload.get("workstreams", [])
-    decision_rows = "\n".join(f"| {d.get('decision','')} | {d.get('rationale','')} | {d.get('reversible','')} |" for d in decisions) or "| None | | |"
-    work_rows = "\n".join(f"| {w.get('name','')} | {w.get('outcome','')} | {', '.join(w.get('dependencies', []))} |" for w in workstreams) or "| None | | |"
+    decision_rows = "\n".join(
+        f"| {d.get('decision','')} | {d.get('rationale','')} | {d.get('reversible','')} |" for d in decisions
+    ) or "| None | | |"
+    work_rows = "\n".join(
+        f"| {w.get('name','')} | {w.get('outcome','')} | {', '.join(w.get('dependencies', []))} |" for w in workstreams
+    ) or "| None | | |"
     parts = [
-        f"# Execution Brief: {payload['title']}", "", "## Outcome",
-        f"- Problem: {intent.get('problem','')}", f"- Desired outcome: {intent.get('desired_outcome','')}",
-        f"- Actor: {intent.get('actor')}", f"- Status: {payload.get('status')}", f"- Domain: {payload.get('domain')}", "",
-        "## Scope", "### In", bullets(scope.get('in', [])), "", "### Out", bullets(scope.get('out', [])), "", "### Constraints", bullets(scope.get('constraints', [])), "",
-        "## Knowledge Ledger", "### Facts", bullets(knowledge.get('facts', [])), "", "### Assumptions", bullets(knowledge.get('assumptions', [])), "", "### Unknowns", bullets(knowledge.get('unknowns', [])), "",
-        "## Decisions", "| Decision | Rationale | Reversible |", "|---|---|---|", decision_rows, "",
-        "## Workstreams", "| Workstream | Outcome | Dependencies |", "|---|---|---|", work_rows, "",
-        "## Deliverables", bullets(payload.get('deliverables', [])), "", "## Risks", bullets(payload.get('risks', [])), "",
-        "## Verification", "### Success criteria", bullets(verification.get('success_criteria', [])), "", "### Evidence", bullets(verification.get('evidence', [])), "",
-        "## Blockers", bullets(payload.get('blockers', [])), "", "## Next executable action", f"- {payload.get('next_action') or 'Not set'}", "",
+        f"# Execution Brief: {payload['title']}",
+        "",
+        "## Outcome",
+        f"- Problem: {intent.get('problem','')}",
+        f"- Desired outcome: {intent.get('desired_outcome','')}",
+        f"- Actor: {intent.get('actor')}",
+        f"- Status: {payload.get('status')}",
+        f"- Domain: {payload.get('domain')}",
+        "",
+        "## Scope",
+        "### In",
+        bullets(scope.get("in", [])),
+        "",
+        "### Out",
+        bullets(scope.get("out", [])),
+        "",
+        "### Constraints",
+        bullets(scope.get("constraints", [])),
+        "",
+        "## Knowledge Ledger",
+        "### Facts",
+        bullets(knowledge.get("facts", [])),
+        "",
+        "### Assumptions",
+        bullets(knowledge.get("assumptions", [])),
+        "",
+        "### Unknowns",
+        bullets(knowledge.get("unknowns", [])),
+        "",
+        "## Decisions",
+        "| Decision | Rationale | Reversible |",
+        "|---|---|---|",
+        decision_rows,
+        "",
+        "## Open Decisions",
+        bullets(payload.get("open_decisions", [])),
+        "",
+        "## Workstreams",
+        "| Workstream | Outcome | Dependencies |",
+        "|---|---|---|",
+        work_rows,
+        "",
+        "## Deliverables",
+        bullets(payload.get("deliverables", [])),
+        "",
+        "## Risks",
+        bullets(payload.get("risks", [])),
+        "",
+        "## Verification",
+        "### Success criteria",
+        bullets(verification.get("success_criteria", [])),
+        "",
+        "### Evidence",
+        bullets(verification.get("evidence", [])),
+        "",
+        "## Blockers",
+        bullets(payload.get("blockers", [])),
+        "",
+        "## Next executable action",
+        f"- {payload.get('next_action') or 'Not set'}",
+        "",
     ]
     return "\n".join(parts)
 
@@ -268,7 +467,7 @@ def cmd_package(args: argparse.Namespace) -> int:
             for f in sorted(s_dir.rglob("*")):
                 if f.is_file() and not f.name.startswith(".DS_Store") and "__pycache__" not in f.parts:
                     zf.write(f, arcname=str(f.relative_to(s_dir)))
-        print(f"📦 Built {dest_zip.name} ({dest_zip.stat().st_size:,} bytes)")
+        print(f"Built {dest_zip.name} ({dest_zip.stat().st_size:,} bytes)")
         count += 1
     print(f"PASS: packaged {count} standalone skill bundles to {out_dir}")
     return 0
@@ -277,13 +476,49 @@ def cmd_package(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="gtd", description="Get Things Done skill pack utilities")
     sub = p.add_subparsers(dest="command", required=True)
-    x = sub.add_parser("doctor"); x.add_argument("--root"); x.set_defaults(func=cmd_doctor)
-    x = sub.add_parser("list-domains"); x.add_argument("--root"); x.set_defaults(func=cmd_list_domains)
-    x = sub.add_parser("new-domain"); x.add_argument("slug"); x.add_argument("--name"); x.add_argument("--output"); x.add_argument("--root"); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_new_domain)
-    x = sub.add_parser("new-brief"); x.add_argument("--title", required=True); x.add_argument("--domain"); x.add_argument("--out", required=True); x.add_argument("--force", action="store_true"); x.set_defaults(func=cmd_new_brief)
-    x = sub.add_parser("validate-brief"); x.add_argument("path"); x.add_argument("--root"); x.set_defaults(func=cmd_validate_brief)
-    x = sub.add_parser("render-brief"); x.add_argument("path"); x.add_argument("--out"); x.set_defaults(func=cmd_render_brief)
-    x = sub.add_parser("package"); x.add_argument("--out"); x.add_argument("--root"); x.set_defaults(func=cmd_package)
+
+    x = sub.add_parser("doctor")
+    x.add_argument("--root")
+    x.set_defaults(func=cmd_doctor)
+
+    x = sub.add_parser("list-domains")
+    x.add_argument("--root")
+    x.set_defaults(func=cmd_list_domains)
+
+    x = sub.add_parser("new-domain")
+    x.add_argument("slug")
+    x.add_argument("--name")
+    x.add_argument("--output")
+    x.add_argument("--root")
+    x.add_argument("--force", action="store_true")
+    x.set_defaults(func=cmd_new_domain)
+
+    x = sub.add_parser("new-brief")
+    x.add_argument("--title", required=True)
+    x.add_argument("--domain")
+    x.add_argument("--out", required=True)
+    x.add_argument("--force", action="store_true")
+    x.set_defaults(func=cmd_new_brief)
+
+    x = sub.add_parser("validate-brief")
+    x.add_argument("path")
+    x.add_argument("--root")
+    x.set_defaults(func=cmd_validate_brief)
+
+    x = sub.add_parser("assess-brief")
+    x.add_argument("path")
+    x.add_argument("--json", action="store_true")
+    x.set_defaults(func=cmd_assess_brief)
+
+    x = sub.add_parser("render-brief")
+    x.add_argument("path")
+    x.add_argument("--out")
+    x.set_defaults(func=cmd_render_brief)
+
+    x = sub.add_parser("package")
+    x.add_argument("--out")
+    x.add_argument("--root")
+    x.set_defaults(func=cmd_package)
     return p
 
 
@@ -291,6 +526,6 @@ def main() -> int:
     args = build_parser().parse_args()
     return int(args.func(args))
 
+
 if __name__ == "__main__":
     raise SystemExit(main())
-
