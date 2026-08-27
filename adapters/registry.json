@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "canonical_standard": "Agent Skills",
+  "plugin_standard": "Agent Plugins 1.0.0",
+  "adapters": [
+    {"id":"agent-skills","label":"Agent Skills / Universal","family":"standard","support":"native-standard","kind":"skills","project_path":".agents/skills","export":"skills-layout"},
+    {"id":"agent-plugins","label":"Agent Plugins","family":"standard","support":"native-standard","kind":"plugin","manifest":"plugin.json","export":"agent-plugin"},
+    {"id":"claude-ai","label":"Claude AI Skills","family":"anthropic","support":"portable","kind":"skills","project_path":".claude/skills","export":"skills-layout"},
+    {"id":"claude-code","label":"Claude Code","family":"anthropic","support":"first-class","kind":"skills+plugin","project_path":".claude/skills","manifest":".claude-plugin/plugin.json","export":"claude-plugin"},
+    {"id":"claude-marketplace","label":"Claude Marketplace","family":"anthropic","support":"first-class","kind":"marketplace","manifest":".claude-plugin/marketplace.json","export":"claude-plugin"},
+    {"id":"claude-cowork","label":"Claude Cowork","family":"anthropic","support":"first-class","kind":"skills+plugin","project_path":".claude/skills","manifest":".claude-plugin/plugin.json","export":"claude-plugin"},
+    {"id":"chatgpt-web","label":"ChatGPT Web","family":"openai","support":"first-class","kind":"plugin","manifest":".codex-plugin/plugin.json","export":"openai-plugin"},
+    {"id":"chatgpt-work","label":"ChatGPT Work","family":"openai","support":"first-class","kind":"plugin","manifest":".codex-plugin/plugin.json","export":"openai-plugin"},
+    {"id":"chatgpt-plugin","label":"ChatGPT Plugin","family":"openai","support":"first-class","kind":"plugin","manifest":".codex-plugin/plugin.json","export":"openai-plugin"},
+    {"id":"codex","label":"Codex","family":"openai","support":"first-class","kind":"skills+plugin","project_path":".agents/skills","manifest":".codex-plugin/plugin.json","export":"openai-plugin"},
+    {"id":"cursor","label":"Cursor","family":"cursor","support":"first-class","kind":"skills","project_path":".cursor/skills","fallback_path":".agents/skills","export":"skills-layout"},
+    {"id":"kimi","label":"Kimi Code","family":"moonshot","support":"first-class","kind":"skills+plugin","project_path":".kimi-code/skills","fallback_path":".agents/skills","manifest":"kimi.plugin.json","export":"kimi-plugin"},
+    {"id":"grok","label":"Grok Build","family":"xai","support":"first-class","kind":"skills","project_path":".grok/skills","fallback_path":".agents/skills","export":"skills-layout"},
+    {"id":"deepseek","label":"DeepSeek DeepCode","family":"deepseek","support":"first-class","kind":"skills","project_path":".deepcode/skills","fallback_path":".agents/skills","export":"skills-layout"},
+    {"id":"skills-sh","label":"Vercel skills.sh","family":"distribution","support":"first-class","kind":"registry","manifest":"skills.sh.json","export":"skills-sh"},
+    {"id":"skill-kit","label":"Contentful Skill Kit","family":"authoring","support":"authoring-bridge","kind":"authoring","export":"skill-kit-bridge"},
+    {"id":"glama","label":"Glama","family":"mcp","support":"conditional","kind":"mcp-registry","export":"conditional-mcp","requires":"mcp.json"}
+  ]
+}
