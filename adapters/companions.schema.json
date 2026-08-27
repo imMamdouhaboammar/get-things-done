@@ -13,7 +13,21 @@
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["id", "label", "kind", "relationship", "companion_role", "ownership", "integration", "guardrails"],
+        "required": [
+          "id",
+          "label",
+          "kind",
+          "relationship",
+          "companion_role",
+          "ownership",
+          "integration",
+          "inputs",
+          "outputs",
+          "evidence_contract",
+          "failure_policy",
+          "authority_boundary",
+          "guardrails"
+        ],
         "properties": {
           "id": {"type": "string", "minLength": 1, "pattern": "^[a-z0-9][a-z0-9-]*$"},
           "label": {"type": "string", "minLength": 1},
@@ -31,6 +45,21 @@
             "additionalProperties": false
           },
           "integration": {"type": "string", "minLength": 1},
+          "inputs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "outputs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "evidence_contract": {"type": "string", "minLength": 1},
+          "failure_policy": {"type": "string", "minLength": 1},
+          "authority_boundary": {"type": "string", "minLength": 1},
           "guardrails": {
             "type": "array",
             "minItems": 1,
