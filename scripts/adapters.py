@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import shutil
 import sys
 import zipfile
@@ -13,6 +14,14 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL_NAMES = ("get-things-done", "building-gtd-domain-packs")
 SAFE_PATH_FIELDS = ("project_path", "fallback_path", "manifest", "requires")
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
+RETIRED_REPO_NAME = "get-things-done-skillpack"
+SEMVER_PATTERN = re.compile(
+    r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"
+)
+
+
+def is_valid_semver(version: Any) -> bool:
+    return isinstance(version, str) and bool(SEMVER_PATTERN.match(version))
 
 
 def load_registry(root: Path = ROOT) -> dict[str, Any]:
@@ -181,9 +190,29 @@ def validate_manifests(root: Path = ROOT) -> list[str]:
             errors.append(f"missing manifest: {label}")
             continue
         try:
-            parsed[label] = json.loads(path.read_text(encoding="utf-8"))
+            content = path.read_text(encoding="utf-8")
+            if RETIRED_REPO_NAME in content:
+                errors.append(f"{label}: references retired repository identity {RETIRED_REPO_NAME}")
+            parsed[label] = json.loads(content)
         except Exception as exc:
             errors.append(f"invalid JSON {label}: {exc}")
+
+    # SemVer and version consistency check
+    versions: dict[str, str] = {}
+    for label in ("plugin.json", ".codex-plugin/plugin.json", ".claude-plugin/plugin.json", "kimi.plugin.json"):
+        data = parsed.get(label)
+        if isinstance(data, dict) and "version" in data:
+            ver = data["version"]
+            if not is_valid_semver(ver):
+                errors.append(f"{label}: invalid semver: {ver}")
+            else:
+                versions[label] = str(ver)
+    if versions:
+        first_ver = next(iter(versions.values()))
+        for label, ver in versions.items():
+            if ver != first_ver:
+                errors.append(f"{label}: version mismatch ({ver} != {first_ver})")
+
     ap = parsed.get("plugin.json", {})
     if ap.get("$schema") != "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json":
         errors.append("plugin.json must declare Agent Plugins 1.0.0 schema")
@@ -213,8 +242,12 @@ def validate_manifests(root: Path = ROOT) -> list[str]:
     formula = root / "Formula" / "get-things-done.rb"
     if not formula.is_file():
         errors.append("missing Homebrew formula: Formula/get-things-done.rb")
-    elif "class GetThingsDone < Formula" not in formula.read_text(encoding="utf-8"):
-        errors.append("Homebrew formula class mismatch")
+    else:
+        formula_text = formula.read_text(encoding="utf-8")
+        if "class GetThingsDone < Formula" not in formula_text:
+            errors.append("Homebrew formula class mismatch")
+        if RETIRED_REPO_NAME in formula_text:
+            errors.append(f"Formula/get-things-done.rb: references retired repository identity {RETIRED_REPO_NAME}")
     return errors
 
 
