@@ -3,8 +3,9 @@
   "$id": "https://github.com/imMamdouhaboammar/get-things-done/blob/main/adapters/companions.schema.json",
   "title": "Get Things Done companion interoperability registry",
   "type": "object",
-  "required": ["schema_version", "purpose", "companions"],
+  "required": ["$schema", "schema_version", "purpose", "companions"],
   "properties": {
+    "$schema": {"const": "./companions.schema.json"},
     "schema_version": {"type": "string"},
     "purpose": {"type": "string", "minLength": 1},
     "companions": {
