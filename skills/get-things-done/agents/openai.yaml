@@ -8,3 +8,15 @@ categories:
 - productivity
 - project-management
 - workflow-automation
+interface:
+  display_name: Get Things Done
+  short_description: Turn fuzzy work into executable action
+  icon_small: ../assets/small-logo.svg
+  icon_large: ../assets/large-logo.svg
+  brand_color: '#2563EB'
+  default_prompt: 'Turn this idea into an executable work model with clear facts, decisions, and actions:'
+policy:
+  products:
+  - CHAT
+  - CODEX
+  allow_implicit_invocation: true
