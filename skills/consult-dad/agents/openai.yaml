@@ -1,0 +1,19 @@
+schema_version: v1
+name: consult-dad
+display_name: Consult Dad
+short_description: Grounded senior advisory mode with direct honest guidance and GTD next steps.
+default_prompt: 'Give me a direct, grounded senior advisory assessment on this decision:'
+brand_color: '#D97706'
+categories:
+- productivity
+- leadership
+- decision-making
+interface:
+  display_name: "Consult Dad"
+  short_description: "Grounded senior advisory mode with direct honest guidance and GTD next steps"
+  icon_small: "./assets/small-logo.svg"
+  icon_large: "./assets/large-logo.svg"
+  brand_color: "#D97706"
+  default_prompt: "Use $consult-dad for grounded senior advisory, honest feedback, and GTD action bridge."
+policy:
+  allow_implicit_invocation: true

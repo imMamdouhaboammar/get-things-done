@@ -372,6 +372,7 @@ adapters/
 skills/
   get-things-done/
   building-gtd-domain-packs/
+  consult-dad/
 scripts/
   gtd.py
   adapters.py

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGradDad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D97706" />
+      <stop offset="50%" stop-color="#B45309" />
+      <stop offset="100%" stop-color="#451A03" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE68A" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <radialGradient id="glowDad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FBBF24" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#D97706" stop-opacity="0" />
+    </radialGradient>
+    <filter id="dropShadowDad" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#78350F" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <!-- Base Squircle -->
+  <rect x="40" y="40" width="432" height="432" rx="96" fill="url(#bgGradDad)" stroke="#FFFFFF" stroke-opacity="0.2" stroke-width="4" />
+  <circle cx="256" cy="256" r="180" fill="url(#glowDad)" />
+
+  <!-- Compass / Grounding Star Lines -->
+  <g opacity="0.25" stroke="#FDE68A" stroke-width="1.5">
+    <line x1="256" y1="90" x2="256" y2="422" stroke-dasharray="6 6" />
+    <line x1="90" y1="256" x2="422" y2="256" stroke-dasharray="6 6" />
+    <circle cx="256" cy="256" r="130" fill="none" stroke-width="1" />
+  </g>
+
+  <!-- 3D Senior Advisory Nexus / Lighthouse Pillar -->
+  <g filter="url(#dropShadowDad)">
+    <!-- Base Platform (Grounding Foundation) -->
+    <polygon points="256,360 370,300 256,240 142,300" fill="#78350F" stroke="#FDE68A" stroke-width="2" stroke-opacity="0.8" />
+    <polygon points="142,300 256,360 256,385 142,325" fill="#451A03" />
+    <polygon points="256,360 370,300 370,325 256,385" fill="#311102" />
+
+    <!-- Lighthouse Beacon Tower / Advisory Core -->
+    <polygon points="230,260 282,260 274,150 238,150" fill="url(#goldGrad)" stroke="#FFFFFF" stroke-width="2" />
+    <polygon points="220,150 292,150 286,135 226,135" fill="#FBBF24" stroke="#FDE68A" stroke-width="2" />
+
+    <!-- Radiant Beacon Light Apex -->
+    <circle cx="256" cy="115" r="22" fill="#FFFFFF" />
+    <circle cx="256" cy="115" r="14" fill="#FDE68A" />
+    <circle cx="256" cy="115" r="6" fill="#D97706" />
+
+    <!-- Dynamic Clarity Beams -->
+    <polygon points="256,115 390,75 380,110" fill="#FFFFFF" fill-opacity="0.3" />
+    <polygon points="256,115 122,75 132,110" fill="#FFFFFF" fill-opacity="0.3" />
+  </g>
+</svg>
