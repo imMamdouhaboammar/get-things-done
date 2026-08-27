@@ -26,10 +26,25 @@ jobs:
         run: |
           pip install pyyaml pytest
 
-      - name: Validate & Package Skills
+      - name: Validate Skills And Adapters
         run: |
           python scripts/catalog_stylist.py --validate
+          python scripts/adapters.py validate
+          pytest -q
+
+      - name: Package Canonical Skills
+        run: |
           python scripts/package_skills.py --out ./dist
+
+      - name: Build Adapter Bundles
+        run: |
+          python scripts/adapters.py export-all --out ./dist/adapters
+          for adapter in agent-skills agent-plugins claude-ai claude-code claude-marketplace claude-cowork chatgpt-web chatgpt-work chatgpt-plugin codex cursor kimi grok deepseek homebrew shell skills-sh skill-kit; do
+            (cd "./dist/adapters/$adapter" && zip -qr "../$adapter.zip" .)
+          done
+          test -f ./dist/adapters/homebrew.zip
+          test -f ./dist/adapters/shell.zip
+          test ! -e ./dist/adapters/glama.zip
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -38,6 +53,7 @@ jobs:
           files: |
             dist/get-things-done.zip
             dist/building-gtd-domain-packs.zip
+            dist/adapters/*.zip
           draft: false
           prerelease: false
           generate_release_notes: true
