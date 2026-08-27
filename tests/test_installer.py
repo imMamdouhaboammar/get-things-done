@@ -37,6 +37,13 @@ def test_dry_run_reports_destinations_without_writing(tmp_path):
     assert not (tmp_path / "home").exists()
 
 
+def test_unknown_named_target_fails_without_writing(tmp_path):
+    result = run_installer(tmp_path, "--target", "unknown-agent")
+    assert result.returncode == 2
+    assert "Unknown target: unknown-agent" in result.stderr
+    assert not (tmp_path / "home").exists()
+
+
 def test_kimi_home_override_controls_install_root(tmp_path):
     kimi_home = tmp_path / "kimi-home"
     result = run_installer(tmp_path, "--target", "kimi", env_overrides={"KIMI_CODE_HOME": str(kimi_home)})
