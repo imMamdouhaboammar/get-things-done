@@ -80,6 +80,15 @@ def test_custom_path_with_spaces_is_supported(tmp_path):
     assert (custom / "get-things-done/SKILL.md").is_file()
 
 
+def test_multiple_custom_paths_install_independently(tmp_path):
+    first = tmp_path / "agent-a/skills"
+    second = tmp_path / "agent-b/skills"
+    result = run_installer(tmp_path, "--target-path", str(first), "--target-path", str(second))
+    assert result.returncode == 0, result.stderr
+    assert (first / "get-things-done/SKILL.md").is_file()
+    assert (second / "get-things-done/SKILL.md").is_file()
+
+
 def test_named_targets_sharing_a_root_are_deduplicated(tmp_path):
     result = run_installer(tmp_path, "--target", "agents", "--target", "codex")
     assert result.returncode == 0, result.stderr
