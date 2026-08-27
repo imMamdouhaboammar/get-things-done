@@ -253,11 +253,20 @@ Role boundaries:
 
 Companion output is evidence or context, not automatic authority. Repository governance and the current code remain the source of truth.
 
+## Release artifact verification
+
+When consuming packaged release archives or exported adapter bundles, verify archive integrity against the published `SHA256SUMS` manifest:
+
+```bash
+python scripts/release_checksums.py dist/adapters --verify dist/adapters/SHA256SUMS
+```
+
 ## Validate every adapter
 
 ```bash
 python scripts/adapters.py validate
-python scripts/adapters.py export-all --out dist/adapters
+python scripts/adapters.py status
+python scripts/adapters.py export-all --out dist/adapters --package --report dist/export-report.json
 ```
 
-`export-all` skips conditional adapters whose prerequisites are absent and reports them separately.
+`export-all` exports all 18 non-conditional targets, writes a machine-readable report, and reports conditional adapters (Glama) separately.
