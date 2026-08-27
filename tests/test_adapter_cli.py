@@ -81,3 +81,13 @@ def test_validate_reports_adapter_and_companion_counts():
     assert result.returncode == 0, result.stderr
     assert "19 adapter contracts" in result.stdout
     assert "5 companion profiles" in result.stdout
+
+
+def test_export_all_package_builds_reproducible_archives(tmp_path):
+    out = tmp_path / "adapters"
+    result = run("export-all", "--out", str(out), "--package")
+    assert result.returncode == 0, result.stderr
+    assert (out / "homebrew.zip").is_file()
+    assert (out / "shell.zip").is_file()
+    assert (out / "codex.zip").is_file()
+    assert not (out / "glama.zip").exists()
