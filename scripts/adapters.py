@@ -387,17 +387,23 @@ def cmd_export_all(args: argparse.Namespace) -> int:
             print(f"- {error}", file=sys.stderr)
         return 2
     exported = 0
+    packaged = 0
     skipped: list[str] = []
     for item in load_registry(root)["adapters"]:
         try:
-            export_adapter(item["id"], out, root)
+            target = export_adapter(item["id"], out, root)
             exported += 1
+            if args.package:
+                package_directory(target)
+                packaged += 1
         except RuntimeError as exc:
             if item.get("support") == "conditional" and "refusing to generate fake support" in str(exc):
                 skipped.append(item["id"])
             else:
                 raise
     print(f"exported: {exported}")
+    if args.package:
+        print(f"packaged: {packaged}")
     if skipped:
         print("conditional: " + ", ".join(skipped))
     return 0
@@ -413,7 +419,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = subs.add_parser("interop"); p.add_argument("companion", nargs="?"); p.set_defaults(func=cmd_interop)
     p = subs.add_parser("validate"); p.set_defaults(func=cmd_validate)
     p = subs.add_parser("export"); p.add_argument("adapter"); p.add_argument("--out", required=True); p.add_argument("--package", action="store_true"); p.set_defaults(func=cmd_export)
-    p = subs.add_parser("export-all"); p.add_argument("--out", required=True); p.set_defaults(func=cmd_export_all)
+    p = subs.add_parser("export-all"); p.add_argument("--out", required=True); p.add_argument("--package", action="store_true"); p.set_defaults(func=cmd_export_all)
     return parser
 
 
