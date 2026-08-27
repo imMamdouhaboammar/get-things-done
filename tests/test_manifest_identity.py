@@ -40,5 +40,6 @@ def test_distribution_manifests_do_not_reference_retired_repository_name():
         ".claude-plugin/plugin.json",
         ".claude-plugin/marketplace.json",
         "kimi.plugin.json",
+        "pyproject.toml",
     ]:
         assert STALE_REPO not in (ROOT / path).read_text(encoding="utf-8")

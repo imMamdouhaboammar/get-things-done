@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "get-things-done-skillpack"
+name = "get-things-done"
 version = "1.2.0"
 description = "Turn messy intent into executable work models with explicit decisions, readiness checks, completion evidence, and multi-host agent adapters."
 readme = "README.md"
@@ -11,6 +11,7 @@ license = { text = "MIT" }
 authors = [
     { name = "Mamdouh Aboammar", email = "mamdouhfces1997@gmail.com" }
 ]
+urls = { Homepage = "https://github.com/imMamdouhaboammar/get-things-done", Repository = "https://github.com/imMamdouhaboammar/get-things-done", Documentation = "https://github.com/imMamdouhaboammar/get-things-done#readme" }
 keywords = [
     "ai-agent",
     "agent-skills",
