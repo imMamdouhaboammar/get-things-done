@@ -44,6 +44,11 @@ jobs:
           test -f ./dist/adapters/codex.zip
           test ! -e ./dist/adapters/glama.zip
 
+      - name: Write Release Checksums
+        run: |
+          python scripts/release_checksums.py ./dist --out ./dist/SHA256SUMS
+          python scripts/release_checksums.py ./dist/adapters --out ./dist/adapters/SHA256SUMS
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
@@ -51,7 +56,9 @@ jobs:
           files: |
             dist/get-things-done.zip
             dist/building-gtd-domain-packs.zip
+            dist/SHA256SUMS
             dist/adapters/*.zip
+            dist/adapters/SHA256SUMS
           draft: false
           prerelease: false
           generate_release_notes: true
