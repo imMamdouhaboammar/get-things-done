@@ -12,6 +12,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 SKILL_NAMES = ("get-things-done", "building-gtd-domain-packs")
 SAFE_PATH_FIELDS = ("project_path", "fallback_path", "manifest", "requires")
+ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 
 
 def load_registry(root: Path = ROOT) -> dict[str, Any]:
@@ -295,7 +296,13 @@ def package_directory(directory: Path) -> Path:
         zip_path.unlink()
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for path in sorted(p for p in directory.rglob("*") if p.is_file()):
-            zf.write(path, path.relative_to(directory))
+            relative = path.relative_to(directory).as_posix()
+            info = zipfile.ZipInfo(relative, date_time=ZIP_TIMESTAMP)
+            info.create_system = 3
+            info.compress_type = zipfile.ZIP_DEFLATED
+            mode = path.stat().st_mode & 0o777
+            info.external_attr = mode << 16
+            zf.writestr(info, path.read_bytes())
     return zip_path
 
 
