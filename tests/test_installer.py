@@ -27,6 +27,14 @@ def test_list_targets_reports_named_shell_hosts_without_installing(tmp_path):
     assert not (tmp_path / "home").exists()
 
 
+def test_dry_run_reports_destinations_without_writing(tmp_path):
+    result = run_installer(tmp_path, "--target", "claude", "--dry-run")
+    assert result.returncode == 0, result.stderr
+    assert "Would install get-things-done" in result.stdout
+    assert ".claude/skills/get-things-done" in result.stdout
+    assert not (tmp_path / "home").exists()
+
+
 def test_default_install_uses_universal_agent_skills_root(tmp_path):
     result = run_installer(tmp_path)
     assert result.returncode == 0, result.stderr
