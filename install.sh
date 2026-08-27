@@ -18,6 +18,7 @@ Multi-host options:
   --target <name>       agents|codex|claude|cursor|kimi|grok|deepseek
   --target-path <dir>   Install to an explicit Agent Skills-compatible root
   --all                 Install to all distinct supported user skill roots
+  --list-targets        Print named shell targets without installing
   --force               Replace existing GTD skill directories
   -h, --help            Show this help
 
@@ -26,6 +27,18 @@ Examples:
   ./install.sh --target claude --target cursor
   ./install.sh --target-path "$HOME/.my-agent/skills"
   ./install.sh --all --force
+EOF
+}
+
+list_targets() {
+  cat <<'EOF'
+agents     ~/.agents/skills
+codex      ~/.agents/skills
+claude     ~/.claude/skills
+cursor     ~/.cursor/skills
+kimi       ${KIMI_CODE_HOME:-~/.kimi-code}/skills
+grok       ~/.grok/skills
+deepseek   ~/.agents/skills
 EOF
 }
 
@@ -42,6 +55,7 @@ while [[ $# -gt 0 ]]; do
       [[ -n "$2" ]] || { echo "--target-path cannot be empty" >&2; exit 2; }
       TARGET_PATHS+=("$2"); shift 2 ;;
     --all) TARGETS+=("agents" "claude" "cursor" "kimi" "grok" "deepseek"); shift ;;
+    --list-targets) list_targets; exit 0 ;;
     --force) FORCE="true"; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; usage >&2; exit 2 ;;
