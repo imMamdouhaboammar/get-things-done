@@ -31,6 +31,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install jsonschema pyyaml pytest pytest-cov
 
+      - name: Bytecode Compilation Check
+        run: |
+          python -m compileall scripts tests
+
       - name: Run Test Suite
         run: |
           pytest -v
@@ -42,12 +46,15 @@ jobs:
       - name: Validate Host Adapter Contracts
         run: |
           python scripts/adapters.py validate
+          python scripts/adapters.py status
+          python scripts/adapters.py capabilities
           python scripts/adapters.py companions
           python scripts/adapters.py interop context7
 
       - name: Smoke All Host Exports
         run: |
-          python scripts/adapters.py export-all --out ./dist/adapters
+          python scripts/adapters.py export-all --out ./dist/adapters --package --report ./dist/export-report.json
+          test -f ./dist/export-report.json
           test -f ./dist/adapters/cursor/.cursor/skills/get-things-done/SKILL.md
           test -f ./dist/adapters/kimi/kimi.plugin.json
           test -f ./dist/adapters/chatgpt-plugin/.codex-plugin/plugin.json
@@ -55,7 +62,16 @@ jobs:
           test -f ./dist/adapters/homebrew/Formula/get-things-done.rb
           test -f ./dist/adapters/shell/install.sh
           test -f ./dist/adapters/shell/skills/get-things-done/SKILL.md
+          test -f ./dist/adapters/homebrew.zip
+          test -f ./dist/adapters/shell.zip
+          test -f ./dist/adapters/codex.zip
           test ! -e ./dist/adapters/glama
+          test ! -e ./dist/adapters/glama.zip
+
+      - name: Verify Release Checksums Generation and Verification
+        run: |
+          python scripts/release_checksums.py ./dist/adapters --out ./dist/adapters/SHA256SUMS
+          python scripts/release_checksums.py ./dist/adapters --verify ./dist/adapters/SHA256SUMS
 
       - name: Run GTD CLI Doctor
         run: |

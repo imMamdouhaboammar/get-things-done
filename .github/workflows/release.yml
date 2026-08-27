@@ -48,6 +48,8 @@ jobs:
         run: |
           python scripts/release_checksums.py ./dist --out ./dist/SHA256SUMS
           python scripts/release_checksums.py ./dist/adapters --out ./dist/adapters/SHA256SUMS
+          python scripts/release_checksums.py ./dist --verify ./dist/SHA256SUMS
+          python scripts/release_checksums.py ./dist/adapters --verify ./dist/adapters/SHA256SUMS
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
