@@ -125,3 +125,33 @@ def test_all_installs_each_distinct_supported_skill_root(tmp_path):
         tmp_path / "home/.grok/skills/get-things-done/SKILL.md",
     ]
     assert all(path.is_file() for path in expected)
+
+
+def test_installer_both_flag_installs_agents_and_claude(tmp_path):
+    result = run_installer(tmp_path, "--both")
+    assert result.returncode == 0, result.stderr
+    assert (tmp_path / "home/.agents/skills/get-things-done/SKILL.md").is_file()
+    assert (tmp_path / "home/.claude/skills/get-things-done/SKILL.md").is_file()
+
+
+def test_installer_claude_flag_installs_claude_skills(tmp_path):
+    result = run_installer(tmp_path, "--claude")
+    assert result.returncode == 0, result.stderr
+    assert (tmp_path / "home/.claude/skills/get-things-done/SKILL.md").is_file()
+    assert not (tmp_path / "home/.agents/skills").exists()
+
+
+def test_installer_help_flag_displays_usage(tmp_path):
+    for flag in ["-h", "--help"]:
+        result = run_installer(tmp_path, flag)
+        assert result.returncode == 0, result.stderr
+        assert "Usage: ./install.sh" in result.stdout
+        assert "--target-path" in result.stdout
+        assert "--force" in result.stdout
+
+
+def test_installer_empty_target_path_fails(tmp_path):
+    result = run_installer(tmp_path, "--target-path", "")
+    assert result.returncode == 2
+    assert "cannot be empty" in result.stderr
+
