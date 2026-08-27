@@ -1,0 +1,11 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Get Things Done",
+      "description": "Turn unclear work into executable, verifiable outcomes.",
+      "skills": ["get-things-done", "building-gtd-domain-packs"]
+    }
+  ]
+}
