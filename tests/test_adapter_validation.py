@@ -70,3 +70,34 @@ def test_duplicate_capabilities_are_rejected(tmp_path):
     root = repo_copy(tmp_path)
     mutate_registry(root, "shell", "capabilities", ["skills", "skills"])
     assert any("duplicate capabilities" in error for error in adapters.validate_registry(root))
+
+
+def test_retired_repository_url_in_manifests_is_rejected(tmp_path):
+    root = repo_copy(tmp_path)
+    path = root / ".codex-plugin/plugin.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["homepage"] = "https://github.com/imMamdouhaboammar/get-things-done-skillpack"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    errors = adapters.validate_manifests(root)
+    assert any("retired repository identity" in error or "stale repository" in error for error in errors)
+
+
+def test_mismatched_manifest_versions_are_rejected(tmp_path):
+    root = repo_copy(tmp_path)
+    path = root / "kimi.plugin.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["version"] = "9.9.9"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    errors = adapters.validate_manifests(root)
+    assert any("version mismatch" in error for error in errors)
+
+
+def test_invalid_semver_in_manifest_is_rejected(tmp_path):
+    root = repo_copy(tmp_path)
+    path = root / "plugin.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["version"] = "invalid-version"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    errors = adapters.validate_manifests(root)
+    assert any("invalid semver" in error for error in errors)
+
