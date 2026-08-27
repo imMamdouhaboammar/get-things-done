@@ -15,7 +15,7 @@ def test_doctor_passes_on_canonical_pack_with_adapters():
     )
     assert result.returncode == 0, result.stderr
     assert "PASS: core files valid" in result.stdout
-    assert "4 domain packs found" in result.stdout
+    assert "5 domain packs found" in result.stdout
 
 
 def test_doctor_fails_if_required_file_missing(tmp_path):

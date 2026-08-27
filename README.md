@@ -212,6 +212,7 @@ The schema lives at [`skills/get-things-done/references/execution-brief.schema.j
 | **Marketing** | audience, offer, channel, measurement, experiment and campaign checks |
 | **Product** | user, job, behavior, scope, trade-off and product outcome checks |
 | **Research** | question framing, source quality, evidence, uncertainty and reproducibility checks |
+| **Advisory** | root dilemmas, reversibility, strategic trade-offs, founder alignment, decision frameworks |
 
 Need another field such as finance, operations, legal, sales, branding, or media buying
 
