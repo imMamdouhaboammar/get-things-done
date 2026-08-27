@@ -67,6 +67,13 @@ def test_custom_path_with_spaces_is_supported(tmp_path):
     assert (custom / "get-things-done/SKILL.md").is_file()
 
 
+def test_named_targets_sharing_a_root_are_deduplicated(tmp_path):
+    result = run_installer(tmp_path, "--target", "agents", "--target", "codex")
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.count("Installed get-things-done ->") == 1
+    assert result.stdout.count("Installed building-gtd-domain-packs ->") == 1
+
+
 def test_installer_refuses_overwrite_without_force(tmp_path):
     first = run_installer(tmp_path)
     second = run_installer(tmp_path)
