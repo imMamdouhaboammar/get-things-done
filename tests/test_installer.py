@@ -19,6 +19,14 @@ def run_installer(tmp_path: Path, *args: str) -> subprocess.CompletedProcess[str
     )
 
 
+def test_list_targets_reports_named_shell_hosts_without_installing(tmp_path):
+    result = run_installer(tmp_path, "--list-targets")
+    assert result.returncode == 0, result.stderr
+    for target in ["agents", "codex", "claude", "cursor", "kimi", "grok", "deepseek"]:
+        assert target in result.stdout
+    assert not (tmp_path / "home").exists()
+
+
 def test_default_install_uses_universal_agent_skills_root(tmp_path):
     result = run_installer(tmp_path)
     assert result.returncode == 0, result.stderr
