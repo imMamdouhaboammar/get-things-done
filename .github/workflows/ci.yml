@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyyaml pytest pytest-cov
+          pip install jsonschema pyyaml pytest pytest-cov
 
       - name: Run Test Suite
         run: |
