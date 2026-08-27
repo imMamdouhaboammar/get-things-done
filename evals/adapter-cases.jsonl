@@ -1,0 +1,5 @@
+{"id":"cursor-native-layout","adapter":"cursor","expected":"Export contains .cursor/skills and both canonical GTD skills"}
+{"id":"openai-shared-package","adapter":"chatgpt-plugin","expected":"Export contains .codex-plugin/plugin.json and canonical skills without duplicating GTD behavior"}
+{"id":"claude-marketplace","adapter":"claude-marketplace","expected":"Export contains both Claude plugin and marketplace manifests"}
+{"id":"kimi-native-plugin","adapter":"kimi","expected":"Export contains kimi.plugin.json with skills ./skills/"}
+{"id":"glama-no-mcp","adapter":"glama","expected":"Fail closed because GTD has no mcp.json instead of claiming registry support"}
