@@ -42,15 +42,22 @@ def companions_by_id(root: Path = ROOT) -> dict[str, dict[str, Any]]:
     return {item["id"]: item for item in load_companions(root)["companions"]}
 
 
-def interop_matrix(root: Path = ROOT) -> dict[str, dict[str, str]]:
-    matrix: dict[str, dict[str, str]] = {}
+def interop_matrix(root: Path = ROOT) -> dict[str, dict[str, Any]]:
+    matrix: dict[str, dict[str, Any]] = {}
     for item in load_companions(root)["companions"]:
-        matrix[item["id"]] = {
+        entry: dict[str, Any] = {
             "label": item["label"],
             "relationship": item["relationship"],
             "gtd_role": item["ownership"]["gtd"],
             "companion_role": item["ownership"]["companion"],
+            "inputs": item.get("inputs", []),
+            "outputs": item.get("outputs", []),
+            "failure_policy": item.get("failure_policy", ""),
+            "authority_boundary": item.get("authority_boundary", ""),
         }
+        if "transport" in item:
+            entry["transport"] = item["transport"]
+        matrix[item["id"]] = entry
     return matrix
 
 
@@ -159,11 +166,16 @@ def validate_companions(root: Path = ROOT) -> list[str]:
         ownership = item.get("ownership")
         if not isinstance(ownership, dict) or not ownership.get("gtd") or not ownership.get("companion"):
             errors.append(f"{ident}: ownership must declare gtd and companion roles")
-        guardrails = item.get("guardrails")
-        if not isinstance(guardrails, list) or not guardrails:
-            errors.append(f"{ident}: guardrails must be a non-empty array")
-        elif len(guardrails) != len(set(guardrails)):
-            errors.append(f"{ident}: duplicate guardrails")
+        for key in ("integration", "evidence_contract", "failure_policy", "authority_boundary"):
+            val = item.get(key)
+            if not isinstance(val, str) or not val.strip():
+                errors.append(f"{ident}: missing or empty {key}")
+        for list_key in ("inputs", "outputs", "guardrails"):
+            arr = item.get(list_key)
+            if not isinstance(arr, list) or not arr or not all(isinstance(v, str) and v.strip() for v in arr):
+                errors.append(f"{ident}: {list_key} must be a non-empty string array")
+            elif len(arr) != len(set(arr)):
+                errors.append(f"{ident}: duplicate {list_key}")
         for forbidden in ("manifest", "project_path", "export"):
             if forbidden in item:
                 errors.append(f"{ident}: companion profiles cannot declare {forbidden}")
