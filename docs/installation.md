@@ -22,6 +22,28 @@ For an agent with a different Agent Skills root:
 
 The custom path is the portability escape hatch for agents that consume Agent Skills but do not have a dedicated GTD adapter yet.
 
+## All agents through skills.sh
+
+The current `skills` CLI supports Claude Code, Codex, Cursor, Kimi Code CLI, and many other agents. To install both GTD skills to every agent detected by the CLI:
+
+```bash
+npx skills add imMamdouhaboammar/get-things-done --all
+```
+
+To install globally for one or more explicit agents:
+
+```bash
+npx skills add imMamdouhaboammar/get-things-done -g -a claude-code -a codex -a cursor -y
+```
+
+To refresh installed skills later:
+
+```bash
+npx skills update
+```
+
+This is the preferred broad compatibility path when the target agent is already supported by the open Agent Skills ecosystem. GTD's own `--target-path` remains available for agents with custom skill roots.
+
 ## Shell installer
 
 Named targets are available for the user-level roots GTD verifies:
@@ -35,7 +57,7 @@ Named targets are available for the user-level roots GTD verifies:
 ./install.sh --target deepseek
 ```
 
-Install all distinct supported user roots:
+Install all distinct supported user roots known to GTD's shell installer:
 
 ```bash
 ./install.sh --all
@@ -156,7 +178,29 @@ Use the shell installer when you also want the skills copied into a host's user 
 
 ## skills.sh
 
-The repository ships `skills.sh.json` for skills.sh discovery and distribution. For direct CLI installation, follow the current skills.sh client syntax for installing a GitHub-hosted skill package. The canonical source remains `skills/` in this repository.
+The repository ships `skills.sh.json` for skills.sh discovery and distribution. The CLI can install directly from the GitHub repository:
+
+```bash
+npx skills add imMamdouhaboammar/get-things-done
+```
+
+List the skills before installing:
+
+```bash
+npx skills add imMamdouhaboammar/get-things-done --list
+```
+
+Install all GTD skills to all supported agents without prompts:
+
+```bash
+npx skills add imMamdouhaboammar/get-things-done --all
+```
+
+Update installed skills later:
+
+```bash
+npx skills update
+```
 
 Validate the local distribution metadata before publishing or updating it:
 
