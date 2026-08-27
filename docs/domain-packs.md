@@ -73,4 +73,14 @@ python scripts/gtd.py new-domain media-buying \
   --output skills/get-things-done/domains/media-buying.md
 ```
 
-Then replace the scaffold guidance with field-specific rules and add evaluation cases
+Then replace the scaffold guidance with field-specific rules and verify domain pack invariants:
+
+```bash
+# Validate domain pack contracts and prevent naming collisions
+pytest tests/test_pack.py -v
+
+# Create and validate a sample brief using the new domain
+python scripts/gtd.py new-brief --title "Campaign budget review" --domain media-buying --out brief.json
+python scripts/gtd.py validate-brief brief.json --root .
+```
+
