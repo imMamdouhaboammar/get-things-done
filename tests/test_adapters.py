@@ -11,7 +11,7 @@ spec.loader.exec_module(adapters)
 
 def make_repo(tmp_path: Path) -> Path:
     root = tmp_path / "repo"
-    for rel in ["adapters", ".codex-plugin", ".claude-plugin", "skills/get-things-done/assets", "skills/building-gtd-domain-packs"]:
+    for rel in ["adapters", ".codex-plugin", ".claude-plugin", "Formula", "skills/get-things-done/assets", "skills/building-gtd-domain-packs"]:
         (root / rel).mkdir(parents=True, exist_ok=True)
     source_root = Path(__file__).resolve().parents[1]
     for rel in ["adapters/registry.json", "adapters/companions.json"]:
@@ -22,7 +22,7 @@ def make_repo(tmp_path: Path) -> Path:
         p.write_text(f"---\nname: {name}\ndescription: test\n---\nbody\n")
     for name in ["small-logo.svg", "large-logo.svg"]:
         (root / "skills/get-things-done/assets" / name).write_text("<svg></svg>")
-    for rel in ["plugin.json", ".codex-plugin/plugin.json", ".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", "kimi.plugin.json", "skills.sh.json"]:
+    for rel in ["plugin.json", ".codex-plugin/plugin.json", ".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", "kimi.plugin.json", "skills.sh.json", "install.sh", "Formula/get-things-done.rb"]:
         src = source_root / rel
         dest = root / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
@@ -32,7 +32,7 @@ def make_repo(tmp_path: Path) -> Path:
 
 def test_registry_covers_requested_hosts():
     ids = set(adapters.adapters_by_id().keys())
-    expected = {"claude-ai", "claude-code", "claude-marketplace", "claude-cowork", "chatgpt-web", "chatgpt-work", "chatgpt-plugin", "codex", "cursor", "kimi", "grok", "deepseek", "skills-sh", "skill-kit", "glama", "agent-skills", "agent-plugins"}
+    expected = {"claude-ai", "claude-code", "claude-marketplace", "claude-cowork", "chatgpt-web", "chatgpt-work", "chatgpt-plugin", "codex", "cursor", "kimi", "grok", "deepseek", "homebrew", "shell", "skills-sh", "skill-kit", "glama", "agent-skills", "agent-plugins"}
     assert expected <= ids
 
 
@@ -44,6 +44,20 @@ def test_registry_exposes_universal_agent_skills_contract():
     assert universal["project_path"] == ".agents/skills"
     assert "skills" in universal["capabilities"]
     assert "portable-to-conforming-agents" in universal["capabilities"]
+
+
+def test_shell_adapter_is_portable_and_custom_path_capable():
+    shell = adapters.adapters_by_id()["shell"]
+    assert shell["support"] == "first-class"
+    assert shell["export"] == "shell-bundle"
+    assert "custom-install-root" in shell["capabilities"]
+
+
+def test_homebrew_adapter_uses_formula_source():
+    brew = adapters.adapters_by_id()["homebrew"]
+    assert brew["support"] == "first-class"
+    assert brew["manifest"] == "Formula/get-things-done.rb"
+    assert brew["export"] == "homebrew-formula"
 
 
 def test_companion_registry_covers_requested_tools():
@@ -82,6 +96,21 @@ def test_interop_matrix_reports_role_boundaries():
 
 def test_repository_contracts_validate():
     assert adapters.validate() == []
+
+
+def test_shell_export_contains_installer_and_canonical_skills(tmp_path):
+    root = make_repo(tmp_path)
+    target = adapters.export_adapter("shell", tmp_path / "dist", root)
+    assert (target / "install.sh").is_file()
+    assert (target / "skills/get-things-done/SKILL.md").is_file()
+    assert (target / "skills/building-gtd-domain-packs/SKILL.md").is_file()
+
+
+def test_homebrew_export_contains_formula_and_skills(tmp_path):
+    root = make_repo(tmp_path)
+    target = adapters.export_adapter("homebrew", tmp_path / "dist", root)
+    assert (target / "Formula/get-things-done.rb").is_file()
+    assert (target / "skills/get-things-done/SKILL.md").is_file()
 
 
 def test_cursor_export_uses_native_project_path(tmp_path):
