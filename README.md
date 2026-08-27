@@ -53,7 +53,7 @@ That means a host integration cannot quietly fork the GTD decision model or crea
 
 ## Supported surfaces
 
-The repository tracks **17 adapter contracts**. The label describes the package/export contract GTD verifies, not a claim that every vendor has approved or listed the package in its public marketplace
+The repository tracks **19 adapter contracts**. The label describes the package/export contract GTD verifies, not a claim that every vendor has approved or listed the package in its public marketplace
 
 | Target | Support model | Delivery |
 |---|---|---|
@@ -71,6 +71,8 @@ The repository tracks **17 adapter contracts**. The label describes the package/
 | Kimi Code | First-class adapter | `kimi.plugin.json` + `.kimi-code/skills` |
 | Grok Build | First-class adapter | `.grok/skills` |
 | DeepSeek DeepCode | First-class adapter | `.deepcode/skills` |
+| Homebrew | First-class distribution | HEAD Formula + packaged canonical skills (`Formula/get-things-done.rb`) |
+| Shell Installer | First-class distribution | Multi-host install script (`install.sh`) with named roots and `--target-path` |
 | Vercel skills.sh | First-class distribution metadata | `skills.sh.json` |
 | Contentful Skill Kit | Authoring bridge | typed workflow compilation when needed |
 | Glama | Conditional | enabled only when GTD ships a real `mcp.json` |
@@ -82,6 +84,18 @@ The adapter CLI fails closed instead of manufacturing registry support that does
 Public marketplace approval, directory listing, vendor review, and local package conformance are separate states. This repository only claims the states it can verify
 
 See [Host adapters and distribution](docs/adapters.md)
+
+## Companion interoperability
+
+GTD tracks 5 companion tools in `adapters/companions.json` with strict separation of concerns. Companions participate in the engineering workflow without becoming GTD hosts or runtime dependencies:
+
+| Companion | Relationship | Companion role | Boundary |
+|---|---|---|---|
+| **Plugin Autopilot** | complementary | agent orchestration | Autopilot schedules agent runs; GTD owns work state, brief, and done contract |
+| **Plugin Eval** | complementary | plugin and skill evaluation | Eval findings enter GTD as verification evidence; cannot bypass exit gates |
+| **Superpowers** | complementary | development methodology | Superpowers guides TDD and review disciplines; GTD wraps high-level brief |
+| **ArmorCodex** | complementary | security review | Security findings enter GTD as blockers/evidence; severity is never rewritten |
+| **Context7** | optional | documentation retrieval over MCP | Context7 provides external docs context; local code and repo governance win |
 
 ## What GTD does
 
@@ -217,38 +231,69 @@ python scripts/gtd.py package --out dist
 
 ## Adapter CLI
 
-Inspect the compatibility registry
+Inspect the compatibility registry and system status:
 
 ```bash
+python scripts/adapters.py status
 python scripts/adapters.py list
+python scripts/adapters.py capabilities
+python scripts/adapters.py query --capability skills
 python scripts/adapters.py info cursor
+python scripts/adapters.py companions
+python scripts/adapters.py interop context7
 python scripts/adapters.py validate
 ```
 
-Export one host package
+Export one host package:
 
 ```bash
 python scripts/adapters.py export cursor --out dist/adapters
 python scripts/adapters.py export chatgpt-plugin --out dist/adapters --package
+python scripts/adapters.py export homebrew --out dist/adapters
+python scripts/adapters.py export shell --out dist/adapters
 ```
 
-Export every non-conditional adapter
+Export every non-conditional adapter with deterministic ZIP packages and execution report:
 
 ```bash
-python scripts/adapters.py export-all --out dist/adapters
+python scripts/adapters.py export-all --out dist/adapters --package --report dist/export-report.json
 ```
 
-The command exports 16 targets and reports Glama separately until an MCP package exists
+The command exports 18 targets and reports Glama separately until an MCP package exists.
 
 ## Installation
 
-Universal Agent Skills location
+### 1. Fastest universal install
+
+Install to the standard Agent Skills user location (`~/.agents/skills`):
 
 ```bash
+git clone https://github.com/imMamdouhaboammar/get-things-done.git
+cd get-things-done
 ./install.sh --agents
 ```
 
-Specific user-level host locations
+For any custom Agent Skills-compatible directory:
+
+```bash
+./install.sh --target-path "$HOME/.my-agent/skills"
+```
+
+### 2. All agents via skills.sh
+
+Install GTD across all detected agent harnesses using the Vercel skills CLI:
+
+```bash
+npx skills add imMamdouhaboammar/get-things-done --all
+```
+
+Or install globally for specific agents:
+
+```bash
+npx skills add imMamdouhaboammar/get-things-done -g -a claude-code -a codex -a cursor -y
+```
+
+### 3. Named host targets via shell installer
 
 ```bash
 ./install.sh --target claude
@@ -259,43 +304,53 @@ Specific user-level host locations
 ./install.sh --target deepseek
 ```
 
-Install to all distinct supported user skill roots
+Install to all distinct supported user roots at once:
 
 ```bash
-./install.sh --all
+./install.sh --all --force
 ```
 
-For project-level or plugin packages, use `scripts/adapters.py export`
+### 4. Homebrew (HEAD)
 
-## Distribution manifests
+```bash
+brew install --HEAD ./Formula/get-things-done.rb
+gtd doctor
+```
+
+## Distribution manifests and schemas
 
 ```text
-plugin.json                       Agent Plugins 1.0.0
-.codex-plugin/plugin.json         ChatGPT / Codex plugin
-.claude-plugin/plugin.json        Claude plugin
-.claude-plugin/marketplace.json   Claude marketplace
-kimi.plugin.json                  Kimi Code plugin
-skills.sh.json                    skills.sh repository metadata
-adapters/registry.json            GTD compatibility registry
+plugin.json                         Agent Plugins 1.0.0 manifest
+.codex-plugin/plugin.json           ChatGPT / Codex plugin manifest
+.claude-plugin/plugin.json          Claude plugin manifest
+.claude-plugin/marketplace.json     Claude marketplace catalog entry
+kimi.plugin.json                    Kimi Code plugin manifest
+skills.sh.json                      skills.sh discovery metadata
+Formula/get-things-done.rb          Homebrew HEAD Formula
+install.sh                          Portable multi-host shell installer
+adapters/registry.json              GTD adapter compatibility registry
+adapters/registry.schema.json       Adapter registry JSON schema
+adapters/companions.json            Companion interoperability registry
+adapters/companions.schema.json     Companion registry JSON schema
 ```
 
 ## Verification
 
-CI verifies deterministic repository behavior across Python 3.10, 3.11, 3.12, and 3.13
+CI verifies deterministic repository behavior across Python 3.10, 3.11, 3.12, and 3.13:
 
-- GTD core tests
+- Python bytecode compilation (`python -m compileall scripts tests`)
+- GTD core tests and CLI wrapper behavior
 - Execution Brief validation and Ready/Done assessment
-- domain pack contracts
-- skill catalog assets
-- current OpenAI skill metadata
-- adapter registry and manifest validation
-- host export smoke tests
-- standalone skill packaging
-- installer syntax
+- Domain pack contracts and collision rules
+- Skill catalog assets and OpenAI skill metadata
+- Adapter registry and manifest validation
+- Companion contract schema conformance and boundary checks
+- Host export and packaging smoke tests
+- Deterministic SHA-256 release checksum generation and verification
+- Installer syntax and bash 3.2 compatibility
+- Homebrew formula syntax validation
 
-Behavioral model evals remain separate from deterministic tests
-
-Passing Python tests proves package invariants, not that every model will follow every workflow perfectly under every prompt
+Behavioral model evals remain separate from deterministic tests.
 
 ## Repository map
 
@@ -305,14 +360,23 @@ plugin.json
 .claude-plugin/
 kimi.plugin.json
 skills.sh.json
+Formula/
+  get-things-done.rb
+install.sh
 adapters/
   registry.json
+  registry.schema.json
+  companions.json
+  companions.schema.json
 skills/
   get-things-done/
   building-gtd-domain-packs/
 scripts/
   gtd.py
   adapters.py
+  package_skills.py
+  release_checksums.py
+  catalog_stylist.py
 docs/
 evals/
 examples/
