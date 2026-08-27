@@ -46,35 +46,49 @@ A named first-class adapter means GTD additionally verifies a host-specific path
 
 ## Companion interoperability
 
-Plugin Autopilot, Plugin Eval, Superpowers, ArmorCodex, and Context7 are not host adapters. GTD records them in `adapters/companions.json` so role boundaries are testable without pretending GTD owns their runtime, prompts, evaluation logic, security semantics, or MCP implementation.
+Plugin Autopilot, Plugin Eval, Superpowers, ArmorCodex, and Context7 are not host adapters. GTD records them in `adapters/companions.json` (validated by `adapters/companions.schema.json`) so role boundaries and machine-readable contracts are testable without pretending GTD owns their runtime, prompts, evaluation logic, security semantics, or MCP implementation.
 
-| Companion | Relationship | Companion role |
-|---|---|---|
-| Plugin Autopilot | complementary | agent orchestration |
-| Plugin Eval | complementary | plugin and skill evaluation |
-| Superpowers | complementary | development methodology |
-| ArmorCodex | complementary | security review |
-| Context7 | optional | documentation retrieval over MCP |
+| Companion | Relationship | Companion role | Machine-readable I/O | Failure policy |
+|---|---|---|---|---|
+| **Plugin Autopilot** | complementary | agent orchestration | In: `execution-brief`, `work-state`<br>Out: `agent-dispatch-plan`, `timeline` | graceful degradation |
+| **Plugin Eval** | complementary | plugin and skill evaluation | In: `skill-package`, `execution-brief`<br>Out: `evaluation-scorecard`, `findings` | fail-safe blocker |
+| **Superpowers** | complementary | development methodology | In: `user-intent`, `codebase-context`<br>Out: `implementation-plan`, `tdd-cycles` | fail-safe halt |
+| **ArmorCodex** | complementary | security review | In: `source-diff`, `manifests`<br>Out: `security-audit-report`, `advisories` | fail-closed |
+| **Context7** | optional | documentation retrieval over MCP | In: `library-queries`, `symbols`<br>Out: `verified-documentation`, `signatures` | local source fallback |
 
 Companion output can become evidence, context, a blocker, or follow-up work. It does not override repository governance or GTD exit conditions.
 
 ## CLI
 
 ```bash
+# Ecosystem status and metrics
+python scripts/adapters.py status
+python scripts/adapters.py status --json
+
+# Discovery and capability queries
 python scripts/adapters.py list
+python scripts/adapters.py capabilities
+python scripts/adapters.py query --capability skills
+python scripts/adapters.py query --support first-class
 python scripts/adapters.py info cursor
+
+# Companion inspection
 python scripts/adapters.py companions
 python scripts/adapters.py interop
 python scripts/adapters.py interop context7
+
+# Validation
 python scripts/adapters.py validate
+
+# Host exports and packaging
 python scripts/adapters.py export cursor --out dist/adapters
 python scripts/adapters.py export homebrew --out dist/adapters
 python scripts/adapters.py export shell --out dist/adapters
 python scripts/adapters.py export chatgpt-plugin --out dist/adapters --package
-python scripts/adapters.py export-all --out dist/adapters
+python scripts/adapters.py export-all --out dist/adapters --package --report dist/export-report.json
 ```
 
-`export-all` intentionally reports conditional adapters separately.
+`export-all` exports 18 verified targets, packages them reproducibly, and reports conditional adapters (Glama) separately.
 
 ## Why adapters are thin
 
