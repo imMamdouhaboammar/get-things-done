@@ -2,6 +2,7 @@
 set -euo pipefail
 
 FORCE="false"
+DRY_RUN="false"
 TARGETS=()
 TARGET_PATHS=()
 
@@ -19,6 +20,7 @@ Multi-host options:
   --target-path <dir>   Install to an explicit Agent Skills-compatible root
   --all                 Install to all distinct supported user skill roots
   --list-targets        Print named shell targets without installing
+  --dry-run             Print intended writes without changing files
   --force               Replace existing GTD skill directories
   -h, --help            Show this help
 
@@ -56,6 +58,7 @@ while [[ $# -gt 0 ]]; do
       TARGET_PATHS+=("$2"); shift 2 ;;
     --all) TARGETS+=("agents" "claude" "cursor" "kimi" "grok" "deepseek"); shift ;;
     --list-targets) list_targets; exit 0 ;;
+    --dry-run) DRY_RUN="true"; shift ;;
     --force) FORCE="true"; shift ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown argument: $1" >&2; usage >&2; exit 2 ;;
@@ -72,11 +75,17 @@ install_to() {
   [[ -n "$base" ]] || { echo "Install root cannot be empty" >&2; exit 2; }
   [[ -z "${SEEN[$base]:-}" ]] || return 0
   SEEN[$base]=1
-  mkdir -p "$base"
+  if [[ "$DRY_RUN" != "true" ]]; then
+    mkdir -p "$base"
+  fi
   for skill in get-things-done building-gtd-domain-packs; do
     local source="$ROOT/skills/$skill"
     local dest="$base/$skill"
     [[ -f "$source/SKILL.md" ]] || { echo "Missing canonical skill: $source/SKILL.md" >&2; exit 2; }
+    if [[ "$DRY_RUN" == "true" ]]; then
+      echo "Would install $skill -> $dest"
+      continue
+    fi
     if [[ -e "$dest" && "$FORCE" != "true" ]]; then
       echo "Refusing to overwrite $dest. Use --force" >&2
       exit 2
