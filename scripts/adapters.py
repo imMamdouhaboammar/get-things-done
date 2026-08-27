@@ -307,7 +307,11 @@ def package_directory(directory: Path) -> Path:
 
 
 def cmd_list(args: argparse.Namespace) -> int:
-    for item in load_registry(Path(args.root))["adapters"]:
+    items = load_registry(Path(args.root))["adapters"]
+    if args.json:
+        print(json.dumps(items, indent=2))
+        return 0
+    for item in items:
         print(f"{item['id']:20} {item['support']:16} {item['label']}")
     return 0
 
@@ -322,7 +326,11 @@ def cmd_info(args: argparse.Namespace) -> int:
 
 
 def cmd_companions(args: argparse.Namespace) -> int:
-    for item in load_companions(Path(args.root))["companions"]:
+    items = load_companions(Path(args.root))["companions"]
+    if args.json:
+        print(json.dumps(items, indent=2))
+        return 0
+    for item in items:
         print(f"{item['id']:20} {item['relationship']:16} {item['label']}")
     return 0
 
@@ -399,9 +407,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="GTD host adapter validator, exporter, and interoperability inspector")
     parser.add_argument("--root", default=str(ROOT))
     subs = parser.add_subparsers(dest="command", required=True)
-    p = subs.add_parser("list"); p.set_defaults(func=cmd_list)
+    p = subs.add_parser("list"); p.add_argument("--json", action="store_true"); p.set_defaults(func=cmd_list)
     p = subs.add_parser("info"); p.add_argument("adapter"); p.set_defaults(func=cmd_info)
-    p = subs.add_parser("companions"); p.set_defaults(func=cmd_companions)
+    p = subs.add_parser("companions"); p.add_argument("--json", action="store_true"); p.set_defaults(func=cmd_companions)
     p = subs.add_parser("interop"); p.add_argument("companion", nargs="?"); p.set_defaults(func=cmd_interop)
     p = subs.add_parser("validate"); p.set_defaults(func=cmd_validate)
     p = subs.add_parser("export"); p.add_argument("adapter"); p.add_argument("--out", required=True); p.add_argument("--package", action="store_true"); p.set_defaults(func=cmd_export)
