@@ -6,7 +6,7 @@
 
 Turn messy intent into a clear work model, identify the real blocker, execute the next useful action, and require evidence before calling anything done
 
-[![CI](https://github.com/imMamdouhaboammar/get-things-done-skillpack/actions/workflows/ci.yml/badge.svg)](https://github.com/imMamdouhaboammar/get-things-done-skillpack/actions/workflows/ci.yml)
+[![CI](https://github.com/imMamdouhaboammar/get-things-done/actions/workflows/ci.yml/badge.svg)](https://github.com/imMamdouhaboammar/get-things-done/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg)](https://www.python.org/)
 [![Agent Plugins 1.0](https://img.shields.io/badge/Agent_Plugins-1.0-111111.svg)](https://agent-plugins.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-111111.svg)](LICENSE)
