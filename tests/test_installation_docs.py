@@ -35,6 +35,12 @@ def test_installation_guide_documents_universal_custom_path():
     assert "Agent Skills" in GUIDE
 
 
+def test_installation_guide_documents_skills_sh_all_agents_flow():
+    assert "npx skills add imMamdouhaboammar/get-things-done --all" in GUIDE
+    assert "npx skills update" in GUIDE
+    assert "-a claude-code -a codex -a cursor" in GUIDE
+
+
 def test_installation_guide_preserves_glama_boundary():
     assert "conditional" in GUIDE.lower()
     assert "mcp.json" in GUIDE
