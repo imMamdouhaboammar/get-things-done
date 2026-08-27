@@ -422,6 +422,99 @@ def cmd_export(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_status(args: argparse.Namespace) -> int:
+    root = Path(args.root)
+    reg = load_registry(root)
+    comps = load_companions(root)
+    adapters_list = reg["adapters"]
+    companions_list = comps["companions"]
+
+    version = "unknown"
+    try:
+        plugin_data = json.loads((root / "plugin.json").read_text(encoding="utf-8"))
+        version = plugin_data.get("version", "unknown")
+    except Exception:
+        pass
+
+    support_counts: dict[str, int] = {}
+    for item in adapters_list:
+        support_counts[item["support"]] = support_counts.get(item["support"], 0) + 1
+
+    family_counts: dict[str, int] = {}
+    for item in adapters_list:
+        family_counts[item["family"]] = family_counts.get(item["family"], 0) + 1
+
+    errors = validate(root)
+    health = "healthy" if not errors else "degraded"
+
+    payload = {
+        "version": version,
+        "health": health,
+        "adapters_total": len(adapters_list),
+        "companions_total": len(companions_list),
+        "support_counts": support_counts,
+        "family_counts": family_counts,
+        "errors": errors,
+    }
+
+    if args.json:
+        print(json.dumps(payload, indent=2))
+        return 0 if not errors else 1
+
+    print(f"GTD Ecosystem Status (v{version})")
+    print(f"Health: {health.upper()} ({len(errors)} errors)")
+    print(f"Adapters: {len(adapters_list)} total")
+    for s_name, count in sorted(support_counts.items()):
+        print(f"  - {s_name:18}: {count}")
+    print(f"Companions: {len(companions_list)} total")
+    for c in companions_list:
+        print(f"  - {c['id']:18}: {c['companion_role']} ({c['relationship']})")
+    return 0 if not errors else 1
+
+
+def cmd_capabilities(args: argparse.Namespace) -> int:
+    root = Path(args.root)
+    adapters_list = load_registry(root)["adapters"]
+    cap_map: dict[str, list[str]] = {}
+    for item in adapters_list:
+        for cap in item.get("capabilities", []):
+            cap_map.setdefault(cap, []).append(item["id"])
+
+    if args.json:
+        print(json.dumps(cap_map, indent=2))
+        return 0
+
+    print("Adapter Capabilities:")
+    for cap, adapter_ids in sorted(cap_map.items()):
+        print(f"  {cap:30} -> {', '.join(adapter_ids)}")
+    return 0
+
+
+def cmd_query(args: argparse.Namespace) -> int:
+    root = Path(args.root)
+    adapters_list = load_registry(root)["adapters"]
+    results = adapters_list
+
+    if args.capability:
+        results = [a for a in results if args.capability in a.get("capabilities", [])]
+    if args.support:
+        results = [a for a in results if a.get("support") == args.support]
+    if args.family:
+        results = [a for a in results if a.get("family") == args.family]
+    if args.kind:
+        results = [a for a in results if a.get("kind") == args.kind]
+    if args.export:
+        results = [a for a in results if a.get("export") == args.export]
+
+    if args.json:
+        print(json.dumps(results, indent=2))
+        return 0
+
+    for item in results:
+        print(f"{item['id']:20} {item['support']:16} {item['label']}")
+    return 0
+
+
 def cmd_export_all(args: argparse.Namespace) -> int:
     root = Path(args.root)
     out = Path(args.out)
@@ -434,13 +527,17 @@ def cmd_export_all(args: argparse.Namespace) -> int:
     exported = 0
     packaged = 0
     skipped: list[str] = []
+    artifacts: list[dict[str, Any]] = []
     for item in load_registry(root)["adapters"]:
         try:
             target = export_adapter(item["id"], out, root)
             exported += 1
+            art_entry: dict[str, Any] = {"id": item["id"], "directory": str(target)}
             if args.package:
-                package_directory(target)
+                zip_path = package_directory(target)
                 packaged += 1
+                art_entry["package"] = str(zip_path)
+            artifacts.append(art_entry)
         except RuntimeError as exc:
             if item.get("support") == "conditional" and "refusing to generate fake support" in str(exc):
                 skipped.append(item["id"])
@@ -451,6 +548,17 @@ def cmd_export_all(args: argparse.Namespace) -> int:
         print(f"packaged: {packaged}")
     if skipped:
         print("conditional: " + ", ".join(skipped))
+
+    if args.report:
+        report_path = Path(args.report)
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_data = {
+            "exported": exported,
+            "packaged": packaged,
+            "skipped_conditional": skipped,
+            "artifacts": artifacts,
+        }
+        report_path.write_text(json.dumps(report_data, indent=2) + "\n", encoding="utf-8")
     return 0
 
 
@@ -460,11 +568,21 @@ def build_parser() -> argparse.ArgumentParser:
     subs = parser.add_subparsers(dest="command", required=True)
     p = subs.add_parser("list"); p.add_argument("--json", action="store_true"); p.set_defaults(func=cmd_list)
     p = subs.add_parser("info"); p.add_argument("adapter"); p.set_defaults(func=cmd_info)
+    p = subs.add_parser("status"); p.add_argument("--json", action="store_true"); p.set_defaults(func=cmd_status)
+    p = subs.add_parser("capabilities"); p.add_argument("--json", action="store_true"); p.set_defaults(func=cmd_capabilities)
+    p = subs.add_parser("query")
+    p.add_argument("--capability")
+    p.add_argument("--support")
+    p.add_argument("--family")
+    p.add_argument("--kind")
+    p.add_argument("--export")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=cmd_query)
     p = subs.add_parser("companions"); p.add_argument("--json", action="store_true"); p.set_defaults(func=cmd_companions)
     p = subs.add_parser("interop"); p.add_argument("companion", nargs="?"); p.set_defaults(func=cmd_interop)
     p = subs.add_parser("validate"); p.set_defaults(func=cmd_validate)
     p = subs.add_parser("export"); p.add_argument("adapter"); p.add_argument("--out", required=True); p.add_argument("--package", action="store_true"); p.set_defaults(func=cmd_export)
-    p = subs.add_parser("export-all"); p.add_argument("--out", required=True); p.add_argument("--package", action="store_true"); p.set_defaults(func=cmd_export_all)
+    p = subs.add_parser("export-all"); p.add_argument("--out", required=True); p.add_argument("--package", action="store_true"); p.add_argument("--report"); p.set_defaults(func=cmd_export_all)
     return parser
 
 
