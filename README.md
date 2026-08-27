@@ -53,31 +53,33 @@ That means a host integration cannot quietly fork the GTD decision model or crea
 
 ## Supported surfaces
 
-The repository currently tracks **17 adapter contracts**
+The repository tracks **17 adapter contracts**. The label describes the package/export contract GTD verifies, not a claim that every vendor has approved or listed the package in its public marketplace
 
 | Target | Support model | Delivery |
 |---|---|---|
 | Agent Skills / compatible agents | Native standard | canonical `skills/` tree |
 | Agent Plugins | Native standard | root `plugin.json` |
 | Claude AI Skills | Portable | Agent Skills package |
-| Claude Code | First-class | Claude plugin + skills |
-| Claude Marketplace | First-class | `.claude-plugin/marketplace.json` |
-| Claude Cowork | First-class | Claude plugin/skill package |
-| ChatGPT Web | First-class | OpenAI plugin package |
-| ChatGPT Work | First-class | OpenAI plugin package |
-| ChatGPT Plugins | First-class | `.codex-plugin/plugin.json` |
-| Codex | First-class | OpenAI plugin + Agent Skills fallback |
-| Cursor | First-class | `.cursor/skills` |
-| Kimi Code | First-class | `kimi.plugin.json` + `.kimi-code/skills` |
-| Grok Build | First-class | `.grok/skills` |
-| DeepSeek DeepCode | First-class | `.deepcode/skills` |
-| Vercel skills.sh | First-class distribution | `skills.sh.json` |
+| Claude Code | First-class adapter | Claude plugin + skills |
+| Claude Marketplace | First-class package | `.claude-plugin/marketplace.json` |
+| Claude Cowork | First-class adapter | Claude plugin/skill package |
+| ChatGPT Web | First-class adapter | OpenAI plugin package |
+| ChatGPT Work | First-class adapter | OpenAI plugin package |
+| ChatGPT Plugins | First-class package | `.codex-plugin/plugin.json` |
+| Codex | First-class adapter | OpenAI plugin + Agent Skills fallback |
+| Cursor | First-class adapter | `.cursor/skills` |
+| Kimi Code | First-class adapter | `kimi.plugin.json` + `.kimi-code/skills` |
+| Grok Build | First-class adapter | `.grok/skills` |
+| DeepSeek DeepCode | First-class adapter | `.deepcode/skills` |
+| Vercel skills.sh | First-class distribution metadata | `skills.sh.json` |
 | Contentful Skill Kit | Authoring bridge | typed workflow compilation when needed |
 | Glama | Conditional | enabled only when GTD ships a real `mcp.json` |
 
 Glama is intentionally not marked native today because GTD does not currently ship an MCP server
 
 The adapter CLI fails closed instead of manufacturing registry support that does not exist
+
+Public marketplace approval, directory listing, vendor review, and local package conformance are separate states. This repository only claims the states it can verify
 
 See [Host adapters and distribution](docs/adapters.md)
 
@@ -236,7 +238,7 @@ Export every non-conditional adapter
 python scripts/adapters.py export-all --out dist/adapters
 ```
 
-The command currently exports 16 targets and reports Glama separately until an MCP package exists
+The command exports 16 targets and reports Glama separately until an MCP package exists
 
 ## Installation
 
