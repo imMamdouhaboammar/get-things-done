@@ -37,6 +37,12 @@ def test_dry_run_reports_destinations_without_writing(tmp_path):
     assert not (tmp_path / "home").exists()
 
 
+def test_target_flag_requires_a_value(tmp_path):
+    result = run_installer(tmp_path, "--target")
+    assert result.returncode == 2
+    assert "--target requires a value" in result.stderr
+
+
 def test_unknown_named_target_fails_without_writing(tmp_path):
     result = run_installer(tmp_path, "--target", "unknown-agent")
     assert result.returncode == 2
