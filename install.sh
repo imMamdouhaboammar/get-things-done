@@ -68,13 +68,26 @@ done
 [[ ${#TARGETS[@]} -gt 0 || ${#TARGET_PATHS[@]} -gt 0 ]] || TARGETS=("agents")
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-declare -A SEEN=()
+SEEN_PATHS=()
+
+has_seen() {
+  local target="$1"
+  [[ ${#SEEN_PATHS[@]} -gt 0 ]] || return 1
+  for seen in "${SEEN_PATHS[@]}"; do
+    if [[ "$seen" == "$target" ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
 
 install_to() {
   local base="$1"
   [[ -n "$base" ]] || { echo "Install root cannot be empty" >&2; exit 2; }
-  [[ -z "${SEEN[$base]:-}" ]] || return 0
-  SEEN[$base]=1
+  if has_seen "$base"; then
+    return 0
+  fi
+  SEEN_PATHS+=("$base")
   if [[ "$DRY_RUN" != "true" ]]; then
     mkdir -p "$base"
   fi
@@ -90,23 +103,35 @@ install_to() {
       echo "Refusing to overwrite $dest. Use --force" >&2
       exit 2
     fi
+    local tmp_dest="${dest}.tmp.$$"
+    rm -rf "$tmp_dest"
+    cp -R "$source" "$tmp_dest"
+    if [[ ! -f "$tmp_dest/SKILL.md" ]]; then
+      rm -rf "$tmp_dest"
+      echo "Failed to stage $skill at $tmp_dest" >&2
+      exit 2
+    fi
     rm -rf "$dest"
-    cp -R "$source" "$dest"
+    mv "$tmp_dest" "$dest"
     echo "Installed $skill -> $dest"
   done
 }
 
-for target in "${TARGETS[@]}"; do
-  case "$target" in
-    agents|codex|deepseek) install_to "$HOME/.agents/skills" ;;
-    claude) install_to "$HOME/.claude/skills" ;;
-    cursor) install_to "$HOME/.cursor/skills" ;;
-    kimi) install_to "${KIMI_CODE_HOME:-$HOME/.kimi-code}/skills" ;;
-    grok) install_to "$HOME/.grok/skills" ;;
-    *) echo "Unknown target: $target" >&2; exit 2 ;;
-  esac
-done
+if [[ ${#TARGETS[@]} -gt 0 ]]; then
+  for target in "${TARGETS[@]}"; do
+    case "$target" in
+      agents|codex|deepseek) install_to "$HOME/.agents/skills" ;;
+      claude) install_to "$HOME/.claude/skills" ;;
+      cursor) install_to "$HOME/.cursor/skills" ;;
+      kimi) install_to "${KIMI_CODE_HOME:-$HOME/.kimi-code}/skills" ;;
+      grok) install_to "$HOME/.grok/skills" ;;
+      *) echo "Unknown target: $target" >&2; exit 2 ;;
+    esac
+  done
+fi
 
-for target_path in "${TARGET_PATHS[@]}"; do
-  install_to "$target_path"
-done
+if [[ ${#TARGET_PATHS[@]} -gt 0 ]]; then
+  for target_path in "${TARGET_PATHS[@]}"; do
+    install_to "$target_path"
+  done
+fi
