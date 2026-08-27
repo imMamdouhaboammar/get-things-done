@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "get-things-done"
-version = "1.2.0"
+version = "1.3.0"
 description = "Turn messy intent into executable work models with explicit decisions, readiness checks, completion evidence, and multi-host agent adapters."
 readme = "README.md"
 license = { text = "MIT" }
