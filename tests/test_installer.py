@@ -6,9 +6,11 @@ ROOT = Path(__file__).resolve().parents[1]
 INSTALLER = ROOT / "install.sh"
 
 
-def run_installer(tmp_path: Path, *args: str) -> subprocess.CompletedProcess[str]:
+def run_installer(tmp_path: Path, *args: str, env_overrides: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env["HOME"] = str(tmp_path / "home")
+    if env_overrides:
+        env.update(env_overrides)
     return subprocess.run(
         ["bash", str(INSTALLER), *args],
         cwd=ROOT,
@@ -33,6 +35,14 @@ def test_dry_run_reports_destinations_without_writing(tmp_path):
     assert "Would install get-things-done" in result.stdout
     assert ".claude/skills/get-things-done" in result.stdout
     assert not (tmp_path / "home").exists()
+
+
+def test_kimi_home_override_controls_install_root(tmp_path):
+    kimi_home = tmp_path / "kimi-home"
+    result = run_installer(tmp_path, "--target", "kimi", env_overrides={"KIMI_CODE_HOME": str(kimi_home)})
+    assert result.returncode == 0, result.stderr
+    assert (kimi_home / "skills/get-things-done/SKILL.md").is_file()
+    assert not (tmp_path / "home/.kimi-code").exists()
 
 
 def test_default_install_uses_universal_agent_skills_root(tmp_path):
