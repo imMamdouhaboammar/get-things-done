@@ -7,3 +7,12 @@ brand_color: '#059669'
 categories:
 - developer-tools
 - productivity
+interface:
+  display_name: "GTD Domain Pack Builder"
+  short_description: "Build focused GTD domain extensions"
+  icon_small: "./assets/small-logo.svg"
+  icon_large: "./assets/large-logo.svg"
+  brand_color: "#059669"
+  default_prompt: "Use $building-gtd-domain-packs to design a focused GTD domain pack without forking the core contract."
+policy:
+  allow_implicit_invocation: true
