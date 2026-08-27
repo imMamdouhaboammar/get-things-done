@@ -60,6 +60,13 @@ def test_custom_path_install_supports_any_agent_skill_root(tmp_path):
     assert (custom / "building-gtd-domain-packs/SKILL.md").is_file()
 
 
+def test_custom_path_with_spaces_is_supported(tmp_path):
+    custom = tmp_path / "agent home/skill root"
+    result = run_installer(tmp_path, "--target-path", str(custom))
+    assert result.returncode == 0, result.stderr
+    assert (custom / "get-things-done/SKILL.md").is_file()
+
+
 def test_installer_refuses_overwrite_without_force(tmp_path):
     first = run_installer(tmp_path)
     second = run_installer(tmp_path)
