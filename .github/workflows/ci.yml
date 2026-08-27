@@ -39,6 +39,19 @@ jobs:
         run: |
           python scripts/catalog_stylist.py --validate
 
+      - name: Validate Host Adapter Contracts
+        run: |
+          python scripts/adapters.py validate
+
+      - name: Smoke All Host Exports
+        run: |
+          python scripts/adapters.py export-all --out ./dist/adapters
+          test -f ./dist/adapters/cursor/.cursor/skills/get-things-done/SKILL.md
+          test -f ./dist/adapters/kimi/kimi.plugin.json
+          test -f ./dist/adapters/chatgpt-plugin/.codex-plugin/plugin.json
+          test -f ./dist/adapters/claude-marketplace/.claude-plugin/marketplace.json
+          test ! -e ./dist/adapters/glama
+
       - name: Run GTD CLI Doctor
         run: |
           python scripts/gtd.py doctor
