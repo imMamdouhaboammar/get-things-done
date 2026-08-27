@@ -24,7 +24,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyyaml pytest
+          pip install jsonschema pyyaml pytest
 
       - name: Validate Skills And Adapters
         run: |
