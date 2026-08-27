@@ -18,8 +18,29 @@ def load_registry(root: Path = ROOT) -> dict[str, Any]:
         return json.load(fh)
 
 
+def load_companions(root: Path = ROOT) -> dict[str, Any]:
+    with (root / "adapters" / "companions.json").open(encoding="utf-8") as fh:
+        return json.load(fh)
+
+
 def adapters_by_id(root: Path = ROOT) -> dict[str, dict[str, Any]]:
     return {item["id"]: item for item in load_registry(root)["adapters"]}
+
+
+def companions_by_id(root: Path = ROOT) -> dict[str, dict[str, Any]]:
+    return {item["id"]: item for item in load_companions(root)["companions"]}
+
+
+def interop_matrix(root: Path = ROOT) -> dict[str, dict[str, str]]:
+    matrix: dict[str, dict[str, str]] = {}
+    for item in load_companions(root)["companions"]:
+        matrix[item["id"]] = {
+            "label": item["label"],
+            "relationship": item["relationship"],
+            "gtd_role": item["ownership"]["gtd"],
+            "companion_role": item["ownership"]["companion"],
+        }
+    return matrix
 
 
 def _skill_source(root: Path, name: str) -> Path:
@@ -63,16 +84,64 @@ def validate_registry(root: Path = ROOT) -> list[str]:
         for key in ("label", "family", "support", "kind", "export"):
             if not isinstance(item.get(key), str) or not item[key]:
                 errors.append(f"{ident}: missing {key}")
+        capabilities = item.get("capabilities")
+        if not isinstance(capabilities, list) or not capabilities or not all(isinstance(value, str) and value for value in capabilities):
+            errors.append(f"{ident}: capabilities must be a non-empty string array")
         if item.get("support") == "conditional" and not item.get("requires"):
             errors.append(f"{ident}: conditional adapter must declare requires")
     required = {
         "agent-skills", "agent-plugins", "claude-ai", "claude-code", "claude-marketplace",
         "claude-cowork", "chatgpt-web", "chatgpt-work", "chatgpt-plugin", "codex", "cursor",
-        "kimi", "grok", "deepseek", "skills-sh", "skill-kit", "glama"
+        "kimi", "grok", "deepseek", "homebrew", "shell", "skills-sh", "skill-kit", "glama"
     }
     missing = sorted(required - ids)
     if missing:
         errors.append("missing required adapters: " + ", ".join(missing))
+    if not data.get("portability_contract"):
+        errors.append("registry must declare portability_contract")
+    return errors
+
+
+def validate_companions(root: Path = ROOT) -> list[str]:
+    errors: list[str] = []
+    try:
+        data = load_companions(root)
+    except Exception as exc:
+        return [f"companions unreadable: {exc}"]
+    items = data.get("companions")
+    if not isinstance(items, list) or not items:
+        return ["companions must be a non-empty array"]
+    ids: set[str] = set()
+    allowed_kinds = {"orchestration", "evaluation", "methodology", "security", "documentation"}
+    allowed_relationships = {"complementary", "optional"}
+    for item in items:
+        if not isinstance(item, dict):
+            errors.append("companion entry must be an object")
+            continue
+        ident = item.get("id")
+        if not isinstance(ident, str) or not ident:
+            errors.append("companion id must be a non-empty string")
+            continue
+        if ident in ids:
+            errors.append(f"duplicate companion id: {ident}")
+        ids.add(ident)
+        if item.get("kind") not in allowed_kinds:
+            errors.append(f"{ident}: unsupported companion kind")
+        if item.get("relationship") not in allowed_relationships:
+            errors.append(f"{ident}: unsupported relationship")
+        ownership = item.get("ownership")
+        if not isinstance(ownership, dict) or not ownership.get("gtd") or not ownership.get("companion"):
+            errors.append(f"{ident}: ownership must declare gtd and companion roles")
+        guardrails = item.get("guardrails")
+        if not isinstance(guardrails, list) or not guardrails:
+            errors.append(f"{ident}: guardrails must be a non-empty array")
+        for forbidden in ("manifest", "project_path", "export"):
+            if forbidden in item:
+                errors.append(f"{ident}: companion profiles cannot declare {forbidden}")
+    required = {"plugin-autopilot", "plugin-eval", "superpowers", "armorcodex", "context7"}
+    missing = sorted(required - ids)
+    if missing:
+        errors.append("missing required companions: " + ", ".join(missing))
     return errors
 
 
@@ -119,11 +188,18 @@ def validate_manifests(root: Path = ROOT) -> list[str]:
     skills_sh = parsed.get("skills.sh.json", {})
     if skills_sh.get("$schema") != "https://skills.sh/schemas/skills.sh.schema.json":
         errors.append("skills.sh.json schema mismatch")
+    if not (root / "install.sh").is_file():
+        errors.append("missing shell installer: install.sh")
+    formula = root / "Formula" / "get-things-done.rb"
+    if not formula.is_file():
+        errors.append("missing Homebrew formula: Formula/get-things-done.rb")
+    elif "class GetThingsDone < Formula" not in formula.read_text(encoding="utf-8"):
+        errors.append("Homebrew formula class mismatch")
     return errors
 
 
 def validate(root: Path = ROOT) -> list[str]:
-    errors = validate_registry(root) + validate_manifests(root)
+    errors = validate_registry(root) + validate_companions(root) + validate_manifests(root)
     for name in SKILL_NAMES:
         try:
             _skill_source(root, name)
@@ -164,6 +240,13 @@ def export_adapter(adapter_id: str, out: Path, root: Path = ROOT) -> Path:
         _copy_skills(root, target / "skills")
     elif export_kind == "kimi-plugin":
         shutil.copy2(root / "kimi.plugin.json", target / "kimi.plugin.json")
+        _copy_skills(root, target / "skills")
+    elif export_kind == "homebrew-formula":
+        (target / "Formula").mkdir()
+        shutil.copy2(root / "Formula" / "get-things-done.rb", target / "Formula" / "get-things-done.rb")
+        _copy_skills(root, target / "skills")
+    elif export_kind == "shell-bundle":
+        shutil.copy2(root / "install.sh", target / "install.sh")
         _copy_skills(root, target / "skills")
     elif export_kind == "skills-sh":
         shutil.copy2(root / "skills.sh.json", target / "skills.sh.json")
@@ -209,6 +292,25 @@ def cmd_info(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_companions(args: argparse.Namespace) -> int:
+    for item in load_companions(Path(args.root))["companions"]:
+        print(f"{item['id']:20} {item['relationship']:16} {item['label']}")
+    return 0
+
+
+def cmd_interop(args: argparse.Namespace) -> int:
+    matrix = interop_matrix(Path(args.root))
+    if args.companion:
+        item = matrix.get(args.companion)
+        if item is None:
+            print(f"unknown companion: {args.companion}", file=sys.stderr)
+            return 2
+        print(json.dumps(item, indent=2))
+        return 0
+    print(json.dumps(matrix, indent=2))
+    return 0
+
+
 def cmd_validate(args: argparse.Namespace) -> int:
     errors = validate(Path(args.root))
     if errors:
@@ -216,7 +318,11 @@ def cmd_validate(args: argparse.Namespace) -> int:
         for error in errors:
             print(f"- {error}")
         return 1
-    print(f"PASS: {len(load_registry(Path(args.root))['adapters'])} adapter contracts valid")
+    root = Path(args.root)
+    print(
+        f"PASS: {len(load_registry(root)['adapters'])} adapter contracts and "
+        f"{len(load_companions(root)['companions'])} companion profiles valid"
+    )
     return 0
 
 
@@ -251,11 +357,13 @@ def cmd_export_all(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="GTD host adapter validator and exporter")
+    parser = argparse.ArgumentParser(description="GTD host adapter validator, exporter, and interoperability inspector")
     parser.add_argument("--root", default=str(ROOT))
     subs = parser.add_subparsers(dest="command", required=True)
     p = subs.add_parser("list"); p.set_defaults(func=cmd_list)
     p = subs.add_parser("info"); p.add_argument("adapter"); p.set_defaults(func=cmd_info)
+    p = subs.add_parser("companions"); p.set_defaults(func=cmd_companions)
+    p = subs.add_parser("interop"); p.add_argument("companion", nargs="?"); p.set_defaults(func=cmd_interop)
     p = subs.add_parser("validate"); p.set_defaults(func=cmd_validate)
     p = subs.add_parser("export"); p.add_argument("adapter"); p.add_argument("--out", required=True); p.add_argument("--package", action="store_true"); p.set_defaults(func=cmd_export)
     p = subs.add_parser("export-all"); p.add_argument("--out", required=True); p.set_defaults(func=cmd_export_all)
