@@ -1,0 +1,15 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "get-things-done",
+  "description": "Get Things Done skills and workflow extensions",
+  "owner": {"name": "Mamdouh Aboammar"},
+  "plugins": [
+    {
+      "name": "get-things-done",
+      "description": "Turn fuzzy ideas into executable work models and verifiable outcomes.",
+      "source": ".",
+      "category": "productivity",
+      "homepage": "https://github.com/imMamdouhaboammar/get-things-done-skillpack"
+    }
+  ]
+}

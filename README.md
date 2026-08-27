@@ -8,9 +8,10 @@ Turn messy intent into a clear work model, identify the real blocker, execute th
 
 [![CI](https://github.com/imMamdouhaboammar/get-things-done-skillpack/actions/workflows/ci.yml/badge.svg)](https://github.com/imMamdouhaboammar/get-things-done-skillpack/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg)](https://www.python.org/)
+[![Agent Plugins 1.0](https://img.shields.io/badge/Agent_Plugins-1.0-111111.svg)](https://agent-plugins.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-111111.svg)](LICENSE)
 
-**Agent Skill Pack · Execution Briefs · Domain Packs · Deterministic Readiness & Done checks**
+**One canonical GTD core · Agent Skills · Agent Plugins · Host adapters · Execution Briefs · Domain Packs · Evidence-based completion**
 
 </div>
 
@@ -18,17 +19,69 @@ Turn messy intent into a clear work model, identify the real blocker, execute th
 
 Most ideas do not arrive as clean requirements
 
-They arrive like this
-
-> I want something around AI agents that helps marketing teams work faster, maybe a plugin, maybe a workflow, and it should understand the brand and somehow manage execution too
+They arrive half-formed, mixed with assumptions, missing decisions, unclear scope, and several possible next moves
 
 A normal assistant can turn that into a long plan
 
 That is not the same as making the work executable
 
-**Get Things Done focuses on the gap between "I have an idea" and "there is a next action we can perform and verify"**
+**Get Things Done focuses on the gap between “I have an idea” and “there is a next action we can perform and verify”**
 
-It separates what is known from what is assumed, finds the current blocker, decides whether the work needs clarification, research, decomposition, a decision, validation, execution, or verification, then keeps the state in a reusable Execution Brief
+It separates what is known from what is assumed, identifies the current blocker, decides whether the work needs clarification, research, decomposition, a decision, validation, execution, or verification, then keeps the state in a reusable Execution Brief
+
+## One GTD core, many agent hosts
+
+GTD does not maintain a different reasoning workflow for every AI client
+
+```text
+                    Canonical GTD Skills
+                           │
+          ┌────────────────┼────────────────┐
+          │                │                │
+      Agent Skills     Agent Plugins    Host Adapters
+          │                │                │
+          └────────────────┼────────────────┘
+                           │
+ Claude · ChatGPT · Codex · Cursor · Kimi · Grok · DeepCode · more
+```
+
+The `skills/` tree remains the source of truth
+
+Adapters own only discovery paths, manifests, packaging, installation layout, and compatibility checks
+
+That means a host integration cannot quietly fork the GTD decision model or create a second version of the workflow
+
+## Supported surfaces
+
+The repository tracks **17 adapter contracts**. The label describes the package/export contract GTD verifies, not a claim that every vendor has approved or listed the package in its public marketplace
+
+| Target | Support model | Delivery |
+|---|---|---|
+| Agent Skills / compatible agents | Native standard | canonical `skills/` tree |
+| Agent Plugins | Native standard | root `plugin.json` |
+| Claude AI Skills | Portable | Agent Skills package |
+| Claude Code | First-class adapter | Claude plugin + skills |
+| Claude Marketplace | First-class package | `.claude-plugin/marketplace.json` |
+| Claude Cowork | First-class adapter | Claude plugin/skill package |
+| ChatGPT Web | First-class adapter | OpenAI plugin package |
+| ChatGPT Work | First-class adapter | OpenAI plugin package |
+| ChatGPT Plugins | First-class package | `.codex-plugin/plugin.json` |
+| Codex | First-class adapter | OpenAI plugin + Agent Skills fallback |
+| Cursor | First-class adapter | `.cursor/skills` |
+| Kimi Code | First-class adapter | `kimi.plugin.json` + `.kimi-code/skills` |
+| Grok Build | First-class adapter | `.grok/skills` |
+| DeepSeek DeepCode | First-class adapter | `.deepcode/skills` |
+| Vercel skills.sh | First-class distribution metadata | `skills.sh.json` |
+| Contentful Skill Kit | Authoring bridge | typed workflow compilation when needed |
+| Glama | Conditional | enabled only when GTD ships a real `mcp.json` |
+
+Glama is intentionally not marked native today because GTD does not currently ship an MCP server
+
+The adapter CLI fails closed instead of manufacturing registry support that does not exist
+
+Public marketplace approval, directory listing, vendor review, and local package conformance are separate states. This repository only claims the states it can verify
+
+See [Host adapters and distribution](docs/adapters.md)
 
 ## What GTD does
 
@@ -58,37 +111,9 @@ The core behavior is intentionally domain-independent
 
 Software, marketing, product, and research are added through domain packs that inherit the same decision, readiness, evidence, and handoff rules
 
-## A small example
-
-**Input**
-
-> I want to build a tool that makes AI-generated landing pages feel less generic and more on-brand
-
-**Instead of jumping straight to a backlog, GTD models the work**
-
-```yaml
-outcome: AI-generated landing pages consistently follow a supplied brand direction
-current_mode: validate
-facts:
-  - the requested output is a landing page
-assumptions:
-  - brand guidance can be represented as reusable constraints and examples
-open_decisions:
-  - whether the first version targets code generation, visual review, or both
-success_criteria:
-  - independent runs can be reviewed against the same brand checks
-next_action: test three candidate brand-context representations on the same page brief
-```
-
-The point is not the YAML
-
-The point is that the next move is now explicit and testable
-
 ## Core ideas
 
-### 1. Knowledge has types
-
-GTD keeps four categories distinct
+### Knowledge has types
 
 | Type | Meaning |
 |---|---|
@@ -97,19 +122,17 @@ GTD keeps four categories distinct
 | **Decision** | selected option that changes what will be done |
 | **Unknown** | information that is still unresolved |
 
-This prevents a common agent failure where an unanswered question quietly becomes a made-up fact
+This prevents an unanswered question from quietly becoming a made-up fact
 
-### 2. One active blocker at a time
+### One active blocker at a time
 
-GTD does not run a giant generic workflow on every request
-
-It routes the current blocker to one mode
+GTD routes the current blocker to one working mode
 
 `clarify` · `research` · `decompose` · `decide` · `validate` · `model` · `execute` · `verify`
 
-After each cycle, it classifies again
+After each meaningful cycle, it classifies again
 
-### 3. Ready and Done are different gates
+### Ready and Done are different gates
 
 **Definition of Ready** asks whether the next action can be performed safely and meaningfully
 
@@ -117,9 +140,7 @@ After each cycle, it classifies again
 
 A polished plan can pass neither
 
-A generated artifact can be ready for verification without being done
-
-### 4. Progress must leave evidence
+### Progress must leave evidence
 
 A useful cycle should produce at least one concrete result
 
@@ -167,7 +188,7 @@ Substantial work is represented as a portable Execution Brief
 }
 ```
 
-The JSON Schema lives at [`skills/get-things-done/references/execution-brief.schema.json`](skills/get-things-done/references/execution-brief.schema.json)
+The schema lives at [`skills/get-things-done/references/execution-brief.schema.json`](skills/get-things-done/references/execution-brief.schema.json)
 
 ## Built-in domain packs
 
@@ -182,9 +203,7 @@ Need another field such as finance, operations, legal, sales, branding, or media
 
 Use the companion `building-gtd-domain-packs` skill to create a pack without forking the core contract
 
-## CLI
-
-The included Python CLI makes the work model inspectable outside the conversation
+## GTD CLI
 
 ```bash
 python scripts/gtd.py doctor
@@ -196,81 +215,105 @@ python scripts/gtd.py render-brief brief.json --out brief.md
 python scripts/gtd.py package --out dist
 ```
 
-### `assess-brief`
+## Adapter CLI
 
-`assess-brief` applies deterministic structural checks for the core Ready and Done gates
+Inspect the compatibility registry
 
-```text
-READY: NO
-- ready gap: success criteria are empty
-- ready gap: next executable action is missing
-DONE: NO
-- done gap: deliverables are empty
-- done gap: verification evidence is empty
+```bash
+python scripts/adapters.py list
+python scripts/adapters.py info cursor
+python scripts/adapters.py validate
 ```
 
-It does not replace domain review or human judgment
+Export one host package
 
-It catches obvious state claims that the brief itself cannot support
+```bash
+python scripts/adapters.py export cursor --out dist/adapters
+python scripts/adapters.py export chatgpt-plugin --out dist/adapters --package
+```
+
+Export every non-conditional adapter
+
+```bash
+python scripts/adapters.py export-all --out dist/adapters
+```
+
+The command exports 16 targets and reports Glama separately until an MCP package exists
 
 ## Installation
 
-### Universal agent skills directory
+Universal Agent Skills location
 
 ```bash
 ./install.sh --agents
 ```
 
-### Claude Code skills directory
+Specific user-level host locations
 
 ```bash
-./install.sh --claude
+./install.sh --target claude
+./install.sh --target cursor
+./install.sh --target kimi
+./install.sh --target grok
+./install.sh --target codex
+./install.sh --target deepseek
 ```
 
-### Both
+Install to all distinct supported user skill roots
 
 ```bash
-./install.sh --both
+./install.sh --all
 ```
 
-### Standalone archives
+For project-level or plugin packages, use `scripts/adapters.py export`
 
-```bash
-python scripts/gtd.py package --out dist
-```
-
-This produces
+## Distribution manifests
 
 ```text
-dist/get-things-done.zip
-dist/building-gtd-domain-packs.zip
+plugin.json                       Agent Plugins 1.0.0
+.codex-plugin/plugin.json         ChatGPT / Codex plugin
+.claude-plugin/plugin.json        Claude plugin
+.claude-plugin/marketplace.json   Claude marketplace
+kimi.plugin.json                  Kimi Code plugin
+skills.sh.json                    skills.sh repository metadata
+adapters/registry.json            GTD compatibility registry
 ```
 
-Each archive is self-contained for hosts that accept folder-based skill bundles
+## Verification
+
+CI verifies deterministic repository behavior across Python 3.10, 3.11, 3.12, and 3.13
+
+- GTD core tests
+- Execution Brief validation and Ready/Done assessment
+- domain pack contracts
+- skill catalog assets
+- current OpenAI skill metadata
+- adapter registry and manifest validation
+- host export smoke tests
+- standalone skill packaging
+- installer syntax
+
+Behavioral model evals remain separate from deterministic tests
+
+Passing Python tests proves package invariants, not that every model will follow every workflow perfectly under every prompt
 
 ## Repository map
 
 ```text
+plugin.json
+.codex-plugin/
+.claude-plugin/
+kimi.plugin.json
+skills.sh.json
+adapters/
+  registry.json
 skills/
-├── get-things-done/
-│   ├── SKILL.md
-│   ├── domains/
-│   ├── references/
-│   ├── templates/
-│   ├── scripts/
-│   └── agents/
-└── building-gtd-domain-packs/
-    ├── SKILL.md
-    ├── references/
-    └── templates/
-
+  get-things-done/
+  building-gtd-domain-packs/
+scripts/
+  gtd.py
+  adapters.py
 docs/
-├── README.md
-├── architecture.md
-├── quickstart.md
-├── domain-packs.md
-└── evaluation.md
-
 evals/
 examples/
 tests/
@@ -279,26 +322,12 @@ tests/
 ## Docs
 
 - [Docs index](docs/README.md)
-- [Architecture](docs/architecture.md)
 - [Quickstart](docs/quickstart.md)
+- [Architecture](docs/architecture.md)
+- [Host adapters](docs/adapters.md)
+- [Execution Brief](docs/execution-brief.md)
 - [Building domain packs](docs/domain-packs.md)
-- [Evaluation approach](docs/evaluation.md)
-
-## Verification status
-
-The repository CI checks the deterministic parts of the pack across supported Python versions
-
-- skill file and reference integrity
-- domain pack contract shape
-- Execution Brief validation
-- CLI behavior
-- standalone packaging
-- catalog assets
-- install script syntax
-
-Behavioral agent eval cases are included under [`evals/`](evals/) and are intentionally reported separately from deterministic test coverage
-
-That distinction matters because passing Python tests does not prove that every model will follow a skill correctly under every prompt
+- [Evaluation](docs/evaluation.md)
 
 ## Design principle
 

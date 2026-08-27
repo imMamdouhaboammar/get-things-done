@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "get-things-done",
+  "version": "1.2.0",
+  "description": "Turn fuzzy intent into executable work models, explicit decisions, next actions, and verifiable completion."
+}

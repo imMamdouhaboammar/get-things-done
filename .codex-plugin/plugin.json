@@ -1,0 +1,29 @@
+{
+  "name": "get-things-done",
+  "version": "1.2.0",
+  "description": "Turn messy ideas into executable work models and verifiable outcomes.",
+  "author": {"name": "Mamdouh Aboammar", "url": "https://github.com/imMamdouhaboammar"},
+  "homepage": "https://github.com/imMamdouhaboammar/get-things-done-skillpack",
+  "repository": "https://github.com/imMamdouhaboammar/get-things-done-skillpack",
+  "license": "MIT",
+  "keywords": ["execution", "planning", "agent-skills", "workflow", "decision-making"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Get Things Done",
+    "shortDescription": "Turn fuzzy ideas into executable work",
+    "longDescription": "Get Things Done helps ChatGPT and Codex convert incomplete or chaotic intent into an explicit work model: facts, assumptions, decisions, blockers, scope, success criteria, a next executable action, and evidence-backed completion.",
+    "developerName": "Mamdouh Aboammar",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://github.com/imMamdouhaboammar/get-things-done-skillpack",
+    "defaultPrompt": [
+      "Turn this messy idea into an executable work model.",
+      "Find what is blocking this work and define the next action.",
+      "Check whether this work is actually ready or done."
+    ],
+    "brandColor": "#2563EB",
+    "composerIcon": "./skills/get-things-done/assets/small-logo.svg",
+    "logo": "./skills/get-things-done/assets/large-logo.svg",
+    "screenshots": []
+  }
+}

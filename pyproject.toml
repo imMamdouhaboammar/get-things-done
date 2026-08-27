@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "get-things-done-skillpack"
-version = "1.1.0"
-description = "Turn messy intent into executable work models with explicit decisions, readiness checks, and completion evidence for AI agents."
+version = "1.2.0"
+description = "Turn messy intent into executable work models with explicit decisions, readiness checks, completion evidence, and multi-host agent adapters."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
@@ -14,13 +14,18 @@ authors = [
 keywords = [
     "ai-agent",
     "agent-skills",
+    "agent-plugins",
     "gtd",
     "execution",
     "workflow",
     "chatgpt",
     "codex",
     "claude-code",
-    "antigravity",
+    "cursor",
+    "kimi",
+    "grok",
+    "deepseek",
+    "skills-sh",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
