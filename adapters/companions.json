@@ -1,0 +1,98 @@
+{
+  "$schema": "./companions.schema.json",
+  "schema_version": "1.0",
+  "purpose": "Machine-readable interoperability profiles for optional tools that complement GTD without becoming host adapters or runtime dependencies.",
+  "companions": [
+    {
+      "id": "plugin-autopilot",
+      "label": "Plugin Autopilot",
+      "kind": "orchestration",
+      "relationship": "complementary",
+      "companion_role": "agent-orchestration",
+      "ownership": {
+        "gtd": "execution-contract",
+        "companion": "agent-orchestration"
+      },
+      "integration": "GTD defines the execution brief, work states, evidence, and completion contract; Autopilot may decide when and where agent work runs.",
+      "inputs": ["execution-brief", "work-state", "target-environment"],
+      "outputs": ["agent-dispatch-plan", "execution-timeline", "host-routing"],
+      "evidence_contract": "Autopilot execution logs are captured as execution history; GTD maintains the core workstream completion record.",
+      "failure_policy": "graceful-degradation-to-manual-agent-dispatch",
+      "authority_boundary": "Autopilot decides execution orchestration timing; GTD defines task readiness, state transitions, and completion evidence.",
+      "guardrails": ["no-behavior-copy", "no-runtime-dependency", "preserve-gtd-completion-contract"]
+    },
+    {
+      "id": "plugin-eval",
+      "label": "Plugin Eval",
+      "kind": "evaluation",
+      "relationship": "complementary",
+      "companion_role": "plugin-evaluation",
+      "ownership": {
+        "gtd": "execution-contract",
+        "companion": "plugin-evaluation"
+      },
+      "integration": "GTD owns task execution and evidence capture; Plugin Eval may evaluate a skill or plugin artifact and feed findings back as verification evidence or follow-up work.",
+      "inputs": ["skill-package", "execution-brief", "test-assertions"],
+      "outputs": ["evaluation-scorecard", "pressure-case-findings", "regression-report"],
+      "evidence_contract": "Plugin Eval results enter GTD as verification evidence artifacts; scores do not automatically override Done definitions.",
+      "failure_policy": "fail-safe-blocker-on-evaluation-regression",
+      "authority_boundary": "Evaluation findings inform verification; GTD core criteria determine whether the work is genuinely complete.",
+      "guardrails": ["evaluation-is-evidence-not-authority", "no-runtime-dependency", "preserve-gtd-exit-conditions"]
+    },
+    {
+      "id": "superpowers",
+      "label": "Superpowers",
+      "kind": "methodology",
+      "relationship": "complementary",
+      "companion_role": "development-methodology",
+      "ownership": {
+        "gtd": "execution-contract",
+        "companion": "development-methodology"
+      },
+      "integration": "GTD can wrap a Superpowers-driven engineering workflow with explicit readiness, evidence, blocker, and done semantics without duplicating Superpowers skills.",
+      "inputs": ["user-intent", "codebase-context", "task-specification"],
+      "outputs": ["implementation-plan", "tdd-cycles", "code-review-checkpoints"],
+      "evidence_contract": "Superpowers TDD and review outcomes populate GTD verification evidence tables directly.",
+      "failure_policy": "fail-safe-halt-on-test-failure",
+      "authority_boundary": "Superpowers guides development disciplines; GTD wraps the high-level Execution Brief and readiness/done gates.",
+      "guardrails": ["no-skill-vendoring", "respect-host-skill-routing", "gtd-remains-domain-independent"]
+    },
+    {
+      "id": "armorcodex",
+      "label": "ArmorCodex",
+      "kind": "security",
+      "relationship": "complementary",
+      "companion_role": "security-review",
+      "ownership": {
+        "gtd": "execution-contract",
+        "companion": "security-review"
+      },
+      "integration": "Security findings can become GTD evidence, blockers, or follow-up tasks; GTD does not weaken or override the security tool's severity and validation semantics.",
+      "inputs": ["source-diff", "dependency-manifests", "adapter-configurations"],
+      "outputs": ["security-audit-report", "vulnerability-findings", "remediation-advisories"],
+      "evidence_contract": "Security scan findings are recorded as blockers or follow-up tasks; severity scores are preserved without modification.",
+      "failure_policy": "fail-closed-on-critical-vulnerability",
+      "authority_boundary": "ArmorCodex owns security finding severity; GTD determines whether blockers prevent promotion through Ready/Done gates.",
+      "guardrails": ["security-findings-remain-independent", "no-severity-rewrite", "no-runtime-dependency"]
+    },
+    {
+      "id": "context7",
+      "label": "Context7",
+      "kind": "documentation",
+      "relationship": "optional",
+      "companion_role": "documentation-retrieval",
+      "transport": "MCP",
+      "ownership": {
+        "gtd": "execution-contract",
+        "companion": "documentation-retrieval"
+      },
+      "integration": "Context7 may supply current library and framework documentation during research or implementation; GTD records relevant evidence and decisions but does not treat retrieved text as repository authority.",
+      "inputs": ["library-queries", "api-symbols", "framework-versions"],
+      "outputs": ["verified-documentation", "api-signatures", "usage-examples"],
+      "evidence_contract": "Retrieved documentation is cited in facts or decisions; external docs do not override repository architecture.",
+      "failure_policy": "fallback-to-local-source-inspection",
+      "authority_boundary": "Context7 provides external reference context over MCP; repository source code and local governance remain primary authority.",
+      "guardrails": ["source-of-truth", "repository-governance-wins", "no-runtime-dependency"]
+    }
+  ]
+}

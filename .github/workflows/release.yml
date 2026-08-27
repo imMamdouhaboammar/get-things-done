@@ -24,12 +24,32 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pyyaml pytest
+          pip install jsonschema pyyaml pytest
 
-      - name: Validate & Package Skills
+      - name: Validate Skills And Adapters
         run: |
           python scripts/catalog_stylist.py --validate
+          python scripts/adapters.py validate
+          pytest -q
+
+      - name: Package Canonical Skills
+        run: |
           python scripts/package_skills.py --out ./dist
+
+      - name: Build Adapter Bundles
+        run: |
+          python scripts/adapters.py export-all --out ./dist/adapters --package
+          test -f ./dist/adapters/homebrew.zip
+          test -f ./dist/adapters/shell.zip
+          test -f ./dist/adapters/codex.zip
+          test ! -e ./dist/adapters/glama.zip
+
+      - name: Write Release Checksums
+        run: |
+          python scripts/release_checksums.py ./dist --out ./dist/SHA256SUMS
+          python scripts/release_checksums.py ./dist/adapters --out ./dist/adapters/SHA256SUMS
+          python scripts/release_checksums.py ./dist --verify ./dist/SHA256SUMS
+          python scripts/release_checksums.py ./dist/adapters --verify ./dist/adapters/SHA256SUMS
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -38,6 +58,9 @@ jobs:
           files: |
             dist/get-things-done.zip
             dist/building-gtd-domain-packs.zip
+            dist/SHA256SUMS
+            dist/adapters/*.zip
+            dist/adapters/SHA256SUMS
           draft: false
           prerelease: false
           generate_release_notes: true

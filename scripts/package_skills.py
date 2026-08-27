@@ -11,20 +11,28 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 
 
+ZIP_TIMESTAMP = (2026, 1, 1, 0, 0, 0)
+
+
 def package_skill(skill_dir: Path, output_zip: Path) -> list[str]:
-    """Package a skill directory into a self-contained zip archive."""
+    """Package a skill directory into a self-contained, deterministic zip archive."""
     output_zip.parent.mkdir(parents=True, exist_ok=True)
+    if output_zip.exists():
+        output_zip.unlink()
     packaged_files: list[str] = []
     
     with zipfile.ZipFile(output_zip, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        for file_path in sorted(skill_dir.rglob("*")):
-            if file_path.is_file():
-                # Skip OS artifacts or caches if any
-                if file_path.name.startswith(".DS_Store") or "__pycache__" in file_path.parts:
-                    continue
-                rel_path = file_path.relative_to(skill_dir)
-                zf.write(file_path, arcname=str(rel_path))
-                packaged_files.append(str(rel_path))
+        for file_path in sorted(p for p in skill_dir.rglob("*") if p.is_file()):
+            if file_path.name.startswith(".DS_Store") or "__pycache__" in file_path.parts:
+                continue
+            rel_path = file_path.relative_to(skill_dir).as_posix()
+            info = zipfile.ZipInfo(rel_path, date_time=ZIP_TIMESTAMP)
+            info.create_system = 3
+            info.compress_type = zipfile.ZIP_DEFLATED
+            mode = file_path.stat().st_mode & 0o777
+            info.external_attr = mode << 16
+            zf.writestr(info, file_path.read_bytes())
+            packaged_files.append(rel_path)
                 
     return packaged_files
 

@@ -178,7 +178,15 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     except Exception:
         schema_ok = False
     names = sorted(p.stem for p in domains_dir(root).glob("*.md")) if domains_dir(root).exists() else []
-    if missing or not schema_ok or not names:
+    adapter_ok = True
+    if (root / "adapters" / "registry.json").is_file():
+        try:
+            reg_data = read_json(root / "adapters" / "registry.json")
+            comps_data = read_json(root / "adapters" / "companions.json")
+            adapter_ok = bool(reg_data.get("adapters")) and bool(comps_data.get("companions"))
+        except Exception:
+            adapter_ok = False
+    if missing or not schema_ok or not names or not adapter_ok:
         print("FAIL")
         if missing:
             print("missing:", ", ".join(missing))
@@ -186,8 +194,11 @@ def cmd_doctor(args: argparse.Namespace) -> int:
             print("schema: invalid")
         if not names:
             print("domains: none")
+        if not adapter_ok:
+            print("adapters: invalid")
         return 1
-    print(f"PASS: core files valid, schema readable, {len(names)} domain packs found")
+    adapter_msg = ", adapter registry verified" if (root / "adapters" / "registry.json").is_file() else ""
+    print(f"PASS: core files valid, schema readable, {len(names)} domain packs found{adapter_msg}")
     return 0
 
 

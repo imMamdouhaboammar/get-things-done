@@ -1,5 +1,19 @@
-{"id":"cursor-native-layout","adapter":"cursor","expected":"Export contains .cursor/skills and both canonical GTD skills"}
+{"id":"agent-skills-universal","adapter":"agent-skills","expected":"Export uses the canonical Agent Skills layout under .agents/skills with both GTD skills and no host-specific behavior fork"}
+{"id":"agent-plugins-standard","adapter":"agent-plugins","expected":"Export contains root plugin.json plus canonical skills and keeps Agent Plugins metadata separate from GTD behavior"}
+{"id":"claude-ai-portable","adapter":"claude-ai","expected":"Export contains both canonical skills at the Claude skills project path without requiring a separate runtime implementation"}
+{"id":"claude-code-plugin","adapter":"claude-code","expected":"Export contains Claude plugin metadata plus canonical skills"}
+{"id":"claude-marketplace","adapter":"claude-marketplace","expected":"Export contains both Claude plugin and marketplace manifests without implying public marketplace approval"}
+{"id":"claude-cowork-shared-package","adapter":"claude-cowork","expected":"Export reuses the Claude plugin and canonical skills rather than forking Cowork behavior"}
+{"id":"chatgpt-web-package","adapter":"chatgpt-web","expected":"Export contains .codex-plugin/plugin.json and canonical skills"}
+{"id":"chatgpt-work-package","adapter":"chatgpt-work","expected":"Export contains the shared OpenAI plugin package and canonical skills"}
 {"id":"openai-shared-package","adapter":"chatgpt-plugin","expected":"Export contains .codex-plugin/plugin.json and canonical skills without duplicating GTD behavior"}
-{"id":"claude-marketplace","adapter":"claude-marketplace","expected":"Export contains both Claude plugin and marketplace manifests"}
-{"id":"kimi-native-plugin","adapter":"kimi","expected":"Export contains kimi.plugin.json with skills ./skills/"}
+{"id":"codex-plugin-and-skills","adapter":"codex","expected":"Export contains the OpenAI plugin package and canonical skills compatible with the universal Agent Skills contract"}
+{"id":"cursor-native-layout","adapter":"cursor","expected":"Export contains .cursor/skills and both canonical GTD skills"}
+{"id":"kimi-native-plugin","adapter":"kimi","expected":"Export contains kimi.plugin.json with skills ./skills/ and both canonical skills"}
+{"id":"grok-native-layout","adapter":"grok","expected":"Export places both canonical skills under .grok/skills"}
+{"id":"deepseek-native-layout","adapter":"deepseek","expected":"Export places both canonical skills under .deepcode/skills while preserving universal portability separately"}
+{"id":"homebrew-head-formula","adapter":"homebrew","expected":"Export contains the HEAD-only Homebrew Formula plus canonical skills and does not claim a stable formula release"}
+{"id":"shell-portable-installer","adapter":"shell","expected":"Export contains install.sh and canonical skills; installer supports named roots, custom Agent Skills roots, dry-run, and overwrite protection"}
+{"id":"skills-sh-distribution","adapter":"skills-sh","expected":"Export contains skills.sh.json and canonical skills suitable for skills CLI discovery, all-agent install, and update flows"}
+{"id":"skill-kit-authoring-bridge","adapter":"skill-kit","expected":"Export contains canonical skills and bridge guidance without pretending Skill Kit is a GTD runtime host"}
 {"id":"glama-no-mcp","adapter":"glama","expected":"Fail closed because GTD has no mcp.json instead of claiming registry support"}

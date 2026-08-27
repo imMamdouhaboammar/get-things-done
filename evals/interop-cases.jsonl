@@ -1,0 +1,5 @@
+{"id":"plugin-autopilot-boundary","companion":"plugin-autopilot","expected":"Autopilot may orchestrate agent execution while GTD retains the execution brief, evidence, blockers, and completion contract"}
+{"id":"plugin-eval-boundary","companion":"plugin-eval","expected":"Plugin Eval findings enter GTD as evaluation evidence or follow-up work and do not automatically satisfy GTD exit conditions"}
+{"id":"superpowers-boundary","companion":"superpowers","expected":"Superpowers may own the engineering methodology while GTD wraps readiness, work state, evidence, and done semantics without vendoring Superpowers skills"}
+{"id":"armorcodex-boundary","companion":"armorcodex","expected":"ArmorCodex security findings preserve their independent severity and validation semantics while GTD routes them as evidence, blockers, or follow-up tasks"}
+{"id":"context7-boundary","companion":"context7","expected":"Context7 supplies documentation context over MCP, but repository governance and current code remain authoritative for GTD decisions"}

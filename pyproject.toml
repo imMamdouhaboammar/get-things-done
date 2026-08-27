@@ -3,14 +3,15 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "get-things-done-skillpack"
-version = "1.2.0"
+name = "get-things-done"
+version = "1.3.0"
 description = "Turn messy intent into executable work models with explicit decisions, readiness checks, completion evidence, and multi-host agent adapters."
 readme = "README.md"
 license = { text = "MIT" }
 authors = [
     { name = "Mamdouh Aboammar", email = "mamdouhfces1997@gmail.com" }
 ]
+urls = { Homepage = "https://github.com/imMamdouhaboammar/get-things-done", Repository = "https://github.com/imMamdouhaboammar/get-things-done", Documentation = "https://github.com/imMamdouhaboammar/get-things-done#readme" }
 keywords = [
     "ai-agent",
     "agent-skills",
@@ -25,6 +26,7 @@ keywords = [
     "kimi",
     "grok",
     "deepseek",
+    "homebrew",
     "skills-sh",
 ]
 classifiers = [
@@ -46,6 +48,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "jsonschema>=4.0.0",
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
     "ruff>=0.4.0",

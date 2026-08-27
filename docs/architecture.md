@@ -88,23 +88,48 @@ The detailed transition contract lives in [`core-contract.md`](../skills/get-thi
 
 ## Deterministic and model-driven layers
 
-GTD deliberately contains both
+GTD deliberately contains both:
 
 ### Deterministic
 
-- JSON validation
-- file and package integrity checks
-- domain contract shape
-- basic Ready and Done structural assessment
-- packaging
+- JSON schema validation (`execution-brief.schema.json`, `registry.schema.json`, `companions.schema.json`)
+- File, manifest, and package integrity checks
+- Cross-manifest SemVer and canonical identity alignment
+- Domain contract shape and collision checks
+- Basic Ready and Done structural assessment
+- Multi-host adapter export and deterministic packaging
+- Deterministic SHA-256 release checksum generation and verification
 
 ### Model-driven
 
-- interpreting messy intent
-- deciding which unknown matters now
-- choosing the active blocker mode
-- deciding when a domain pack is relevant
-- evaluating trade-offs
-- field-specific review
+- Interpreting messy intent
+- Deciding which unknown matters now
+- Choosing the active blocker mode
+- Deciding when a domain pack is relevant
+- Evaluating trade-offs
+- Field-specific review
 
-The CLI does not replace contextual judgment, and the skill does not pretend model judgment is deterministic
+The CLI does not replace contextual judgment, and the skill does not pretend model judgment is deterministic.
+
+## Host adapter architecture
+
+The repository maintains **19 adapter contracts** across three primary delivery tiers:
+
+1. **Native standard (`native-standard`)**: Pure Agent Skills (`skills/`) and Agent Plugins (`plugin.json`) consumed without wrapping.
+2. **First-class adapters (`first-class`)**: Manifests, packaging layouts, or installers for Claude, ChatGPT/Codex, Cursor, Kimi, Grok, DeepSeek, Homebrew, Shell, and skills.sh.
+3. **Authoring bridges and conditional integrations (`authoring-bridge`, `conditional`)**: Contentful Skill Kit compilation bridge and Glama MCP validation.
+
+Adapters are strictly thin projection layers. They never duplicate or alter the core GTD execution contract.
+
+## Companion interoperability architecture
+
+GTD defines machine-readable interoperability contracts for 5 companion tools in `adapters/companions.json`:
+
+- **Plugin Autopilot** (agent orchestration)
+- **Plugin Eval** (plugin/skill evaluation)
+- **Superpowers** (engineering methodology)
+- **ArmorCodex** (security review)
+- **Context7** (documentation retrieval)
+
+Companions never own GTD core behavior, cannot bypass exit gates, and do not become mandatory runtime dependencies. All companion interactions follow explicit inputs, outputs, evidence contracts, failure policies, and authority boundaries.
+
