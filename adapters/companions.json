@@ -1,4 +1,5 @@
 {
+  "$schema": "./companions.schema.json",
   "schema_version": "1.0",
   "purpose": "Machine-readable interoperability profiles for optional tools that complement GTD without becoming host adapters or runtime dependencies.",
   "companions": [
