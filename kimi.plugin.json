@@ -5,13 +5,13 @@
   "skills": "./skills/",
   "keywords": ["execution", "planning", "agent-skills", "workflow"],
   "author": "Mamdouh Aboammar",
-  "homepage": "https://github.com/imMamdouhaboammar/get-things-done-skillpack",
+  "homepage": "https://github.com/imMamdouhaboammar/get-things-done",
   "license": "MIT",
   "interface": {
     "displayName": "Get Things Done",
     "shortDescription": "Turn fuzzy ideas into executable work",
     "longDescription": "Model intent, blockers, decisions, scope, next actions, and evidence before claiming completion.",
     "developerName": "Mamdouh Aboammar",
-    "websiteURL": "https://github.com/imMamdouhaboammar/get-things-done-skillpack"
+    "websiteURL": "https://github.com/imMamdouhaboammar/get-things-done"
   }
 }
