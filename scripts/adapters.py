@@ -11,6 +11,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL_NAMES = ("get-things-done", "building-gtd-domain-packs")
+SAFE_PATH_FIELDS = ("project_path", "fallback_path", "manifest", "requires")
 
 
 def load_registry(root: Path = ROOT) -> dict[str, Any]:
@@ -43,6 +44,13 @@ def interop_matrix(root: Path = ROOT) -> dict[str, dict[str, str]]:
     return matrix
 
 
+def _safe_relative_path(value: Any) -> bool:
+    if not isinstance(value, str) or not value:
+        return False
+    path = Path(value)
+    return not path.is_absolute() and ".." not in path.parts
+
+
 def _skill_source(root: Path, name: str) -> Path:
     path = root / "skills" / name
     if not (path / "SKILL.md").is_file():
@@ -66,9 +74,11 @@ def validate_registry(root: Path = ROOT) -> list[str]:
         data = load_registry(root)
     except Exception as exc:
         return [f"registry unreadable: {exc}"]
+    if data.get("$schema") != "./registry.schema.json":
+        errors.append("registry must reference ./registry.schema.json")
     items = data.get("adapters")
     if not isinstance(items, list) or not items:
-        return ["registry adapters must be a non-empty array"]
+        return errors + ["registry adapters must be a non-empty array"]
     ids: set[str] = set()
     for item in items:
         if not isinstance(item, dict):
@@ -87,6 +97,11 @@ def validate_registry(root: Path = ROOT) -> list[str]:
         capabilities = item.get("capabilities")
         if not isinstance(capabilities, list) or not capabilities or not all(isinstance(value, str) and value for value in capabilities):
             errors.append(f"{ident}: capabilities must be a non-empty string array")
+        elif len(capabilities) != len(set(capabilities)):
+            errors.append(f"{ident}: duplicate capabilities")
+        for key in SAFE_PATH_FIELDS:
+            if key in item and not _safe_relative_path(item[key]):
+                errors.append(f"{ident}: unsafe {key}: {item[key]}")
         if item.get("support") == "conditional" and not item.get("requires"):
             errors.append(f"{ident}: conditional adapter must declare requires")
     required = {
@@ -108,9 +123,11 @@ def validate_companions(root: Path = ROOT) -> list[str]:
         data = load_companions(root)
     except Exception as exc:
         return [f"companions unreadable: {exc}"]
+    if data.get("$schema") != "./companions.schema.json":
+        errors.append("companions must reference ./companions.schema.json")
     items = data.get("companions")
     if not isinstance(items, list) or not items:
-        return ["companions must be a non-empty array"]
+        return errors + ["companions must be a non-empty array"]
     ids: set[str] = set()
     allowed_kinds = {"orchestration", "evaluation", "methodology", "security", "documentation"}
     allowed_relationships = {"complementary", "optional"}
@@ -135,6 +152,8 @@ def validate_companions(root: Path = ROOT) -> list[str]:
         guardrails = item.get("guardrails")
         if not isinstance(guardrails, list) or not guardrails:
             errors.append(f"{ident}: guardrails must be a non-empty array")
+        elif len(guardrails) != len(set(guardrails)):
+            errors.append(f"{ident}: duplicate guardrails")
         for forbidden in ("manifest", "project_path", "export"):
             if forbidden in item:
                 errors.append(f"{ident}: companion profiles cannot declare {forbidden}")
@@ -213,6 +232,9 @@ def export_adapter(adapter_id: str, out: Path, root: Path = ROOT) -> Path:
     if adapter_id not in registry:
         raise KeyError(f"unknown adapter: {adapter_id}")
     adapter = registry[adapter_id]
+    registry_errors = validate_registry(root)
+    if registry_errors:
+        raise RuntimeError("invalid adapter registry: " + "; ".join(registry_errors))
     if adapter["support"] == "conditional":
         required = root / adapter["requires"]
         if not required.exists():
@@ -330,8 +352,9 @@ def cmd_export(args: argparse.Namespace) -> int:
     try:
         target = export_adapter(args.adapter, Path(args.out), Path(args.root))
     except RuntimeError as exc:
-        print(f"CONDITIONAL: {exc}", file=sys.stderr)
-        return 3
+        prefix = "CONDITIONAL" if "refusing to generate fake support" in str(exc) else "ERROR"
+        print(f"{prefix}: {exc}", file=sys.stderr)
+        return 3 if prefix == "CONDITIONAL" else 2
     except (KeyError, FileNotFoundError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
@@ -342,14 +365,23 @@ def cmd_export(args: argparse.Namespace) -> int:
 def cmd_export_all(args: argparse.Namespace) -> int:
     root = Path(args.root)
     out = Path(args.out)
+    errors = validate_registry(root)
+    if errors:
+        print("ERROR: invalid adapter registry", file=sys.stderr)
+        for error in errors:
+            print(f"- {error}", file=sys.stderr)
+        return 2
     exported = 0
     skipped: list[str] = []
     for item in load_registry(root)["adapters"]:
         try:
             export_adapter(item["id"], out, root)
             exported += 1
-        except RuntimeError:
-            skipped.append(item["id"])
+        except RuntimeError as exc:
+            if item.get("support") == "conditional" and "refusing to generate fake support" in str(exc):
+                skipped.append(item["id"])
+            else:
+                raise
     print(f"exported: {exported}")
     if skipped:
         print("conditional: " + ", ".join(skipped))
