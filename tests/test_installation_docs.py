@@ -50,3 +50,9 @@ def test_installation_guide_preserves_glama_boundary():
 def test_installation_guide_preserves_homebrew_head_boundary():
     assert "HEAD-only" in GUIDE
     assert "brew install --HEAD" in GUIDE
+
+
+def test_installation_guide_documents_checksum_verification():
+    assert "--verify" in GUIDE
+    assert "SHA256SUMS" in GUIDE
+
