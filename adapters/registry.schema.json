@@ -3,8 +3,9 @@
   "$id": "https://github.com/imMamdouhaboammar/get-things-done/blob/main/adapters/registry.schema.json",
   "title": "Get Things Done adapter registry",
   "type": "object",
-  "required": ["schema_version", "canonical_standard", "plugin_standard", "portability_contract", "adapters"],
+  "required": ["$schema", "schema_version", "canonical_standard", "plugin_standard", "portability_contract", "adapters"],
   "properties": {
+    "$schema": {"const": "./registry.schema.json"},
     "schema_version": {"type": "string"},
     "canonical_standard": {"const": "Agent Skills"},
     "plugin_standard": {"type": "string"},
