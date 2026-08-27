@@ -36,5 +36,12 @@ def test_release_validates_adapters_before_publishing():
 def test_release_builds_multi_host_adapter_artifacts():
     commands = step_run_commands(load_workflow("release.yml"), "release")
     assert "python scripts/adapters.py export-all" in commands
+    assert "--package" in commands
     assert "homebrew" in commands
     assert "shell" in commands
+
+
+def test_release_generates_checksums_for_skill_and_adapter_archives():
+    commands = step_run_commands(load_workflow("release.yml"), "release")
+    assert "python scripts/release_checksums.py ./dist --out ./dist/SHA256SUMS" in commands
+    assert "python scripts/release_checksums.py ./dist/adapters --out ./dist/adapters/SHA256SUMS" in commands
