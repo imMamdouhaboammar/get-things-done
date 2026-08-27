@@ -42,6 +42,8 @@ jobs:
       - name: Validate Host Adapter Contracts
         run: |
           python scripts/adapters.py validate
+          python scripts/adapters.py companions
+          python scripts/adapters.py interop context7
 
       - name: Smoke All Host Exports
         run: |
@@ -50,6 +52,9 @@ jobs:
           test -f ./dist/adapters/kimi/kimi.plugin.json
           test -f ./dist/adapters/chatgpt-plugin/.codex-plugin/plugin.json
           test -f ./dist/adapters/claude-marketplace/.claude-plugin/marketplace.json
+          test -f ./dist/adapters/homebrew/Formula/get-things-done.rb
+          test -f ./dist/adapters/shell/install.sh
+          test -f ./dist/adapters/shell/skills/get-things-done/SKILL.md
           test ! -e ./dist/adapters/glama
 
       - name: Run GTD CLI Doctor
@@ -65,3 +70,7 @@ jobs:
       - name: Verify Install Script Syntax
         run: |
           bash -n install.sh
+
+      - name: Verify Homebrew Formula Syntax
+        run: |
+          ruby -c Formula/get-things-done.rb
