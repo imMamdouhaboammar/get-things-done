@@ -89,7 +89,7 @@ def validate_registry(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     try:
         data = load_registry(root)
-    except Exception as exc:
+    except (json.JSONDecodeError, OSError, KeyError) as exc:
         return [f"registry unreadable: {exc}"]
     if data.get("$schema") != "./registry.schema.json":
         errors.append("registry must reference ./registry.schema.json")
@@ -138,7 +138,7 @@ def validate_companions(root: Path = ROOT) -> list[str]:
     errors: list[str] = []
     try:
         data = load_companions(root)
-    except Exception as exc:
+    except (json.JSONDecodeError, OSError, KeyError) as exc:
         return [f"companions unreadable: {exc}"]
     if data.get("$schema") != "./companions.schema.json":
         errors.append("companions must reference ./companions.schema.json")
@@ -206,7 +206,7 @@ def validate_manifests(root: Path = ROOT) -> list[str]:
             if RETIRED_REPO_NAME in content:
                 errors.append(f"{label}: references retired repository identity {RETIRED_REPO_NAME}")
             parsed[label] = json.loads(content)
-        except Exception as exc:
+        except (json.JSONDecodeError, OSError) as exc:
             errors.append(f"invalid JSON {label}: {exc}")
 
     # SemVer and version consistency check
@@ -433,7 +433,7 @@ def cmd_status(args: argparse.Namespace) -> int:
     try:
         plugin_data = json.loads((root / "plugin.json").read_text(encoding="utf-8"))
         version = plugin_data.get("version", "unknown")
-    except Exception:
+    except (json.JSONDecodeError, OSError):
         pass
 
     support_counts: dict[str, int] = {}

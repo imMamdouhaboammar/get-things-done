@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = ROOT / "skills"
 
 
-ZIP_TIMESTAMP = (2026, 1, 1, 0, 0, 0)
+ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 
 
 def package_skill(skill_dir: Path, output_zip: Path) -> list[str]:

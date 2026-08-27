@@ -175,7 +175,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     try:
         schema = read_json(references_dir(root) / "execution-brief.schema.json")
         schema_ok = schema.get("title") == "Execution Brief v1"
-    except Exception:
+    except (json.JSONDecodeError, OSError, KeyError):
         schema_ok = False
     names = sorted(p.stem for p in domains_dir(root).glob("*.md")) if domains_dir(root).exists() else []
     adapter_ok = True
@@ -184,7 +184,7 @@ def cmd_doctor(args: argparse.Namespace) -> int:
             reg_data = read_json(root / "adapters" / "registry.json")
             comps_data = read_json(root / "adapters" / "companions.json")
             adapter_ok = bool(reg_data.get("adapters")) and bool(comps_data.get("companions"))
-        except Exception:
+        except (json.JSONDecodeError, OSError, KeyError):
             adapter_ok = False
     if missing or not schema_ok or not names or not adapter_ok:
         print("FAIL")
