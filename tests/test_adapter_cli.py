@@ -25,6 +25,15 @@ def test_list_exposes_homebrew_shell_and_universal_support():
     assert "shell" in result.stdout
 
 
+def test_list_json_is_machine_readable():
+    result = run("list", "--json")
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert len(payload) == 19
+    assert any(item["id"] == "homebrew" for item in payload)
+    assert any(item["id"] == "shell" for item in payload)
+
+
 def test_info_emits_machine_readable_adapter_contract():
     result = run("info", "homebrew")
     assert result.returncode == 0, result.stderr
@@ -44,6 +53,14 @@ def test_companions_lists_requested_interop_tools():
     assert result.returncode == 0, result.stderr
     for companion in ["plugin-autopilot", "plugin-eval", "superpowers", "armorcodex", "context7"]:
         assert companion in result.stdout
+
+
+def test_companions_json_is_machine_readable():
+    result = run("companions", "--json")
+    assert result.returncode == 0, result.stderr
+    payload = json.loads(result.stdout)
+    assert len(payload) == 5
+    assert {item["id"] for item in payload} == {"plugin-autopilot", "plugin-eval", "superpowers", "armorcodex", "context7"}
 
 
 def test_interop_single_companion_is_json():
