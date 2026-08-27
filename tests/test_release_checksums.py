@@ -52,3 +52,57 @@ def test_checksum_script_fails_when_no_archives_exist(tmp_path):
     assert result.returncode == 2
     assert "no .zip artifacts" in result.stderr
     assert not output.exists()
+
+
+def test_checksum_script_verifies_valid_manifest(tmp_path):
+    (tmp_path / "pkg1.zip").write_bytes(b"content1")
+    (tmp_path / "pkg2.zip").write_bytes(b"content2")
+    manifest = tmp_path / "SHA256SUMS"
+    res1 = subprocess.run(
+        [sys.executable, str(SCRIPT), str(tmp_path), "--out", str(manifest)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert res1.returncode == 0
+    res2 = subprocess.run(
+        [sys.executable, str(SCRIPT), str(tmp_path), "--verify", str(manifest)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert res2.returncode == 0, res2.stderr
+    assert "OK" in res2.stdout
+
+
+def test_checksum_script_fails_verification_on_corrupted_file(tmp_path):
+    (tmp_path / "pkg.zip").write_bytes(b"original")
+    manifest = tmp_path / "SHA256SUMS"
+    subprocess.run([sys.executable, str(SCRIPT), str(tmp_path), "--out", str(manifest)], check=True)
+    # Corrupt the file
+    (tmp_path / "pkg.zip").write_bytes(b"tampered")
+    res = subprocess.run(
+        [sys.executable, str(SCRIPT), str(tmp_path), "--verify", str(manifest)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert res.returncode == 1
+    assert "FAILED" in res.stderr or "mismatch" in res.stderr
+
+
+def test_checksum_script_fails_verification_on_missing_file(tmp_path):
+    (tmp_path / "pkg.zip").write_bytes(b"original")
+    manifest = tmp_path / "SHA256SUMS"
+    subprocess.run([sys.executable, str(SCRIPT), str(tmp_path), "--out", str(manifest)], check=True)
+    # Delete the file
+    (tmp_path / "pkg.zip").unlink()
+    res = subprocess.run(
+        [sys.executable, str(SCRIPT), str(tmp_path), "--verify", str(manifest)],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    assert res.returncode == 1
+    assert "missing" in res.stderr or "FAILED" in res.stderr
+
