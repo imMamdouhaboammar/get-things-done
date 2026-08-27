@@ -1,8 +1,8 @@
 # Quickstart
 
-Start with the idea as you actually have it. Do not rewrite it into a formal prompt first
+Start with the idea as you actually have it. Do not rewrite it into a formal prompt first.
 
-For substantial work, Get Things Done should make these elements explicit before a large plan appears
+For substantial work, Get Things Done should make these elements explicit before a large plan appears:
 
 - desired outcome
 - important Facts
@@ -13,7 +13,22 @@ For substantial work, Get Things Done should make these elements explicit before
 - success criteria
 - one next executable action
 
-## Create a machine-readable brief
+## 1. Verify your setup
+
+Check repository health and registered domain packs:
+
+```bash
+python scripts/gtd.py doctor
+```
+
+Inspect adapter ecosystem status and capabilities across all 19 supported targets:
+
+```bash
+python scripts/adapters.py status
+python scripts/adapters.py capabilities
+```
+
+## 2. Create a machine-readable brief
 
 ```bash
 python scripts/gtd.py new-brief \
@@ -22,28 +37,50 @@ python scripts/gtd.py new-brief \
   --out brief.json
 ```
 
-Validate its structure
+Validate its structure against the schema:
 
 ```bash
 python scripts/gtd.py validate-brief brief.json --root .
 ```
 
-Assess the basic Ready and Done gates
+Assess the basic Ready and Done gates:
 
 ```bash
 python scripts/gtd.py assess-brief brief.json
 ```
 
-## Choose the right stopping point
+Render the brief into human-readable Markdown:
 
-If the request is for clarity, a Ready brief can be the correct endpoint
+```bash
+python scripts/gtd.py render-brief brief.json --out brief.md
+```
 
-If the request includes implementation and the runtime can perform it, continue into action and verification
+## 3. Export for your agent host
 
-If action cannot happen in the current runtime, preserve the blocker and the exact next action instead of implying that delivery occurred
+Export a ready-to-use adapter package for your target host:
 
-## Verify before Done
+```bash
+# Export for Cursor IDE
+python scripts/adapters.py export cursor --out dist/adapters
 
-A deliverable is not automatically a completed outcome
+# Export for ChatGPT / Codex with a deterministic ZIP bundle
+python scripts/adapters.py export chatgpt-plugin --out dist/adapters --package
 
-Examples of useful evidence include tests or inspected behavior for software, measurement checks for marketing, source-backed findings for research, and acceptance evidence for product work
+# Inspect companion boundaries (e.g. Context7 documentation retrieval)
+python scripts/adapters.py interop context7
+```
+
+## 4. Choose the right stopping point
+
+If the request is for clarity, a Ready brief can be the correct endpoint.
+
+If the request includes implementation and the runtime can perform it, continue into action and verification.
+
+If action cannot happen in the current runtime, preserve the blocker and the exact next action instead of implying that delivery occurred.
+
+## 5. Verify before Done
+
+A deliverable is not automatically a completed outcome.
+
+Examples of useful evidence include tests or inspected behavior for software, measurement checks for marketing, source-backed findings for research, and acceptance evidence for product work.
+
