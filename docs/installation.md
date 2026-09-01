@@ -158,6 +158,22 @@ python scripts/adapters.py export deepseek --out dist/adapters --package
 
 The named shell target uses the universal `~/.agents/skills` user root. The exported host bundle preserves the `.deepcode/skills` layout declared by the adapter contract.
 
+## Antigravity / Gemini CLI
+
+Install GTD directly into Google Antigravity or Gemini CLI's skill configuration root:
+
+```bash
+./install.sh --target antigravity
+```
+
+This copies both canonical skills to `~/.gemini/config/skills/`.
+
+For portable packaging:
+
+```bash
+python scripts/adapters.py export antigravity --out dist/adapters --package
+```
+
 ## Homebrew
 
 GTD currently ships a HEAD-only Formula. This is intentionally not presented as a stable Homebrew release until a versioned release artifact exists.

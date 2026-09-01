@@ -26,7 +26,7 @@ def test_required_skill_files_exist():
 def test_skill_frontmatter_is_discoverable_and_not_workflow_summary():
     text = (ROOT / 'skills/get-things-done/SKILL.md').read_text()
     assert text.startswith('---\nname: get-things-done\n')
-    assert 'description: Use when' in text.split('---', 2)[1]
+    assert 'Use when' in text.split('---', 2)[1]
     assert 'messy' in text.split('---', 2)[1].lower() or 'unclear' in text.split('---', 2)[1].lower()
 
 
@@ -66,7 +66,7 @@ def test_cli_doctor_and_domain_listing():
     cmd = [sys.executable, str(ROOT / 'scripts/gtd.py'), 'list-domains', '--root', str(ROOT)]
     result = subprocess.run(cmd, capture_output=True, text=True)
     assert result.returncode == 0
-    for name in ['software', 'marketing', 'product', 'research']:
+    for name in ['software', 'marketing', 'product', 'research', 'data-ai', 'design-ux', 'operations', 'legal-compliance']:
         assert name in result.stdout
 
 

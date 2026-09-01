@@ -1,0 +1,30 @@
+[
+  {
+    "name": "legal-domain-pack-request",
+    "prompt": "i need to extend GTD for legal work — the core doesn't have jurisdiction handling or the distinction between legal analysis and legal opinion",
+    "should_trigger": true,
+    "category": "domain",
+    "notes": "Clear request to extend GTD for a specialized vertical with identified gaps — exactly what building-gtd-domain-packs is for"
+  },
+  {
+    "name": "ml-domain-pack-request",
+    "prompt": "build a domain pack for ML/data engineering work so GTD handles hypothesis-driven experiments and dataset versioning properly",
+    "should_trigger": true,
+    "category": "domain",
+    "notes": "Explicit domain pack build request for ML/data engineering — correct trigger for building-gtd-domain-packs"
+  },
+  {
+    "name": "use-gtd-for-startup",
+    "prompt": "i want to use GTD to plan my startup",
+    "should_trigger": false,
+    "category": "core",
+    "notes": "User wants to use GTD itself, not extend it — should route to get-things-done skill, not building-gtd-domain-packs"
+  },
+  {
+    "name": "unrelated-new-skill",
+    "prompt": "write a new agent skill that helps with calendar scheduling",
+    "should_trigger": false,
+    "category": "core",
+    "notes": "New skill request entirely unrelated to GTD domain pack extension — different scope and target skill"
+  }
+]

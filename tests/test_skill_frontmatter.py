@@ -22,7 +22,7 @@ def test_skill_md_frontmatter_is_valid_yaml_and_conforms(skill_dir: Path):
     assert isinstance(data, dict)
     assert data["name"] == skill_dir.name
     assert isinstance(data.get("description"), str)
-    assert data["description"].startswith("Use when")
+    assert "Use when" in data["description"]
     assert len(data["description"]) >= 40
 
 

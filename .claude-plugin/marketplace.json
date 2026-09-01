@@ -1,8 +1,15 @@
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "schema_version": "1.0",
   "name": "get-things-done",
-  "description": "Get Things Done skills and workflow extensions",
-  "owner": {"name": "Mamdouh Aboammar"},
+  "display_name": "Get Things Done",
+  "version": "1.4.0",
+  "description": "Turn messy intent into executable work models with explicit decisions, next actions, and evidence-backed completion. Covers software, product, research, marketing, advisory, data/AI, design/UX, operations, and legal/compliance domains.",
+  "author": {
+    "name": "Mamdouh Aboammar",
+    "url": "https://github.com/imMamdouhaboammar"
+  },
+  "homepage": "https://github.com/imMamdouhaboammar/get-things-done",
+  "license": "MIT",
   "plugins": [
     {
       "name": "get-things-done",
@@ -11,5 +18,28 @@
       "category": "productivity",
       "homepage": "https://github.com/imMamdouhaboammar/get-things-done"
     }
-  ]
+  ],
+  "skills": [
+    {
+      "name": "get-things-done",
+      "path": "../skills/get-things-done",
+      "description": "Core execution skill — turns unclear intent into executable work across any domain"
+    },
+    {
+      "name": "building-gtd-domain-packs",
+      "path": "../skills/building-gtd-domain-packs",
+      "description": "Extend GTD for a specialized field without forking the core"
+    }
+  ],
+  "categories": ["Productivity", "Planning", "Developer Tools"],
+  "tags": ["execution", "planning", "workflow", "decision-making", "agent-skills", "gtd"],
+  "assets": {
+    "icon": "../skills/get-things-done/assets/small-logo.svg",
+    "logo": "../skills/get-things-done/assets/large-logo.svg"
+  },
+  "links": {
+    "repository": "https://github.com/imMamdouhaboammar/get-things-done",
+    "documentation": "https://github.com/imMamdouhaboammar/get-things-done#readme",
+    "issues": "https://github.com/imMamdouhaboammar/get-things-done/issues"
+  }
 }

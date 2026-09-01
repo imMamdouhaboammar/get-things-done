@@ -1,9 +1,24 @@
 {
   "name": "get-things-done",
-  "version": "1.3.0",
-  "description": "Turn fuzzy ideas into executable work models and verifiable outcomes.",
-  "author": {"name": "Mamdouh Aboammar"},
+  "version": "1.4.0",
+  "description": "Turn messy intent into executable work models with explicit decisions, next actions, and verifiable completion.",
+  "author": {
+    "name": "Mamdouh Aboammar",
+    "url": "https://github.com/imMamdouhaboammar"
+  },
   "homepage": "https://github.com/imMamdouhaboammar/get-things-done",
   "repository": "https://github.com/imMamdouhaboammar/get-things-done",
-  "license": "MIT"
+  "license": "MIT",
+  "skills": "../skills/",
+  "interface": {
+    "displayName": "Get Things Done",
+    "shortDescription": "Turn fuzzy ideas into executable work",
+    "longDescription": "Get Things Done helps Claude convert unclear or incomplete intent into an explicit work model: facts, assumptions, decisions, blockers, scope, success criteria, a next executable action, and evidence-backed completion. Works across 9 domain packs: software, product, research, marketing, advisory, data/AI, design/UX, operations, and legal/compliance.",
+    "category": "Productivity",
+    "tags": ["execution", "planning", "workflow", "decision-making", "agent-skills"],
+    "developerName": "Mamdouh Aboammar",
+    "websiteURL": "https://github.com/imMamdouhaboammar/get-things-done",
+    "composerIcon": "../skills/get-things-done/assets/small-logo.svg",
+    "logo": "../skills/get-things-done/assets/large-logo.svg"
+  }
 }

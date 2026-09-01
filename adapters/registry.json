@@ -1,6 +1,6 @@
 {
   "$schema": "./registry.schema.json",
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "canonical_standard": "Agent Skills",
   "plugin_standard": "Agent Plugins 1.0.0",
   "portability_contract": "Any agent that consumes the Agent Skills standard can use the canonical skills-layout export without requiring a dedicated GTD behavior fork.",
@@ -19,6 +19,7 @@
     {"id":"kimi","label":"Kimi Code","family":"moonshot","support":"first-class","kind":"skills+plugin","project_path":".kimi-code/skills","fallback_path":".agents/skills","manifest":"kimi.plugin.json","export":"kimi-plugin","capabilities":["skills","plugin-package"]},
     {"id":"grok","label":"Grok Build","family":"xai","support":"first-class","kind":"skills","project_path":".grok/skills","fallback_path":".agents/skills","export":"skills-layout","capabilities":["skills"]},
     {"id":"deepseek","label":"DeepSeek DeepCode","family":"deepseek","support":"first-class","kind":"skills","project_path":".deepcode/skills","fallback_path":".agents/skills","export":"skills-layout","capabilities":["skills"]},
+    {"id":"antigravity","label":"Antigravity / Gemini CLI","family":"google","support":"first-class","kind":"skills","project_path":".gemini/config/skills","fallback_path":".agents/skills","export":"skills-layout","capabilities":["skills"]},
     {"id":"homebrew","label":"Homebrew","family":"distribution","support":"first-class","kind":"package-manager","manifest":"Formula/get-things-done.rb","export":"homebrew-formula","capabilities":["cli-install","skills-bundle","head-install"]},
     {"id":"shell","label":"Shell Installer","family":"distribution","support":"first-class","kind":"installer","manifest":"install.sh","export":"shell-bundle","capabilities":["skills","custom-install-root","multi-host-install"]},
     {"id":"skills-sh","label":"Vercel skills.sh","family":"distribution","support":"first-class","kind":"registry","manifest":"skills.sh.json","export":"skills-sh","capabilities":["skills-distribution","updates"]},

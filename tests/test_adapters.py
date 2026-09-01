@@ -32,7 +32,7 @@ def make_repo(tmp_path: Path) -> Path:
 
 def test_registry_covers_requested_hosts():
     ids = set(adapters.adapters_by_id().keys())
-    expected = {"claude-ai", "claude-code", "claude-marketplace", "claude-cowork", "chatgpt-web", "chatgpt-work", "chatgpt-plugin", "codex", "cursor", "kimi", "grok", "deepseek", "homebrew", "shell", "skills-sh", "skill-kit", "glama", "agent-skills", "agent-plugins"}
+    expected = {"claude-ai", "claude-code", "claude-marketplace", "claude-cowork", "chatgpt-web", "chatgpt-work", "chatgpt-plugin", "codex", "cursor", "kimi", "grok", "deepseek", "homebrew", "shell", "skills-sh", "skill-kit", "glama", "agent-skills", "agent-plugins", "antigravity"}
     assert expected <= ids
 
 

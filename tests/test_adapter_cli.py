@@ -29,9 +29,10 @@ def test_list_json_is_machine_readable():
     result = run("list", "--json")
     assert result.returncode == 0, result.stderr
     payload = json.loads(result.stdout)
-    assert len(payload) == 19
+    assert len(payload) == 20
     assert any(item["id"] == "homebrew" for item in payload)
     assert any(item["id"] == "shell" for item in payload)
+    assert any(item["id"] == "antigravity" for item in payload)
 
 
 def test_info_emits_machine_readable_adapter_contract():
@@ -79,7 +80,7 @@ def test_unknown_companion_returns_usage_error_code():
 def test_validate_reports_adapter_and_companion_counts():
     result = run("validate")
     assert result.returncode == 0, result.stderr
-    assert "19 adapter contracts" in result.stdout
+    assert "20 adapter contracts" in result.stdout
     assert "5 companion profiles" in result.stdout
 
 
@@ -96,7 +97,7 @@ def test_export_all_package_builds_reproducible_archives(tmp_path):
 def test_status_command_reports_summary_and_breakdown():
     result = run("status")
     assert result.returncode == 0, result.stderr
-    assert "Adapters: 19" in result.stdout
+    assert "Adapters: 20" in result.stdout
     assert "Companions: 5" in result.stdout
     assert "first-class" in result.stdout
 
@@ -105,10 +106,10 @@ def test_status_json_command_returns_structured_metrics():
     result = run("status", "--json")
     assert result.returncode == 0, result.stderr
     payload = json.loads(result.stdout)
-    assert payload["adapters_total"] == 19
+    assert payload["adapters_total"] == 20
     assert payload["companions_total"] == 5
     assert payload["support_counts"]["first-class"] >= 10
-    assert payload["version"] == "1.3.0"
+    assert payload["version"] == "1.4.0"
 
 
 def test_capabilities_command_lists_all_capabilities():
@@ -149,8 +150,8 @@ def test_export_all_writes_structured_report(tmp_path):
     assert result.returncode == 0, result.stderr
     assert report_file.is_file()
     payload = json.loads(report_file.read_text(encoding="utf-8"))
-    assert payload["exported"] == 18
-    assert payload["packaged"] == 18
+    assert payload["exported"] == 19
+    assert payload["packaged"] == 19
     assert "glama" in payload["skipped_conditional"]
-    assert len(payload["artifacts"]) == 18
+    assert len(payload["artifacts"]) == 19
 

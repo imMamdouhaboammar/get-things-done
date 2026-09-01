@@ -1,0 +1,51 @@
+# Development
+.git/
+.github/
+.vscode/
+.cursor/
+.claude/
+.kiro/
+.qoder/
+.codebuddy/
+.gemini/
+.ruff_cache/
+.pytest_cache/
+.code-review-graph/
+.code-review-graph-venv/
+
+# Build and distribution
+dist/
+
+# Source tools
+scripts/
+tests/
+evals/
+docs/
+Formula/
+examples/
+
+# Python
+*.py
+pyproject.toml
+*.pyc
+__pycache__/
+
+# Planning
+task_plan.md
+findings.md
+progress.md
+
+# Config files not needed by consumers
+opencode.jsonc
+.mcp.json
+.cursorrules
+.windsurfrules
+*.sh.json
+
+# Agent config files (not the plugin manifests)
+.claude-plugin/
+.codex-plugin/
+kimi.plugin.json
+
+# Misc
+.DS_Store

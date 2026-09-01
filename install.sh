@@ -16,7 +16,7 @@ Legacy options:
   --both                Install to both universal and Claude locations
 
 Multi-host options:
-  --target <name>       agents|codex|claude|cursor|kimi|grok|deepseek
+  --target <name>       agents|codex|claude|cursor|kimi|grok|deepseek|antigravity|gemini-cli
   --target-path <dir>   Install to an explicit Agent Skills-compatible root
   --all                 Install to all distinct supported user skill roots
   --list-targets        Print named shell targets without installing
@@ -34,13 +34,15 @@ EOF
 
 list_targets() {
   cat <<'EOF'
-agents     ~/.agents/skills
-codex      ~/.agents/skills
-claude     ~/.claude/skills
-cursor     ~/.cursor/skills
-kimi       ${KIMI_CODE_HOME:-~/.kimi-code}/skills
-grok       ~/.grok/skills
-deepseek   ~/.agents/skills
+agents       ~/.agents/skills
+codex        ~/.agents/skills
+claude       ~/.claude/skills
+cursor       ~/.cursor/skills
+kimi         ${KIMI_CODE_HOME:-~/.kimi-code}/skills
+grok         ~/.grok/skills
+deepseek     ~/.agents/skills
+antigravity  ~/.gemini/config/skills
+gemini-cli   ~/.gemini/config/skills
 EOF
 }
 
@@ -56,7 +58,7 @@ while [[ $# -gt 0 ]]; do
       [[ $# -ge 2 ]] || { echo "--target-path requires a value" >&2; exit 2; }
       [[ -n "$2" ]] || { echo "--target-path cannot be empty" >&2; exit 2; }
       TARGET_PATHS+=("$2"); shift 2 ;;
-    --all) TARGETS+=("agents" "claude" "cursor" "kimi" "grok" "deepseek"); shift ;;
+    --all) TARGETS+=("agents" "claude" "cursor" "kimi" "grok" "deepseek" "antigravity"); shift ;;
     --list-targets) list_targets; exit 0 ;;
     --dry-run) DRY_RUN="true"; shift ;;
     --force) FORCE="true"; shift ;;
@@ -125,6 +127,7 @@ if [[ ${#TARGETS[@]} -gt 0 ]]; then
       cursor) install_to "$HOME/.cursor/skills" ;;
       kimi) install_to "${KIMI_CODE_HOME:-$HOME/.kimi-code}/skills" ;;
       grok) install_to "$HOME/.grok/skills" ;;
+      antigravity|gemini-cli) install_to "$HOME/.gemini/config/skills" ;;
       *) echo "Unknown target: $target" >&2; exit 2 ;;
     esac
   done

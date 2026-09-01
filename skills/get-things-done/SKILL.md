@@ -1,15 +1,30 @@
 ---
 name: get-things-done
-description: Use when a user has a messy, unclear, broad, incomplete, contradictory, or partially formed idea and needs help turning it into work that can be decided, executed, verified, or handed off across domains
+description: >
+  Use when someone says "I have an idea but don't know where to start", "help me figure out what to do next on X", "turn this into a plan I can actually execute", "I'm stuck and need to find the blocker", or "what's the next action here" — even if they don't mention GTD or execution models. Turn messy, unclear, broad, or contradictory intent into an executable work model and drive it through delivery. Do not use for simple one-step questions with a known answer, tasks already fully specified and ready to execute, or pure research or writing with no decision component.
 ---
 
 # Get Things Done
 
-Turn unclear intent into an executable work model, then continue through delivery when execution was requested and the runtime can act
+Turn unclear intent into an executable work model, then continue through delivery when execution was requested and the runtime can act.
 
-**REQUIRED REFERENCE:** Read `references/core-contract.md`
+Load `references/core-contract.md` at the start of every cycle — the knowledge ledger, mode router, and gate contracts live there.
 
-Load one matching pack from `domains/` only when task intent clearly belongs to a supported field. If selection is ambiguous, stay on the core until evidence favors a domain. Never force a domain from keywords alone
+## Domain quick-select
+
+Load one matching pack from `domains/` only when task intent clearly belongs to a supported field. Stay on core when domain is ambiguous — never force a domain from keywords alone.
+
+| Domain | Load when |
+|---|---|
+| `domains/software.md` | code, APIs, architecture, bugs, infra |
+| `domains/product.md` | user problems, features, prioritization, roadmap |
+| `domains/research.md` | evidence synthesis, literature, technical investigation |
+| `domains/marketing.md` | campaigns, positioning, acquisition, content |
+| `domains/advisory.md` | strategic crossroads, career forks, direct honest feedback |
+| `domains/data-ai.md` | data pipelines, ML, model training, AI system design |
+| `domains/design-ux.md` | UX research, interaction design, design systems |
+| `domains/operations.md` | incidents, runbooks, SLO management, postmortems |
+| `domains/legal-compliance.md` | contracts, compliance gaps, regulatory mapping |
 
 ## Operating loop
 
@@ -64,10 +79,6 @@ Each meaningful cycle should produce at least one of these
 
 If none happened, the cycle remained analysis
 
-## Output profiles
+## Output
 
-**Small task:** clarified outcome, relevant assumptions, and next executable action
-
-**Substantial task:** updated Execution Brief plus the active blocker or next action
-
-**Handoff:** current outcome, status, scope, knowledge ledger, decisions, artifacts, evidence, blockers, and next action without duplicating existing artifacts
+See `references/output-profiles.md` for output shape by task size.

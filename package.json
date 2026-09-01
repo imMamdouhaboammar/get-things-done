@@ -1,0 +1,42 @@
+{
+  "name": "get-things-done",
+  "version": "1.4.0",
+  "description": "GTD agent skill — turn messy intent into executable work models with evidence-backed completion. For Claude, Codex, Cursor, Kimi, Grok, DeepSeek, Antigravity, and any Agent Skills-compatible runtime.",
+  "keywords": [
+    "agent-skills",
+    "gtd",
+    "get-things-done",
+    "claude",
+    "codex",
+    "cursor",
+    "kimi",
+    "grok",
+    "deepseek",
+    "antigravity",
+    "gemini-cli",
+    "execution",
+    "workflow",
+    "agent-plugins"
+  ],
+  "author": "Mamdouh Aboammar <mamdouhfces1997@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/imMamdouhaboammar/get-things-done",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imMamdouhaboammar/get-things-done.git"
+  },
+  "bugs": {
+    "url": "https://github.com/imMamdouhaboammar/get-things-done/issues"
+  },
+  "files": [
+    "skills/",
+    "skills.sh.json",
+    "plugin.json",
+    "install.sh",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=16"
+  }
+}

@@ -1,0 +1,430 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/imMamdouhaboammar/get-things-done/schemas/execution-brief-v2.schema.json",
+  "title": "Execution Brief v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "brief_id",
+    "revision",
+    "plan_changes",
+    "title",
+    "domain",
+    "mode",
+    "status",
+    "outcome",
+    "scope",
+    "knowledge",
+    "authority",
+    "active_frontier",
+    "attempts",
+    "reviews",
+    "decisions",
+    "open_decisions",
+    "workstreams",
+    "deliverables",
+    "risks",
+    "checkpoints",
+    "handoffs",
+    "verification",
+    "capabilities",
+    "next_action",
+    "blockers",
+    "terminal_state",
+    "domain_data"
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9._:-]*$"
+    },
+    "nullableString": {
+      "type": ["string", "null"]
+    },
+    "riskLevel": {
+      "enum": ["unknown", "low", "medium", "high", "critical"]
+    },
+    "capability": {
+      "enum": ["available", "unavailable", "unknown"]
+    },
+    "evidenceLevel": {
+      "enum": ["claim", "direct", "independent"]
+    }
+  },
+  "properties": {
+    "version": {"const": "2.0"},
+    "brief_id": {"$ref": "#/$defs/id"},
+    "revision": {"type": "integer", "minimum": 1},
+    "plan_changes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["revision", "changed_at", "trigger", "summary", "changed_refs", "checkpoint_id"],
+        "properties": {
+          "revision": {"type": "integer", "minimum": 1},
+          "changed_at": {"type": ["string", "null"], "format": "date-time"},
+          "trigger": {"enum": ["initial", "migration", "decision", "evidence", "risk", "blocker", "handoff", "recovery", "manual"]},
+          "summary": {"type": "string", "minLength": 1},
+          "changed_refs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "checkpoint_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]}
+        }
+      }
+    },
+    "title": {"type": "string", "minLength": 1},
+    "domain": {"type": ["string", "null"]},
+    "mode": {"enum": ["fast", "standard", "high-assurance"]},
+    "status": {
+      "enum": ["captured", "clarifying", "researching", "modeling", "ready", "executing", "recovering", "verifying", "done", "blocked"]
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["problem", "desired_result", "actor", "acceptance_summary"],
+      "properties": {
+        "problem": {"type": "string"},
+        "desired_result": {"type": "string"},
+        "actor": {"$ref": "#/$defs/nullableString"},
+        "acceptance_summary": {"type": "string"}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["in", "out", "constraints"],
+      "properties": {
+        "in": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "out": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "constraints": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "knowledge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["facts", "assumptions", "unknowns"],
+      "properties": {
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "statement", "source"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "statement": {"type": "string", "minLength": 1},
+              "source": {"$ref": "#/$defs/nullableString"}
+            }
+          }
+        },
+        "assumptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "statement", "risk", "expires_at"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "statement": {"type": "string", "minLength": 1},
+              "risk": {"$ref": "#/$defs/riskLevel"},
+              "expires_at": {"type": ["string", "null"], "format": "date-time"}
+            }
+          }
+        },
+        "unknowns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "statement", "blocking", "owner"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "statement": {"type": "string", "minLength": 1},
+              "blocking": {"type": "boolean"},
+              "owner": {"$ref": "#/$defs/nullableString"}
+            }
+          }
+        }
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actions"],
+      "properties": {
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "description", "target", "side_effect", "reversible", "approval", "status"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "description": {"type": "string", "minLength": 1},
+              "target": {"type": "string", "minLength": 1},
+              "side_effect": {"enum": ["local", "external", "public", "financial", "security", "destructive"]},
+              "reversible": {"type": "boolean"},
+              "approval": {"enum": ["not_required", "required", "approved"]},
+              "status": {"enum": ["proposed", "authorized", "completed", "revoked"]}
+            }
+          }
+        }
+      }
+    },
+    "active_frontier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "reason", "exit_condition"],
+      "properties": {
+        "mode": {"enum": ["clarify", "research", "decompose", "decide", "validate", "model", "execute", "recover", "verify"]},
+        "reason": {"type": "string"},
+        "exit_condition": {"type": "string"}
+      }
+    },
+    "attempts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "workstream_id", "action", "started_at", "ended_at", "outcome", "failure_class", "retry_allowed", "reconciliation", "artifact_changes"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "workstream_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+          "action": {"type": "string", "minLength": 1},
+          "started_at": {"type": ["string", "null"], "format": "date-time"},
+          "ended_at": {"type": ["string", "null"], "format": "date-time"},
+          "outcome": {"enum": ["in_progress", "succeeded", "failed", "ambiguous"]},
+          "failure_class": {"enum": ["none", "transient", "permanent", "authority", "capability", "validation", "unknown"]},
+          "retry_allowed": {"type": "boolean"},
+          "reconciliation": {"type": "string"},
+          "artifact_changes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+        }
+      }
+    },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "lens", "reviewer", "independent", "result", "observed_at", "findings"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "lens": {"enum": ["outcome", "domain", "execution", "verification"]},
+          "reviewer": {"$ref": "#/$defs/nullableString"},
+          "independent": {"type": "boolean"},
+          "result": {"enum": ["passed", "failed", "waived"]},
+          "observed_at": {"type": ["string", "null"], "format": "date-time"},
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "severity", "description", "evidence", "disposition", "waiver_decision_id"],
+              "properties": {
+                "id": {"$ref": "#/$defs/id"},
+                "severity": {"enum": ["info", "warning", "blocking"]},
+                "description": {"type": "string", "minLength": 1},
+                "evidence": {"type": "string"},
+                "disposition": {"enum": ["open", "resolved", "accepted", "waived"]},
+                "waiver_decision_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]}
+              }
+            }
+          }
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "decision", "rationale", "reversible", "owner", "status"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "decision": {"type": "string", "minLength": 1},
+          "rationale": {"type": "string"},
+          "reversible": {"type": "boolean"},
+          "owner": {"$ref": "#/$defs/nullableString"},
+          "status": {"enum": ["proposed", "decided", "superseded"]}
+        }
+      }
+    },
+    "open_decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "question", "owner", "blocking"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "question": {"type": "string", "minLength": 1},
+          "owner": {"$ref": "#/$defs/nullableString"},
+          "blocking": {"type": "boolean"}
+        }
+      }
+    },
+    "workstreams": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "name", "outcome", "dependencies", "status", "owner", "estimate", "parallel_safe", "completion_criteria"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "kind": {"enum": ["internal", "external"]},
+          "name": {"type": "string", "minLength": 1},
+          "outcome": {"type": "string"},
+          "dependencies": {"type": "array", "items": {"$ref": "#/$defs/id"}, "uniqueItems": true},
+          "status": {"enum": ["pending", "ready", "executing", "blocked", "verifying", "done", "skipped"]},
+          "owner": {"$ref": "#/$defs/nullableString"},
+          "estimate": {"type": "number", "minimum": 0},
+          "parallel_safe": {"type": "boolean"},
+          "completion_criteria": {"type": "array", "items": {"$ref": "#/$defs/id"}, "uniqueItems": true}
+        }
+      }
+    },
+    "deliverables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "status", "workstream_id"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "name": {"type": "string", "minLength": 1},
+          "status": {"enum": ["pending", "in_progress", "done", "accepted"]},
+          "workstream_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]}
+        }
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "likelihood", "impact", "mitigation", "rollback", "owner", "status"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "description": {"type": "string", "minLength": 1},
+          "likelihood": {"$ref": "#/$defs/riskLevel"},
+          "impact": {"$ref": "#/$defs/riskLevel"},
+          "mitigation": {"type": "string"},
+          "rollback": {"$ref": "#/$defs/nullableString"},
+          "owner": {"$ref": "#/$defs/nullableString"},
+          "status": {"enum": ["open", "mitigated", "accepted", "closed"]}
+        }
+      }
+    },
+    "checkpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "trigger", "summary", "status", "resume_action"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "trigger": {"type": "string", "minLength": 1},
+          "summary": {"type": "string"},
+          "status": {"enum": ["planned", "saved", "validated", "obsolete"]},
+          "resume_action": {"type": "string"}
+        }
+      }
+    },
+    "handoffs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "from", "to", "scope", "status", "artifacts", "evidence_contract", "failure_policy", "next_action"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "from": {"$ref": "#/$defs/nullableString"},
+          "to": {"$ref": "#/$defs/nullableString"},
+          "scope": {"type": "string", "minLength": 1},
+          "status": {"enum": ["proposed", "ready", "accepted", "failed"]},
+          "artifacts": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "next_action": {"type": "string"}
+        }
+      }
+    },
+    "verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criteria", "evidence"],
+      "properties": {
+        "criteria": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "description", "required", "evidence_level", "freshness_hours"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "description": {"type": "string", "minLength": 1},
+              "required": {"type": "boolean"},
+              "evidence_level": {"$ref": "#/$defs/evidenceLevel"},
+              "freshness_hours": {"type": ["number", "null"], "exclusiveMinimum": 0}
+            }
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "criterion_id", "method", "source", "observed_at", "result", "level", "limitations"],
+            "properties": {
+              "id": {"$ref": "#/$defs/id"},
+              "criterion_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+              "method": {"type": "string", "minLength": 1},
+              "source": {"type": "string", "minLength": 1},
+              "observed_at": {"type": ["string", "null"], "format": "date-time"},
+              "result": {"enum": ["passed", "failed", "inconclusive"]},
+              "level": {"$ref": "#/$defs/evidenceLevel"},
+              "limitations": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tools", "subagents", "background", "persistence", "approvals"],
+      "properties": {
+        "tools": {"$ref": "#/$defs/capability"},
+        "subagents": {"$ref": "#/$defs/capability"},
+        "background": {"$ref": "#/$defs/capability"},
+        "persistence": {"$ref": "#/$defs/capability"},
+        "approvals": {"$ref": "#/$defs/capability"}
+      }
+    },
+    "next_action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "workstream_id", "owner"],
+      "properties": {
+        "description": {"$ref": "#/$defs/nullableString"},
+        "workstream_id": {"anyOf": [{"$ref": "#/$defs/id"}, {"type": "null"}]},
+        "owner": {"$ref": "#/$defs/nullableString"}
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "owner", "resolution"],
+        "properties": {
+          "id": {"$ref": "#/$defs/id"},
+          "description": {"type": "string", "minLength": 1},
+          "owner": {"$ref": "#/$defs/nullableString"},
+          "resolution": {"$ref": "#/$defs/nullableString"}
+        }
+      }
+    },
+    "terminal_state": {"enum": ["active", "verified_complete", "partially_complete", "blocked", "failed", "unverified"]},
+    "domain_data": {"type": "object", "additionalProperties": true}
+  }
+}

@@ -1,13 +1,14 @@
 ---
 name: building-gtd-domain-packs
-description: Use when Get Things Done needs adaptation for a professional field, discipline, organization practice, or specialized workflow without forking the core skill
+description: >
+  Use when someone says "GTD doesn't cover my field well", "extend GTD for legal/medical/design/data work", "build a domain pack for X discipline", "create a GTD extension without forking the core", or "customize GTD for my industry". Creates a focused domain extension that inherits Get Things Done instead of copying it. Do not use for creating a new agent skill unrelated to GTD, using GTD to execute work (use get-things-done instead), or adding a feature to GTD's core contract.
 ---
 
 # Building GTD Domain Packs
 
-Create a focused domain extension that inherits Get Things Done instead of copying it
+Create a focused domain extension that inherits Get Things Done instead of copying it.
 
-**REQUIRED REFERENCES:** Read local `references/domain-pack-spec.md` and `references/core-contract.md`
+Load `references/domain-pack-spec.md` at the start — the required headings, field contracts, and validation rules live there. Load `references/core-contract.md` to confirm what the core already handles before extending it.
 
 ## Build method
 
@@ -41,7 +42,7 @@ Create a focused domain extension that inherits Get Things Done instead of copyi
 10. **Validate the contract**
     Confirm every required heading appears exactly once and the pack does not weaken the core
 
-Use `templates/domain-pack-template.md` as the output shape
+Use `templates/domain-pack-template.md` as the output shape.
 
 ## Rules
 
@@ -50,3 +51,18 @@ Use `templates/domain-pack-template.md` as the output shape
 - Do not create a new domain for branding or naming alone
 - Do not weaken decision authority, readiness, evidence, completion, handoff, or tool honesty
 - Do not claim a domain is validated until the four collision cases were actually exercised
+
+## Self-validation checklist
+
+Before calling the domain pack ready:
+
+- [ ] all 9 required headings present exactly once
+- [ ] YAML frontmatter has `domain`, `version`, and `extends: gtd-core-v1`
+- [ ] selection signals include at least one non-selection signal
+- [ ] vocabulary section explains why confusion changes work (not just a glossary)
+- [ ] diagnostic questions are candidates, not a mandatory questionnaire
+- [ ] readiness additions are observable by another agent
+- [ ] 2–4 workstream patterns with dependency edges
+- [ ] completion checks prefer inspectable artifacts over subjective language
+- [ ] four collision cases tested (in-domain messy, in-domain well-formed, deceptive near-complete, adjacent out-of-domain)
+- [ ] adjacent out-of-domain case does NOT route to this pack

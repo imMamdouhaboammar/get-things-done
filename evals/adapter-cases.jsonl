@@ -16,4 +16,5 @@
 {"id":"shell-portable-installer","adapter":"shell","expected":"Export contains install.sh and canonical skills; installer supports named roots, custom Agent Skills roots, dry-run, and overwrite protection"}
 {"id":"skills-sh-distribution","adapter":"skills-sh","expected":"Export contains skills.sh.json and canonical skills suitable for skills CLI discovery, all-agent install, and update flows"}
 {"id":"skill-kit-authoring-bridge","adapter":"skill-kit","expected":"Export contains canonical skills and bridge guidance without pretending Skill Kit is a GTD runtime host"}
+{"id":"antigravity-layout","adapter":"antigravity","expected":"Export places canonical skills under .gemini/config/skills with fallback to .agents/skills"}
 {"id":"glama-no-mcp","adapter":"glama","expected":"Fail closed because GTD has no mcp.json instead of claiming registry support"}

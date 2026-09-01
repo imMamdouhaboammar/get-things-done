@@ -1,0 +1,44 @@
+[
+  {
+    "name": "messy-startup-idea",
+    "prompt": "i want to build an AI tool that helps lawyers find case law but i dont know if its technically feasible, what the business model should be, or who the actual customer is — can you help me figure out what to actually do next",
+    "should_trigger": true,
+    "category": "core",
+    "notes": "Classic messy intent with multiple unknowns — exactly what GTD is for"
+  },
+  {
+    "name": "stuck-mid-execution",
+    "prompt": "i'm building a data pipeline for our ML team but we're stuck — we have the schema designed, the ingestion written, but every time we run validation we get type coercion errors in 3 edge cases and we can't tell if we should fix upstream, add transforms, or just document the limitation and move on",
+    "should_trigger": true,
+    "category": "domain",
+    "notes": "Active execution blocker needing mode routing and decomposition"
+  },
+  {
+    "name": "vague-handoff-request",
+    "prompt": "i need to hand this project off to another engineer on monday. its a microservice that handles payment webhook processing. i want to make sure they can actually pick it up without me",
+    "should_trigger": true,
+    "category": "handoff",
+    "notes": "Handoff scenario requiring Execution Brief and completeness check"
+  },
+  {
+    "name": "simple-factual-lookup",
+    "prompt": "what is the capital of France",
+    "should_trigger": false,
+    "category": "core",
+    "notes": "Single-step factual question with a known answer — no execution model needed"
+  },
+  {
+    "name": "code-syntax-fix",
+    "prompt": "fix this Python syntax error: def foo(x) return x+1",
+    "should_trigger": false,
+    "category": "core",
+    "notes": "Fully specified, single-step, ready to execute — GTD adds no value"
+  },
+  {
+    "name": "style-review-only",
+    "prompt": "review my code style and tell me if i'm following PEP 8 — here is the file",
+    "should_trigger": false,
+    "category": "core",
+    "notes": "Pure review task, not messy intent — a code review skill is more appropriate"
+  }
+]

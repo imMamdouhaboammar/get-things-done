@@ -55,6 +55,19 @@ Render the brief into human-readable Markdown:
 python scripts/gtd.py render-brief brief.json --out brief.md
 ```
 
+Export every plan representation in one pass:
+
+```bash
+python scripts/gtd.py export-brief brief.json --format all --out dist/brief
+```
+
+This writes Markdown, lossless JSON, TOON, Mermaid, and graph JSON. Use a single format when needed:
+
+```bash
+python scripts/gtd.py export-brief brief.json --format toon --out brief.toon
+python scripts/gtd.py export-brief brief.json --format graph --out dist/brief-graph
+```
+
 ## 3. Export for your agent host
 
 Export a ready-to-use adapter package for your target host:

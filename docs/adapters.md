@@ -38,6 +38,7 @@ A named first-class adapter means GTD additionally verifies a host-specific path
 | Kimi Code | first-class | `kimi.plugin.json` and `.kimi-code/skills` |
 | Grok Build | first-class | `.grok/skills` |
 | DeepSeek DeepCode | first-class | `.deepcode/skills` |
+| Antigravity / Gemini CLI | first-class | `.gemini/config/skills` |
 | Homebrew | first-class | HEAD Formula + packaged canonical skills |
 | Shell installer | first-class | named host roots + `--target-path` for compatible agents |
 | skills.sh | first-class | root `skills.sh.json` over canonical skills |

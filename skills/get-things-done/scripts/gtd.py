@@ -2,11 +2,14 @@
 from __future__ import annotations
 
 import argparse
+import html
 import json
+import math
 import os
 import re
 import sys
 import zipfile
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -40,6 +43,13 @@ NESTED_REQUIRED = {
     "scope": ["in", "out", "constraints"],
     "knowledge": ["facts", "assumptions", "unknowns"],
     "verification": ["success_criteria", "evidence"],
+}
+EXPORT_SUFFIXES = {
+    "md": ".md",
+    "json": ".json",
+    "toon": ".toon",
+    "mermaid": ".mmd",
+    "graph-json": ".graph.json",
 }
 
 
@@ -371,18 +381,25 @@ def render_brief(payload: dict[str, Any]) -> str:
     knowledge, verification = payload["knowledge"], payload["verification"]
     decisions = payload.get("decisions", [])
     workstreams = payload.get("workstreams", [])
-    decision_rows = "\n".join(
-        f"| {d.get('decision','')} | {d.get('rationale','')} | {d.get('reversible','')} |" for d in decisions
-    ) or "| None | | |"
-    work_rows = "\n".join(
-        f"| {w.get('name','')} | {w.get('outcome','')} | {', '.join(w.get('dependencies', []))} |" for w in workstreams
-    ) or "| None | | |"
+    decision_rows = (
+        "\n".join(
+            f"| {d.get('decision', '')} | {d.get('rationale', '')} | {d.get('reversible', '')} |" for d in decisions
+        )
+        or "| None | | |"
+    )
+    work_rows = (
+        "\n".join(
+            f"| {w.get('name', '')} | {w.get('outcome', '')} | {', '.join(w.get('dependencies', []))} |"
+            for w in workstreams
+        )
+        or "| None | | |"
+    )
     parts = [
         f"# Execution Brief: {payload['title']}",
         "",
         "## Outcome",
-        f"- Problem: {intent.get('problem','')}",
-        f"- Desired outcome: {intent.get('desired_outcome','')}",
+        f"- Problem: {intent.get('problem', '')}",
+        f"- Desired outcome: {intent.get('desired_outcome', '')}",
         f"- Actor: {intent.get('actor')}",
         f"- Status: {payload.get('status')}",
         f"- Domain: {payload.get('domain')}",
@@ -441,6 +458,371 @@ def render_brief(payload: dict[str, Any]) -> str:
         "",
     ]
     return "\n".join(parts)
+
+
+def _toon_is_primitive(value: Any) -> bool:
+    return value is None or isinstance(value, (str, int, float, bool))
+
+
+def _toon_quote(value: str) -> str:
+    escaped: list[str] = []
+    for char in value:
+        codepoint = ord(char)
+        if char == "\\":
+            escaped.append("\\\\")
+        elif char == '"':
+            escaped.append('\\"')
+        elif char == "\n":
+            escaped.append("\\n")
+        elif char == "\r":
+            escaped.append("\\r")
+        elif char == "\t":
+            escaped.append("\\t")
+        elif codepoint < 0x20:
+            escaped.append(f"\\u{codepoint:04x}")
+        else:
+            escaped.append(char)
+    return f'"{"".join(escaped)}"'
+
+
+def _toon_key(value: str) -> str:
+    return value if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_.]*", value) else _toon_quote(value)
+
+
+def _toon_string(value: str, delimiter: str = ",") -> str:
+    numeric_like = re.fullmatch(r"[+-]?[0-9]+(?:\.[0-9]+)?(?:e[+-]?[0-9]+)?", value, re.IGNORECASE)
+    must_quote = (
+        not value
+        or value[:1] in {"-", "#"}
+        or value in {"true", "false", "null"}
+        or value[:1] in {" ", "\t"}
+        or value[-1:] in {" ", "\t"}
+        or numeric_like is not None
+        or delimiter in value
+        or any(char in value for char in ':"\\[]{}')
+        or any(ord(char) < 0x20 for char in value)
+    )
+    return _toon_quote(value) if must_quote else value
+
+
+def _toon_number(value: int | float) -> str:
+    if isinstance(value, int):
+        return str(value)
+    if not math.isfinite(value):
+        return "null"
+    if value == 0:
+        return "0"
+    magnitude = abs(value)
+    if 1e-6 <= magnitude < 1e21:
+        text = format(Decimal(repr(value)), "f")
+        if "." in text:
+            text = text.rstrip("0").rstrip(".")
+        return text
+    text = repr(value).lower()
+    if "e" not in text:
+        return text
+    mantissa, exponent = text.split("e", 1)
+    normalized_exponent = int(exponent)
+    sign = "+" if normalized_exponent >= 0 else "-"
+    return f"{mantissa}e{sign}{abs(normalized_exponent)}"
+
+
+def _toon_primitive(value: Any, delimiter: str = ",") -> str:
+    if value is None:
+        return "null"
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return _toon_number(value)
+    if isinstance(value, str):
+        return _toon_string(value, delimiter)
+    raise TypeError(f"TOON supports JSON values only, got {type(value).__name__}")
+
+
+def _toon_uniform_fields(objects: list[dict[str, Any]]) -> list[tuple[str, Any]] | None:
+    if not objects or any(not item for item in objects):
+        return None
+    keys = list(objects[0])
+    expected = set(keys)
+    if any(set(item) != expected for item in objects[1:]):
+        return None
+
+    fields: list[tuple[str, Any]] = []
+    for key in keys:
+        values = [item[key] for item in objects]
+        if all(_toon_is_primitive(value) for value in values):
+            fields.append((key, None))
+            continue
+        if all(isinstance(value, dict) and value for value in values):
+            nested = _toon_uniform_fields(values)
+            if nested is not None:
+                fields.append((key, nested))
+                continue
+        return None
+    return fields
+
+
+def _toon_field_list(fields: list[tuple[str, Any]]) -> str:
+    encoded: list[str] = []
+    for key, nested in fields:
+        item = _toon_key(key)
+        if nested is not None:
+            item += "{" + _toon_field_list(nested) + "}"
+        encoded.append(item)
+    return ",".join(encoded)
+
+
+def _toon_row_values(payload: dict[str, Any], fields: list[tuple[str, Any]]) -> list[Any]:
+    values: list[Any] = []
+    for key, nested in fields:
+        if nested is None:
+            values.append(payload[key])
+        else:
+            values.extend(_toon_row_values(payload[key], nested))
+    return values
+
+
+def _toon_keyed_fields(payload: dict[str, Any]) -> list[tuple[str, Any]] | None:
+    if len(payload) < 2 or not all(isinstance(value, dict) for value in payload.values()):
+        return None
+    return _toon_uniform_fields(list(payload.values()))
+
+
+def _toon_emit_keyed_table(
+    key: str | None,
+    payload: dict[str, Any],
+    fields: list[tuple[str, Any]],
+    depth: int,
+    lines: list[str],
+) -> None:
+    prefix = _toon_key(key) if key is not None else ""
+    lines.append(f"{'  ' * depth}{prefix}[{len(payload)}:]{{{_toon_field_list(fields)}}}:")
+    for entry_key, entry in payload.items():
+        values = ",".join(_toon_primitive(value) for value in _toon_row_values(entry, fields))
+        lines.append(f"{'  ' * (depth + 1)}{_toon_key(entry_key)}: {values}")
+
+
+def _toon_emit_array(key: str | None, values: list[Any], depth: int, lines: list[str]) -> None:
+    prefix = _toon_key(key) if key is not None else ""
+    indentation = "  " * depth
+    if not values:
+        lines.append(f"{indentation}{prefix}: []" if key is not None else "[]")
+        return
+    if all(_toon_is_primitive(value) for value in values):
+        encoded = ",".join(_toon_primitive(value) for value in values)
+        lines.append(f"{indentation}{prefix}[{len(values)}]: {encoded}")
+        return
+    if all(isinstance(value, dict) for value in values):
+        fields = _toon_uniform_fields(values)
+        if fields is not None:
+            lines.append(f"{indentation}{prefix}[{len(values)}]{{{_toon_field_list(fields)}}}:")
+            for value in values:
+                row = ",".join(_toon_primitive(cell) for cell in _toon_row_values(value, fields))
+                lines.append(f"{'  ' * (depth + 1)}{row}")
+            return
+    lines.append(f"{indentation}{prefix}[{len(values)}]:")
+    for value in values:
+        _toon_emit_list_item(value, depth + 1, lines)
+
+
+def _toon_emit_field(key: str, value: Any, depth: int, lines: list[str]) -> None:
+    indentation = "  " * depth
+    encoded_key = _toon_key(key)
+    if _toon_is_primitive(value):
+        lines.append(f"{indentation}{encoded_key}: {_toon_primitive(value)}")
+    elif isinstance(value, list):
+        _toon_emit_array(key, value, depth, lines)
+    elif isinstance(value, dict):
+        fields = _toon_keyed_fields(value)
+        if fields is not None:
+            _toon_emit_keyed_table(key, value, fields, depth, lines)
+            return
+        lines.append(f"{indentation}{encoded_key}:")
+        for child_key, child_value in value.items():
+            _toon_emit_field(child_key, child_value, depth + 1, lines)
+    else:
+        raise TypeError(f"TOON supports JSON values only, got {type(value).__name__}")
+
+
+def _toon_emit_list_item(value: Any, depth: int, lines: list[str]) -> None:
+    indentation = "  " * depth
+    if _toon_is_primitive(value):
+        lines.append(f"{indentation}- {_toon_primitive(value)}")
+        return
+    if isinstance(value, list):
+        if value and all(_toon_is_primitive(item) for item in value):
+            encoded = ",".join(_toon_primitive(item) for item in value)
+            lines.append(f"{indentation}- [{len(value)}]: {encoded}")
+        else:
+            lines.append(f"{indentation}- [{len(value)}]:")
+            for item in value:
+                _toon_emit_list_item(item, depth + 1, lines)
+        return
+    if isinstance(value, dict):
+        if not value:
+            lines.append(f"{indentation}-")
+            return
+        items = list(value.items())
+        first_lines: list[str] = []
+        _toon_emit_field(items[0][0], items[0][1], depth + 1, first_lines)
+        field_indentation = "  " * (depth + 1)
+        lines.append(f"{indentation}- {first_lines[0][len(field_indentation) :]}")
+        lines.extend(first_lines[1:])
+        for key, item in items[1:]:
+            _toon_emit_field(key, item, depth + 1, lines)
+        return
+    raise TypeError(f"TOON supports JSON values only, got {type(value).__name__}")
+
+
+def render_toon(payload: Any) -> str:
+    """Encode a JSON-shaped value using TOON Specification 4.1 defaults."""
+    lines: list[str] = []
+    if _toon_is_primitive(payload):
+        lines.append(_toon_primitive(payload))
+    elif isinstance(payload, list):
+        _toon_emit_array(None, payload, 0, lines)
+    elif isinstance(payload, dict):
+        fields = _toon_keyed_fields(payload)
+        if fields is not None:
+            _toon_emit_keyed_table(None, payload, fields, 0, lines)
+        else:
+            for key, value in payload.items():
+                _toon_emit_field(key, value, 0, lines)
+    else:
+        raise TypeError(f"TOON supports JSON values only, got {type(payload).__name__}")
+    return "\n".join(lines)
+
+
+def brief_graph(payload: dict[str, Any]) -> dict[str, Any]:
+    """Project an Execution Brief into a deterministic directed relational graph."""
+    nodes: list[dict[str, Any]] = [
+        {
+            "id": "brief",
+            "type": "brief",
+            "label": payload["title"],
+            "status": payload.get("status"),
+            "domain": payload.get("domain"),
+        }
+    ]
+    edges: list[dict[str, str]] = []
+    workstreams = [item for item in payload.get("workstreams", []) if isinstance(item, dict)]
+    workstream_ids: dict[str, str] = {}
+
+    for index, workstream in enumerate(workstreams):
+        node_id = f"workstream:{index}"
+        label = str(workstream.get("name", f"Workstream {index + 1}"))
+        workstream_ids.setdefault(label.strip().casefold(), node_id)
+        nodes.append(
+            {
+                "id": node_id,
+                "type": "workstream",
+                "label": label,
+                "outcome": workstream.get("outcome", ""),
+            }
+        )
+        edges.append({"source": "brief", "target": node_id, "relation": "contains"})
+
+    external_dependencies: dict[str, str] = {}
+    for index, workstream in enumerate(workstreams):
+        source = f"workstream:{index}"
+        for dependency in workstream.get("dependencies", []):
+            label = str(dependency)
+            target = workstream_ids.get(label.strip().casefold())
+            if target is None:
+                normalized = label.strip().casefold()
+                target = external_dependencies.get(normalized)
+                if target is None:
+                    target = f"dependency:{len(external_dependencies)}"
+                    external_dependencies[normalized] = target
+                    nodes.append({"id": target, "type": "external_dependency", "label": label})
+            edges.append({"source": source, "target": target, "relation": "depends_on"})
+
+    collections = [
+        ("deliverables", "deliverable", "produces"),
+        ("success_criteria", "success_criterion", "verified_by"),
+        ("blockers", "blocker", "blocked_by"),
+    ]
+    verification = payload.get("verification", {})
+    for field, node_type, relation in collections:
+        values = verification.get(field, []) if field == "success_criteria" else payload.get(field, [])
+        for index, value in enumerate(values):
+            node_id = f"{node_type}:{index}"
+            nodes.append({"id": node_id, "type": node_type, "label": str(value)})
+            edges.append({"source": "brief", "target": node_id, "relation": relation})
+
+    if payload.get("next_action"):
+        nodes.append({"id": "next_action", "type": "next_action", "label": str(payload["next_action"])})
+        edges.append({"source": "brief", "target": "next_action", "relation": "starts_with"})
+
+    return {"graph_version": "1.0", "directed": True, "nodes": nodes, "edges": edges}
+
+
+def render_mermaid(graph: dict[str, Any]) -> str:
+    node_names = {node["id"]: f"n{index}" for index, node in enumerate(graph["nodes"])}
+    lines = ["flowchart LR"]
+    for node in graph["nodes"]:
+        label = html.escape(str(node["label"]), quote=True).replace("\r\n", "<br/>")
+        label = label.replace("\r", "<br/>").replace("\n", "<br/>")
+        lines.append(f'  {node_names[node["id"]]}["{label}"]')
+    for edge in graph["edges"]:
+        source = node_names[edge["source"]]
+        target = node_names[edge["target"]]
+        lines.append(f"  {source} -->|{edge['relation']}| {target}")
+    return "\n".join(lines) + "\n"
+
+
+def render_export(payload: dict[str, Any], export_format: str) -> str:
+    if export_format == "md":
+        return render_brief(payload)
+    if export_format == "json":
+        return json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    if export_format == "toon":
+        return render_toon(payload)
+    graph = brief_graph(payload)
+    if export_format == "mermaid":
+        return render_mermaid(graph)
+    if export_format == "graph-json":
+        return json.dumps(graph, ensure_ascii=False, indent=2) + "\n"
+    raise ValueError(f"unsupported brief export format: {export_format}")
+
+
+def cmd_export_brief(args: argparse.Namespace) -> int:
+    path = Path(args.path).expanduser().resolve()
+    try:
+        payload = read_json(path)
+    except (json.JSONDecodeError, OSError, UnicodeError) as exc:
+        print(f"INVALID: cannot read JSON: {exc}", file=sys.stderr)
+        return 1
+    errors = validate_brief(payload)
+    if errors:
+        print("INVALID", file=sys.stderr)
+        for error in errors:
+            print(f"- {error}", file=sys.stderr)
+        return 1
+
+    if args.format == "all":
+        selected = list(EXPORT_SUFFIXES)
+    elif args.format == "graph":
+        selected = ["mermaid", "graph-json"]
+    else:
+        selected = [args.format]
+    out = Path(args.out).expanduser().resolve()
+    try:
+        if len(selected) == 1:
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(render_export(payload, selected[0]), encoding="utf-8")
+            print(out)
+            return 0
+
+        out.mkdir(parents=True, exist_ok=True)
+        for export_format in selected:
+            target = out / f"{path.stem}{EXPORT_SUFFIXES[export_format]}"
+            target.write_text(render_export(payload, export_format), encoding="utf-8")
+            print(target)
+    except (OSError, TypeError, ValueError) as exc:
+        print(f"ERROR: cannot export brief: {exc}", file=sys.stderr)
+        return 1
+    return 0
 
 
 def cmd_render_brief(args: argparse.Namespace) -> int:
@@ -525,6 +907,12 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("path")
     x.add_argument("--out")
     x.set_defaults(func=cmd_render_brief)
+
+    x = sub.add_parser("export-brief")
+    x.add_argument("path")
+    x.add_argument("--format", required=True, choices=[*EXPORT_SUFFIXES, "graph", "all"])
+    x.add_argument("--out", required=True)
+    x.set_defaults(func=cmd_export_brief)
 
     x = sub.add_parser("package")
     x.add_argument("--out")

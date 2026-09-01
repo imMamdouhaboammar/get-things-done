@@ -1,6 +1,6 @@
 {
   "name": "get-things-done",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Turn messy ideas into executable work models and verifiable outcomes.",
   "author": {"name": "Mamdouh Aboammar", "url": "https://github.com/imMamdouhaboammar"},
   "homepage": "https://github.com/imMamdouhaboammar/get-things-done",
@@ -11,7 +11,7 @@
   "interface": {
     "displayName": "Get Things Done",
     "shortDescription": "Turn fuzzy ideas into executable work",
-    "longDescription": "Get Things Done helps ChatGPT and Codex convert incomplete or chaotic intent into an explicit work model: facts, assumptions, decisions, blockers, scope, success criteria, a next executable action, and evidence-backed completion.",
+    "longDescription": "Get Things Done helps ChatGPT and Codex convert incomplete or chaotic intent into an explicit work model: facts, assumptions, decisions, blockers, scope, success criteria, a next executable action, and evidence-backed completion. Works across 9 domain packs: software, product, research, marketing, advisory, data/AI, design/UX, operations, and legal/compliance.",
     "developerName": "Mamdouh Aboammar",
     "category": "Productivity",
     "capabilities": ["Interactive", "Read", "Write"],
