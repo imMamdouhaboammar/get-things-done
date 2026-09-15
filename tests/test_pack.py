@@ -179,3 +179,70 @@ def test_package_skills_creates_valid_archives(tmp_path):
             assert 'assets/large-logo.svg' in names
             assert 'agents/openai.yaml' in names
 
+
+
+def _minimal_brief(domain):
+    return {
+        "version": "1.0",
+        "title": "Domain membership check",
+        "domain": domain,
+        "intent": {"problem": "p", "desired_outcome": "o", "actor": None},
+        "status": "captured",
+        "scope": {"in": [], "out": [], "constraints": []},
+        "knowledge": {"facts": [], "assumptions": [], "unknowns": []},
+        "decisions": [],
+        "open_decisions": [],
+        "workstreams": [],
+        "deliverables": [],
+        "risks": [],
+        "domain_data": {},
+        "verification": {"success_criteria": [], "evidence": []},
+        "next_action": None,
+        "blockers": [],
+    }
+
+
+def test_validate_brief_rejects_unknown_domain_without_explicit_root(tmp_path):
+    """Default pack root must reject unknown non-null domains (issue #12)."""
+    path = tmp_path / "unknown-default.json"
+    path.write_text(json.dumps(_minimal_brief("not-a-real-domain")) + "\n", encoding="utf-8")
+    cmd = [sys.executable, str(ROOT / "scripts/gtd.py"), "validate-brief", str(path)]
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "INVALID" in result.stdout
+    assert "domain pack not found: not-a-real-domain" in result.stdout
+    # Error names the missing domain without leaking unrelated filesystem paths
+    assert "/workspace" not in result.stdout
+    assert str(ROOT) not in result.stdout
+
+
+def test_validate_brief_rejects_unknown_domain_with_explicit_root(tmp_path):
+    path = tmp_path / "unknown-root.json"
+    path.write_text(json.dumps(_minimal_brief("totally-missing-pack")) + "\n", encoding="utf-8")
+    cmd = [
+        sys.executable, str(ROOT / "scripts/gtd.py"), "validate-brief", str(path),
+        "--root", str(ROOT),
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
+    assert result.returncode == 1, result.stdout + result.stderr
+    assert "INVALID" in result.stdout
+    assert "domain pack not found: totally-missing-pack" in result.stdout
+    assert str(ROOT) not in result.stdout
+
+
+def test_validate_brief_accepts_known_domain_without_explicit_root(tmp_path):
+    path = tmp_path / "known-default.json"
+    path.write_text(json.dumps(_minimal_brief("software")) + "\n", encoding="utf-8")
+    cmd = [sys.executable, str(ROOT / "scripts/gtd.py"), "validate-brief", str(path)]
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "VALID" in result.stdout
+
+
+def test_validate_brief_accepts_null_domain_without_explicit_root(tmp_path):
+    path = tmp_path / "null-domain.json"
+    path.write_text(json.dumps(_minimal_brief(None)) + "\n", encoding="utf-8")
+    cmd = [sys.executable, str(ROOT / "scripts/gtd.py"), "validate-brief", str(path)]
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "VALID" in result.stdout
