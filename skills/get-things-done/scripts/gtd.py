@@ -333,10 +333,12 @@ def cmd_validate_brief(args: argparse.Namespace) -> int:
         print(f"INVALID: cannot read JSON: {exc}")
         return 1
     errors = validate_brief(payload)
-    if args.root and payload.get("domain"):
-        domain_path = domains_dir(pack_root(args.root)) / f"{payload['domain']}.md"
+    domain = payload.get("domain")
+    if isinstance(domain, str):
+        # Resolve default or explicit pack root; reject unknown non-null domains.
+        domain_path = domains_dir(pack_root(args.root)) / f"{domain}.md"
         if not domain_path.exists():
-            errors.append(f"domain pack not found: {payload['domain']}")
+            errors.append(f"domain pack not found: {domain}")
     if errors:
         print("INVALID")
         for error in errors:
