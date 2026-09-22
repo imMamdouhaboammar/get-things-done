@@ -179,8 +179,9 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         skill / "templates/execution-brief.md",
     ]
     builder = root / "skills/building-gtd-domain-packs/SKILL.md"
+    deliberation = root / "skills/gtd-deliberation/SKILL.md"
     if (root / "skills").is_dir():
-        required.append(builder)
+        required.extend([builder, deliberation])
     missing = [str(p.relative_to(root)) for p in required if not p.exists()]
     try:
         schema = read_json(references_dir(root) / "execution-brief.schema.json")
@@ -853,7 +854,7 @@ def cmd_package(args: argparse.Namespace) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
     skills_root = root / "skills" if (root / "skills").is_dir() else root.parent
     count = 0
-    for s_name in ["get-things-done", "building-gtd-domain-packs"]:
+    for s_name in ["get-things-done", "building-gtd-domain-packs", "gtd-deliberation"]:
         s_dir = skills_root / s_name
         if not s_dir.is_dir():
             continue
