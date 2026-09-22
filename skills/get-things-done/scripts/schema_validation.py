@@ -49,7 +49,7 @@ def _resolve_local_ref(root: dict[str, Any], ref: str) -> dict[str, Any]:
 
 def _valid_datetime(value: str) -> bool:
     if re.fullmatch(
-        r"\\d{4}-\\d{2}-\\d{2}[Tt]\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:[Zz]|[+-]\\d{2}:\\d{2})",
+        r"\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:[Zz]|[+-]\d{2}:\d{2})",
         value,
     ) is None:
         return False
