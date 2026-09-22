@@ -159,3 +159,19 @@ def test_latest_channel_falls_back_to_main_when_no_release(monkeypatch):
     resolved = updater.resolve_remote("latest")
     assert resolved.kind == "main"
     assert resolved.ref == "f" * 40
+
+
+def test_canonical_cli_registers_update_command():
+    import subprocess
+
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "skills/get-things-done/scripts/gtd.py"), "update", "--help"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "--channel" in result.stdout
+    assert "--check" in result.stdout
+    assert "--target-path" in result.stdout
+    assert "--force" in result.stdout
