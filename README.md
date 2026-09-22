@@ -2,623 +2,386 @@
 
 # Get Things Done
 
-### Your idea is not a task yet
+**From messy intent to verified work.**
 
-Turn messy intent into evidence-backed direction · refresh current knowledge · challenge weak framing · execute the next useful action · require proof before calling anything done
+Give GTD the request before it is ready. It separates the outcome from the proposed solution, checks current facts when they matter, chooses the next executable action, and keeps "done" tied to evidence.
 
-[![CI](https://github.com/imMamdouhaboammar/get-things-done/actions/workflows/ci.yml/badge.svg)](https://github.com/imMamdouhaboammar/get-things-done/actions/workflows/ci.yml)
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
-[![Version](https://img.shields.io/badge/version-1.4.0-111111.svg)](docs/changelog-v1.4.md)
-[![Agent Plugins 1.0](https://img.shields.io/badge/Agent_Plugins-1.0-111111.svg)](https://agent-plugins.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-111111.svg)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/imMamdouhaboammar/get-things-done/ci.yml?branch=main&label=CI&style=flat-square)](https://github.com/imMamdouhaboammar/get-things-done/actions/workflows/ci.yml)
+[![Python 3.10-3.14](https://img.shields.io/badge/Python-3.10--3.14-3776AB?style=flat-square&logo=python&logoColor=white)](pyproject.toml)
+[![Agent Skills](https://img.shields.io/badge/Agent%20Skills-compatible-111827?style=flat-square)](skills/)
+[![License MIT](https://img.shields.io/github/license/imMamdouhaboammar/get-things-done?style=flat-square)](LICENSE)
 
-**One canonical GTD core · Deliberation · Capability Router · Agent Skills · Agent Plugins · Host adapters · Execution Briefs · Domain Packs · Evidence-based completion**
+[Install](#install) · [See it work](#start-with-the-request-you-actually-have) · [How it works](#how-gtd-works) · [Verification](#two-kinds-of-proof) · [Docs](#documentation)
 
 </div>
 
----
+<p align="center">
+  <img src="docs/assets/readme/gtd-hero.svg" width="100%" alt="Get Things Done turns a messy request into verified work by separating facts, assumptions and unknowns, choosing one next action, then attaching evidence to the result">
+</p>
 
-## Table of contents
+## Start with the request you actually have
 
-- [The problem](#the-problem)
-- [What GTD does](#what-gtd-does)
-- [Core ideas](#core-ideas)
-- [Quick start](#quick-start)
-- [Installation](#installation)
-- [Domain packs](#domain-packs)
-- [Capability routing](#capability-routing)
-- [Deliberation](#deliberation)
-- [Execution Brief](#execution-brief)
-- [CLI reference](#cli-reference)
-- [Supported surfaces](#supported-surfaces)
-- [Companion tools](#companion-tools)
-- [Architecture](#architecture)
-- [Repository map](#repository-map)
-- [Verification](#verification)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
-- [License](#license)
+GTD is for work that arrives before it is clean enough to execute.
 
----
+You can start with this:
 
-## The problem
+> Build an AI assistant for our marketing team. Maybe RAG. Maybe memory. Just make it work.
 
-Most ideas do not arrive as clean requirements.
+A normal planning pass can turn that sentence into architecture very quickly. GTD first asks whether the architecture is solving the observed problem.
 
-They arrive half-formed, mixed with assumptions, missing decisions, unclear scope, and several possible next moves.
-
-A normal assistant can turn that into a long plan. That is not the same as making the work **executable**.
-
-> **Get Things Done focuses on the gap between "I have an idea" and "there is a next action we can perform and verify"**
-
-It separates what is known from what is assumed, identifies the current blocker, decides whether the work needs clarification, research, decomposition, a decision, validation, execution, or verification — then keeps the state in a reusable Execution Brief.
-
----
-
-## What GTD does
-
-```text
-Messy idea
-   ↓
-Capture outcome (separate result from proposed solution)
-   ↓
-Freshness + deliberation preflight
-   ├─ low-risk / fully specified → continue directly
-   └─ framing risk → contemplate · current-date search · challenge · reframe · direction gate
-   ↓
-Classify current blocker
-   ↓  clarify · research · decompose · decide · validate · model · execute · verify
-Resolve the current frontier
-   ↓
-Update Execution Brief
-   ↓
-Definition of Ready gate
-   ↓
-Act (if execution was requested and tools are available)
-   ↓
-Review through Outcome · Domain · Execution · Verification lenses
-   ↓
-Collect evidence
-   ↓
-Done  ← or loop back to next action
-```
-
-The core behavior is **intentionally domain-independent**. Software, marketing, product, and research are added through [domain packs](#domain-packs) that inherit the same decision, readiness, evidence, and handoff rules.
-
----
-
-## Core ideas
-
-### Knowledge has types
-
-| Type | Meaning |
+| GTD records | Example |
 |---|---|
-| **Fact** | supported by evidence or an explicit user statement |
-| **Assumption** | reversible belief accepted so work can continue |
-| **Decision** | selected option that changes what will be done |
-| **Unknown** | information that is still unresolved |
+| **Outcome** | The team gets consistently brand-aware outputs |
+| **Fact** | Approved brand examples already exist |
+| **Assumption** | RAG is the right mechanism |
+| **Unknown** | Memory is actually the failure mode |
+| **Direction** | Test retrieval and generation quality before changing architecture |
+| **Next action** | Run a controlled generation comparison |
+| **Done evidence** | The promised result exists and the agreed checks pass |
 
-This prevents an unanswered question from quietly becoming a made-up fact.
+The point is not a bigger plan. The point is to stop an untested solution from quietly becoming the task.
 
-### Fresh knowledge before consequential decisions
+## Install
 
-When external or versioned facts can materially change the direction, GTD does not rely on model memory alone. It resolves the current date, searches current relevant sources, and records any stale claims or evidence gaps.
-
-For assumption-heavy or high-impact requests, the `gtd-deliberation` skill challenges the framing before implementation planning.
-
-### One active blocker at a time
-
-GTD routes the current blocker to exactly one working mode per cycle:
-
-`clarify` · `research` · `decompose` · `decide` · `validate` · `model` · `execute` · `verify`
-
-After each meaningful cycle, it classifies again.
-
-### Ready and Done are different gates
-
-**Definition of Ready** — can the next action be performed safely and meaningfully?  
-**Definition of Done** — does the promised result exist with supporting evidence?
-
-A polished plan can pass neither.
-
-### Progress must leave evidence
-
-A useful cycle produces at least one concrete result:
-
-- a decision settled
-- an artifact created or changed
-- an external action executed
-- verification evidence collected
-
-More analysis alone does not count as execution.
-
----
-
-## Quick start
-
-**Prerequisites:** Python 3.10+, `pyyaml` (installed automatically with the package).
-
-### 60-second setup
-
-```bash
-# 1. Clone and install to the universal Agent Skills location
-git clone https://github.com/imMamdouhaboammar/get-things-done.git
-cd get-things-done
-./install.sh --agents
-
-# 2. Verify the install
-python scripts/gtd.py doctor
-
-# 3. Create your first Execution Brief
-python scripts/gtd.py new-brief \
-  --title "Brand-aware landing page generation" \
-  --domain software \
-  --out brief.json
-
-# 4. Validate its structure
-python scripts/gtd.py validate-brief brief.json --root .
-
-# 5. Assess Ready / Done gates
-python scripts/gtd.py assess-brief brief.json
-
-# 6. Render to human-readable Markdown
-python scripts/gtd.py render-brief brief.json --out brief.md
-
-# 7. Export Markdown, JSON, TOON, Mermaid, and graph JSON
-python scripts/gtd.py export-brief brief.json --format all --out dist/brief
-```
-
-Start with the idea **as you actually have it**. GTD will make the outcome, facts, assumptions, decisions, and next action explicit without requiring a perfectly formed prompt first.
-
-See [docs/quickstart.md](docs/quickstart.md) for the full five-step walkthrough.
-
----
-
-## Installation
-
-GTD ships one canonical `skills/` tree and multiple thin adapters around it. Choose the path that matches your agent host.
-
-### Universal (fastest)
-
-```bash
-git clone https://github.com/imMamdouhaboammar/get-things-done.git
-cd get-things-done
-./install.sh --agents        # → ~/.agents/skills
-```
-
-Any custom Agent Skills root:
-
-```bash
-./install.sh --target-path "$HOME/.my-agent/skills"
-```
-
-### Via skills.sh (all detected agents)
+If your agent supports Agent Skills, this is the shortest path:
 
 ```bash
 npx skills add imMamdouhaboammar/get-things-done --all
 ```
 
-Install for specific agents:
+For the repository CLI, adapters, eval harness, and release tooling:
 
 ```bash
-npx skills add imMamdouhaboammar/get-things-done -g -a claude-code -a codex -a cursor -y
+git clone https://github.com/imMamdouhaboammar/get-things-done.git
+cd get-things-done
+./install.sh --agents
+python scripts/gtd.py doctor
 ```
 
-Update installed skills later:
+The installer copies four canonical GTD Skills. It stages the replacement first and rolls back a failed forced update instead of leaving a half-installed set.
+
+[Installation guide](docs/installation.md) · [Updating](docs/updating.md) · [Release and recovery](docs/release.md)
+
+## What changes when GTD is in the loop
+
+| Situation | GTD behavior |
+|---|---|
+| "I have an idea but I do not know where to start" | Separates the desired result from the first solution that came to mind |
+| "I am sure the cause is X" | Treats X as a hypothesis until current evidence supports it |
+| "Research this and then act" | Refreshes current external facts before they can steer the decision |
+| "The PR was green yesterday" | Refreshes the current source of truth before landing |
+| "Tell me this is done" | Requires evidence against the completion criteria |
+| "That tool is unavailable" | Degrades honestly instead of pretending the action or verification happened |
+| "This is a tiny reversible task" | Skips ceremony when acting or testing is cheaper than more analysis |
+
+GTD is deliberately selective. A simple, fully specified task should stay simple.
+
+## How GTD works
+
+```text
+messy request
+     ↓
+problem model
+     ↓
+current evidence + challenge
+     ↓
+approved direction
+     ↓
+next executable action
+     ↓
+act through available capabilities
+     ↓
+verify against evidence
+     ↓
+done, blocked, or next cycle
+```
+
+Three boundaries matter more than the names of the components.
+
+**Thinking and execution are separate.** Deliberation can challenge framing, but it does not count as delivery.
+
+**Tool availability and authority are separate.** A configured integration is not proof that it is connected, authorized, funded, or safe to use now.
+
+**Implementation and completion are separate.** A changed file, generated draft, or confident agent report is not proof that the promised result exists.
+
+For substantial work, GTD keeps those decisions in a portable [Execution Brief](docs/execution-brief.md) so another agent can continue without reconstructing the whole conversation.
+
+## Two kinds of proof
+
+<p align="center">
+  <img src="docs/assets/readme/gtd-proof.svg" width="100%" alt="GTD separates deterministic mechanics such as schema validation, package integrity and rollback from model-driven judgment such as interpreting intent, challenging framing and evaluating trade-offs">
+</p>
+
+GTD contains deterministic mechanics and model-driven judgment. It does not pretend they have the same evidence standard.
+
+| Deterministic | Model-driven |
+|---|---|
+| JSON Schema and semantic validation | interpreting messy intent |
+| package, manifest, and Skill contract checks | deciding which unknown matters now |
+| adapter export contracts | challenging or reframing a proposed solution |
+| deterministic packaging and SHA-256 checks | evaluating trade-offs |
+| transactional install/update rollback | applying domain judgment |
+| release provenance | deciding whether more thought has higher value than action |
+
+CI can prove the left column. The right column needs behavioral evidence.
+
+That boundary is intentional. A green CI badge does not mean a language model made a good decision.
+
+## Agent behavior is a testable claim
+
+The repository ships a behavioral recorder and comparator instead of a self-awarded benchmark score.
+
+A run records:
+
+- suite SHA-256 and exact source commit
+- provider, model, host, and settings
+- response SHA-256 for each case
+- named expected behaviors
+- named forbidden behaviors
+- grader kind and identity
+- derived pass/fail
+
+Create controlled baseline and candidate records:
 
 ```bash
-npx skills update
+python scripts/behavioral_evals.py new-run \
+  --suite evals/cases.jsonl \
+  --label baseline \
+  --provider PROVIDER \
+  --model MODEL \
+  --host HOST \
+  --source-sha BASELINE_SHA \
+  --skill-mode without_skill \
+  --out baseline.json
+
+python scripts/behavioral_evals.py new-run \
+  --suite evals/cases.jsonl \
+  --label candidate \
+  --provider PROVIDER \
+  --model MODEL \
+  --host HOST \
+  --source-sha CANDIDATE_SHA \
+  --skill-mode with_skill \
+  --out candidate.json
 ```
 
-### Named host targets
+The comparator refuses to compare runs when the suite or provider/model/host/settings drift.
 
-```bash
-./install.sh --target claude        # → ~/.claude/skills
-./install.sh --target cursor        # → ~/.cursor/skills
-./install.sh --target kimi          # → ~/.kimi-code/skills
-./install.sh --target grok          # → ~/.grok/skills
-./install.sh --target codex         # → ~/.agents/skills
-./install.sh --target deepseek      # → ~/.agents/skills
-./install.sh --target antigravity   # → ~/.gemini/config/skills
+The repository does **not** claim a behavioral improvement percentage until an actual controlled baseline and candidate run exist.
+
+[Evaluation protocol](docs/evaluation.md) · [Evaluation corpora](evals/README.md)
+
+## Four Skills, one execution contract
+
+The repository ships four canonical Skills. They compose around one core rather than maintaining four competing workflows.
+
+| Skill | Job |
+|---|---|
+| [`get-things-done`](skills/get-things-done/) | Owns the work model, blocker mode, Ready/Done gates, execution state, evidence, and handoff |
+| [`gtd-deliberation`](skills/gtd-deliberation/) | Challenges assumption-heavy or expensive-to-reverse framing before implementation planning |
+| [`gtd-capability-router`](skills/gtd-capability-router/) | Chooses the smallest safe set of available sources, writers, verifiers, reviewers, and landing owners |
+| [`building-gtd-domain-packs`](skills/building-gtd-domain-packs/) | Creates specialist domain packs without forking the core contract |
+
+The normal path is:
+
+```text
+intent
+  → deliberation when framing risk is material
+  → GTD work state
+  → capability routing when execution has multiple possible surfaces
+  → action
+  → verification
 ```
-
-Install to all distinct supported roots at once:
-
-```bash
-./install.sh --dry-run --all     # preview first
-./install.sh --all               # install
-./install.sh --all --force       # overwrite existing installs
-```
-
-### Homebrew (HEAD)
-
-```bash
-brew install --HEAD ./Formula/get-things-done.rb
-gtd doctor
-```
-
-> **Note:** The Homebrew formula is HEAD-only until a versioned release artifact is published.
-
-### Full installation guide
-
-See [docs/installation.md](docs/installation.md) for per-host export commands, adapter packaging, and release artifact verification.
-
----
 
 ## Domain packs
 
-The core skill is domain-independent. Load a domain pack when the task clearly belongs to a supported field.
+GTD loads zero or one specialist pack when field-specific reasoning materially changes diagnosis or completion evidence. A keyword match is not enough.
 
-| Domain | Adds |
+| Pack | Adds |
 |---|---|
-| **Software** | architecture, interfaces, failure modes, testing, deployment checks |
-| **Marketing** | audience, offer, channel, measurement, experiment and campaign checks |
-| **Product** | user, job, behavior, scope, trade-off and product outcome checks |
-| **Research** | question framing, source quality, evidence, uncertainty and reproducibility checks |
-| **Advisory** | root dilemmas, reversibility, strategic trade-offs, founder alignment, decision frameworks |
-| **Data & AI** | data pipelines, ML experiments, model training, evaluation harnesses, reproducibility |
-| **Design & UX** | user observation, prototype fidelity matching, design systems, accessibility gates |
-| **Operations** | incident triage, blast-radius-first analysis, rollback readiness, runbooks, MTTD/MTTR |
-| **Legal & Compliance** | jurisdiction bounding, regulatory gap analysis, policy authoring, authority boundaries |
+| Software | interfaces, failure modes, tests, migrations, deployment evidence |
+| Marketing | audience, offer, channel role, measurement, experiments |
+| Product | user behavior, scope, requirements, product outcomes |
+| Research | source quality, contradictions, uncertainty, reproducibility |
+| Advisory | dilemmas, reversibility, strategic trade-offs |
+| Data & AI | datasets, ML experiments, evaluation, reproducibility |
+| Design & UX | user observation, prototypes, systems, accessibility |
+| Operations | incidents, SLOs, rollback, runbooks, confirmation monitoring |
+| Legal & Compliance | jurisdiction, applicability, risk, remediation ownership |
 
-Need a custom domain (finance, sales, branding, media buying)?  
-Use the companion [`building-gtd-domain-packs`](skills/building-gtd-domain-packs/) skill to create a pack without forking the core contract.
+Need another domain? Use [`building-gtd-domain-packs`](skills/building-gtd-domain-packs/) instead of editing the core.
 
-See [docs/domain-packs.md](docs/domain-packs.md) for authoring guidance.
+[Domain pack contract](docs/domain-packs.md)
 
----
+## Works where your agent works
 
-## Capability routing
+GTD keeps one canonical `skills/` tree and projects it into host-specific delivery formats. The adapter layer is packaging and discovery, not a second execution model.
 
-When one GTD cycle can be handled by several tools, connected sources, reviewers, bots, or executors, load [gtd-capability-router](skills/gtd-capability-router/).
+Current adapter contracts cover **20 targets**, including:
 
-The router preserves one primary owner, one source of truth per fact domain, one write owner per mutable surface, executable verification, one primary independent review path, and one landing owner.
+`Agent Skills` · `Agent Plugins` · `Claude AI` · `Claude Code` · `Claude Marketplace` · `Claude Cowork` · `ChatGPT Web` · `ChatGPT Work` · `ChatGPT Plugins` · `Codex` · `Cursor` · `Kimi Code` · `Grok Build` · `DeepSeek DeepCode` · `Antigravity / Gemini CLI` · `Homebrew` · `Shell` · `skills.sh` · `Skill Kit` · `Glama`
 
-Stable capability roles live in the Skill, while installation and availability are resolved at runtime. A tool being named in the registry is not proof that it is connected, callable, funded, or authorized in the current host.
+Support labels describe what this repository verifies. They do not imply vendor marketplace approval.
 
-The routing pressure corpus lives at [evals/gtd-capability-router-cases.jsonl](evals/gtd-capability-router-cases.jsonl). It is a corpus, not a claim that a model benchmark has already been run.
+Glama remains conditional because GTD does not currently ship an MCP server. The exporter fails closed instead of manufacturing support that is not there.
 
----
+[Adapter matrix and export commands](docs/adapters.md)
 
-## Deliberation
+## The Execution Brief
 
-Use [`gtd-deliberation`](skills/gtd-deliberation/) when a request is assumption-heavy, contradictory, strategically important, expensive to reverse, or framed around an unvalidated proposed solution.
+The Execution Brief is the durable boundary between thinking, execution, verification, and handoff.
 
-The deliberation loop is:
-
-```text
-Contemplate
-  ↓
-Search current evidence using today's runtime date
-  ↓
-Challenge
-  ↓
-Reframe
-  ↓
-Ideate
-  ↓
-Critique + synthesize
-  ↓
-Direction Gate
-  ↓
-Superpowers-style planning
-  ↓
-Backlog
-  ↓
-GTD execution + capability routing
-```
-
-It is not mandatory deep thinking for every task. The activation router bypasses deliberation when work is obvious, low risk, already approved, or cheaper to test than to discuss.
-
-Durable artifacts:
-
-- Problem Model: [schema](skills/gtd-deliberation/references/problem-model.schema.json)
-- Backlog: [schema](skills/gtd-deliberation/references/backlog.schema.json)
-- Example Problem Model: [examples/deliberation-problem-model.json](examples/deliberation-problem-model.json)
-- Example Backlog: [examples/deliberation-backlog.json](examples/deliberation-backlog.json)
-- Full guide: [docs/deliberation.md](docs/deliberation.md)
-
----
-
-## Execution Brief
-
-Substantial work is represented as a portable **Execution Brief** — a durable interface between thinking, execution, verification, and handoff.
+A v2 brief keeps the important parts explicit. This is an excerpt, not the full schema:
 
 ```json
 {
-  "version": "1.0",
-  "title": "Brand-aware landing page generation",
-  "domain": "software",
+  "version": "2.0",
+  "title": "Brand-aware generation",
   "status": "modeling",
-  "intent": {
-    "problem": "AI-generated landing pages drift toward generic design choices",
-    "desired_outcome": "Generated pages consistently follow supplied brand direction",
-    "actor": "Design and growth team"
-  },
-  "scope": {
-    "in": ["brand context representation", "generation rules", "review checks"],
-    "out": ["full CMS", "analytics platform"],
-    "constraints": ["must work across more than one model"]
+  "outcome": {
+    "desired_result": "Generated pages follow supplied brand direction"
   },
   "knowledge": {
     "facts": [],
     "assumptions": [],
     "unknowns": []
   },
-  "decisions": [],
-  "open_decisions": [],
   "workstreams": [],
-  "deliverables": [],
   "verification": {
-    "success_criteria": [],
+    "criteria": [],
     "evidence": []
   },
-  "next_action": ""
+  "next_action": {
+    "description": "Run the controlled comparison"
+  }
 }
 ```
 
-The brief is intentionally useful even when the next agent does not have the original conversation history.
+The full schema tracks authority, attempts, reviews, workstreams, deliverables, evidence freshness, blockers, plan changes, and handoffs.
 
-- **Schema:** [`skills/get-things-done/references/execution-brief.schema.json`](skills/get-things-done/references/execution-brief.schema.json)
-- **Examples:** [`examples/software-brief.json`](examples/software-brief.json) · [`examples/marketing-brief.json`](examples/marketing-brief.json)
-- **Full reference:** [docs/execution-brief.md](docs/execution-brief.md)
+[Execution Brief](docs/execution-brief.md) · [Validation architecture](docs/validation.md) · [Examples](examples/)
 
----
+## Architecture
 
-## CLI reference
+```mermaid
+flowchart TD
+    U[User intent] --> F{Framing risk?}
+    F -->|material| D[Deliberation\ncurrent evidence + challenge]
+    F -->|low| G[GTD core]
+    D --> G
+    G --> P[Problem / Execution model]
+    P --> R{Multiple execution surfaces?}
+    R -->|yes| C[Capability router]
+    R -->|no| A[Action]
+    C --> A
+    A --> V[Executable verification]
+    V --> E[(Evidence)]
+    E --> X{Done contract met?}
+    X -->|yes| DONE[Done]
+    X -->|no| G
+```
+
+The `skills/` tree is the source of truth. Adapters can change where GTD is discovered and packaged, but they cannot fork the work model or weaken Ready/Done semantics.
+
+[Architecture](docs/architecture.md) · [Core contract](skills/get-things-done/references/core-contract.md)
+
+## Install and update paths
+
+Choose the authority that installed your copy.
+
+| Install path | Install / update authority |
+|---|---|
+| Agent Skills / skills.sh | `npx skills add ...` / `npx skills update` |
+| Canonical installed GTD Skills | `gtd update --check` / `gtd update` |
+| Git checkout | `git pull --ff-only` |
+| Homebrew HEAD | `brew upgrade --fetch-HEAD get-things-done` |
+| Named host root | `./install.sh --target <host>` or `--target-path <path>` |
+
+The self-updater stages and validates all four Skills before replacement, preserves non-colliding custom domain files, records canonical hashes, and requires `--force` before overwriting later local edits.
+
+[Updating contract](docs/updating.md)
+
+<details>
+<summary><strong>CLI reference</strong></summary>
 
 ### GTD core
 
 ```bash
-python scripts/gtd.py doctor                                    # repository health check
-python scripts/gtd.py list-domains                              # list registered domain packs
-python scripts/gtd.py new-brief --title "…" --domain software \
-  --out brief.json                                              # create a v1 brief
-python scripts/gtd.py new-brief --version 2.0 --title "…" \
-  --out brief-v2.json                                           # create an opt-in v2 brief
-python scripts/gtd.py validate-brief brief.json --root .        # version-aware schema validation
-python scripts/gtd.py assess-brief brief.json                   # human-readable Ready/Done assessment
-python scripts/gtd.py assess-brief brief-v2.json --require done # machine gate: 0 met, 2 unmet
-python scripts/gtd.py migrate-brief brief.json --out brief-v2.json # explicit v1 → v2 migration
-python scripts/gtd.py render-brief brief.json --out brief.md    # backward-compatible Markdown render
-python scripts/gtd.py export-brief brief.json --format all \
-  --out dist/brief                                              # MD, JSON, TOON, Mermaid, graph JSON
-python scripts/gtd.py package --out dist                        # build distribution package
-python scripts/gtd.py update --check                           # check installed Skills for updates
-python scripts/gtd.py update                                   # update installed Skills from canonical GitHub
+python scripts/gtd.py doctor
+python scripts/gtd.py list-domains
+python scripts/gtd.py new-brief --version 2.0 --title "…" --out brief.json
+python scripts/gtd.py validate-brief brief.json --root .
+python scripts/gtd.py assess-brief brief.json --require ready
+python scripts/gtd.py render-brief brief.json --out brief.md
+python scripts/gtd.py migrate-brief legacy-v1.json --out brief-v2.json
+python scripts/gtd.py package --out dist
+python scripts/gtd.py update --check
 ```
 
 ### Adapter CLI
 
 ```bash
-# Status and discovery
-python scripts/adapters.py status                               # ecosystem status across all 20 targets
-python scripts/adapters.py list                                 # list adapter registry entries
-python scripts/adapters.py capabilities                         # capability matrix
-python scripts/adapters.py query --capability skills            # filter by capability
-python scripts/adapters.py info cursor                          # single adapter detail
-python scripts/adapters.py validate                             # validate all contracts
-
-# Companion interoperability
-python scripts/adapters.py companions                           # list all companion profiles
-python scripts/adapters.py interop context7                     # inspect specific companion boundary
-
-# Single-target export
+python scripts/adapters.py validate
+python scripts/adapters.py status
+python scripts/adapters.py capabilities
 python scripts/adapters.py export cursor --out dist/adapters
-python scripts/adapters.py export chatgpt-plugin --out dist/adapters --package
-python scripts/adapters.py export homebrew --out dist/adapters
-python scripts/adapters.py export shell --out dist/adapters
-
-# Export everything (18 non-conditional targets + machine-readable report)
-python scripts/adapters.py export-all \
-  --out dist/adapters --package --report dist/export-report.json
+python scripts/adapters.py export-all --out dist/adapters --package --report dist/export-report.json
 ```
 
-### Release artifact verification
+### Release integrity
 
 ```bash
-python scripts/release_checksums.py dist/adapters \
-  --verify dist/adapters/SHA256SUMS
+python scripts/release_checksums.py dist --verify dist/SHA256SUMS
 ```
 
----
+</details>
 
-## Supported surfaces
+## Repository guarantees
 
-GTD tracks **20 adapter contracts**. The label describes the package/export contract GTD verifies — not a claim that every vendor has approved the package in its public marketplace.
+Current deterministic CI runs on Python **3.10, 3.11, 3.12, 3.13, and 3.14** and covers the repository contracts that can be checked mechanically, including:
 
-| Target | Support model | Delivery |
-|---|---|---|
-| Agent Skills / compatible agents | Native standard | canonical `skills/` tree |
-| Agent Plugins | Native standard | root `plugin.json` |
-| Claude AI Skills | Portable | Agent Skills package |
-| Claude Code | First-class adapter | Claude plugin + skills |
-| Claude Marketplace | First-class package | `.claude-plugin/marketplace.json` |
-| Claude Cowork | First-class adapter | Claude plugin/skill package |
-| ChatGPT Web | First-class adapter | OpenAI plugin package |
-| ChatGPT Work | First-class adapter | OpenAI plugin package |
-| ChatGPT Plugins | First-class package | `.codex-plugin/plugin.json` |
-| Codex | First-class adapter | OpenAI plugin + Agent Skills fallback |
-| Cursor | First-class adapter | `.cursor/skills` |
-| Kimi Code | First-class adapter | `kimi.plugin.json` + `.kimi-code/skills` |
-| Grok Build | First-class adapter | `.grok/skills` |
-| DeepSeek DeepCode | First-class adapter | `.deepcode/skills` |
-| Antigravity / Gemini CLI | First-class adapter | `.gemini/config/skills` |
-| Homebrew | First-class distribution | HEAD Formula + packaged canonical skills |
-| Shell Installer | First-class distribution | Multi-host `install.sh` with named roots |
-| Vercel skills.sh | First-class distribution metadata | `skills.sh.json` |
-| Contentful Skill Kit | Authoring bridge | typed workflow compilation |
-| Glama | Conditional | enabled only when GTD ships a real `mcp.json` |
+- Execution Brief schemas and semantic relationships
+- domain pack and routing invariants
+- adapter and plugin manifests
+- package installation and the `gtd` entrypoint
+- host exports and deterministic archives
+- installer and updater rollback paths
+- release checksums and provenance
+- behavioral suite and run-record structure
 
-Glama is not marked native today because GTD does not currently ship an MCP server. The adapter CLI fails closed rather than manufacturing registry support that does not exist.
-
-See [docs/adapters.md](docs/adapters.md) for full adapter documentation.
-
----
-
-## Companion tools
-
-GTD tracks 5 companion tools in [`adapters/companions.json`](adapters/companions.json) with strict separation of concerns. Companions participate in the engineering workflow without becoming GTD hosts or runtime dependencies.
-
-| Companion | Role | GTD boundary |
-|---|---|---|
-| **Plugin Autopilot** | agent orchestration | Autopilot schedules agent runs; GTD owns work state, brief, and done contract |
-| **Plugin Eval** | plugin and skill evaluation | Eval findings enter GTD as verification evidence; cannot bypass exit gates |
-| **Superpowers** | development methodology | Superpowers guides TDD and review disciplines; GTD wraps high-level brief |
-| **ArmorCodex** | security review | Security findings enter GTD as blockers/evidence; severity is never rewritten |
-| **Context7** | documentation retrieval over MCP | Context7 provides external docs context; local code and repo governance win |
-
-Inspect companion boundaries:
-
-```bash
-python scripts/adapters.py companions
-python scripts/adapters.py interop context7
-```
-
----
-
-## Architecture
-
-```text
-                    Canonical GTD Skills
-                           │
-          ┌────────────────┼────────────────┐
-          │                │                │
-      Agent Skills     Agent Plugins    Host Adapters
-          │                │                │
-          └────────────────┼────────────────┘
-                           │
- Claude · ChatGPT · Codex · Cursor · Kimi · Grok · DeepCode · more
-```
-
-The `skills/` tree is the **single source of truth**. Adapters own only discovery paths, manifests, packaging, and compatibility checks — they cannot fork the GTD decision model or create a parallel version of the workflow.
-
-GTD deliberately separates two layers:
-
-| Layer | What it covers |
-|---|---|
-| **Deterministic** | JSON schema validation, manifest integrity, SemVer alignment, domain collision checks, Ready/Done structural assessment, adapter export, SHA-256 checksum generation |
-| **Model-driven** | interpreting messy intent, choosing the active blocker mode, evaluating trade-offs, field-specific review |
-
-The CLI does not replace contextual judgment, and the skill does not pretend model judgment is deterministic.
-
-See [docs/architecture.md](docs/architecture.md) for the full runtime model, state machine, and adapter tier descriptions.
-
----
-
-## Repository map
-
-```text
-plugin.json                         Agent Plugins 1.0.0 manifest
-.codex-plugin/                      ChatGPT / Codex plugin manifest
-.claude-plugin/                     Claude plugin + marketplace catalog
-kimi.plugin.json                    Kimi Code plugin manifest
-skills.sh.json                      skills.sh discovery metadata
-Formula/
-  get-things-done.rb                Homebrew HEAD Formula
-install.sh                          Portable multi-host shell installer
-adapters/
-  registry.json                     GTD adapter compatibility registry
-  registry.schema.json              Adapter registry JSON schema
-  companions.json                   Companion interoperability registry
-  companions.schema.json            Companion registry JSON schema
-skills/
-  get-things-done/                  Core GTD skill
-    SKILL.md
-    domains/                        9 built-in domain packs (software, marketing, product, research, advisory, data-ai, design-ux, operations, legal-compliance)
-    references/                     Schemas and core contract
-    templates/                      Brief templates
-  building-gtd-domain-packs/        Companion skill for authoring custom packs
-  gtd-capability-router/             Capability ownership and execution routing
-  gtd-deliberation/                  Evidence-backed framing and direction layer
-scripts/
-  gtd.py                            GTD core CLI
-  adapters.py                       Adapter CLI
-  package_skills.py                 Skill packaging
-  release_checksums.py              Deterministic SHA-256 release checksums
-  release_provenance.py             Source/version/artifact provenance
-  behavioral_evals.py               Behavioral run recorder and comparator
-  catalog_stylist.py                Catalog metadata tooling
-docs/                               Extended documentation
-evals/                              Behavioral model evaluations
-examples/                           Example Execution Briefs
-tests/                              Deterministic test suite (24 modules)
-```
-
----
-
-## Verification
-
-CI verifies deterministic repository behavior across **Python 3.10, 3.11, 3.12, 3.13, and 3.14**:
-
-- Python bytecode compilation (`python -m compileall scripts tests`)
-- GTD core tests and CLI wrapper behavior
-- Execution Brief validation and Ready/Done assessment
-- Domain pack contracts and collision rules
-- Skill catalog assets and OpenAI skill metadata
-- Adapter registry and manifest validation
-- Companion contract schema conformance and boundary checks
-- Host export and packaging smoke tests
-- Deterministic SHA-256 release checksum generation and verification
-- Installer syntax and Bash 3.2 compatibility
-- Homebrew formula syntax validation
-- Cross-manifest SemVer and canonical identity alignment
-
-Behavioral model evals remain separate from deterministic tests — see [docs/evaluation.md](docs/evaluation.md).
-
-The executable behavioral recorder/comparator is `python scripts/behavioral_evals.py`. Corpus validation runs deterministically; live model execution and grading remain separate qualification evidence.
-
-Run the full suite locally:
-
-```bash
-pip install -e ".[dev]"
-pytest
-```
-
----
+Behavioral reasoning remains a separate qualification activity. See [Evaluation](docs/evaluation.md).
 
 ## Documentation
 
-| Document | Contents |
+| Start here | Reference |
 |---|---|
-| [docs/README.md](docs/README.md) | Docs index |
-| [docs/quickstart.md](docs/quickstart.md) | First brief in five steps |
-| [docs/architecture.md](docs/architecture.md) | Runtime model, state machine, adapter tiers |
-| [docs/deliberation.md](docs/deliberation.md) | Freshness, challenge, direction gate, and backlog workflow |
-| [docs/updating.md](docs/updating.md) | Self-update channels, safety, rollback, and package-manager boundaries |
-| [docs/release.md](docs/release.md) | Transactional install recovery, release qualification, provenance, and rollback |
-| [docs/adapters.md](docs/adapters.md) | Full host adapter and companion documentation |
-| [docs/execution-brief.md](docs/execution-brief.md) | Brief schema, lifecycle, and handoff contract |
-| [docs/validation.md](docs/validation.md) | Schema runtime, version routing, migration, and CLI exit semantics |
-| [docs/domain-packs.md](docs/domain-packs.md) | Built-in packs and authoring guide |
-| [docs/installation.md](docs/installation.md) | Per-host installation and export commands |
-| [docs/evaluation.md](docs/evaluation.md) | Behavioral evaluation approach |
-| [docs/ci.md](docs/ci.md) | CI runtime support, package-install, lint, coverage, and permission policy |
-| [docs/changelog-v1.3.md](docs/changelog-v1.3.md) | v1.3 release notes |
-
----
+| [Quickstart](docs/quickstart.md) | First GTD workflow |
+| [Installation](docs/installation.md) | Host-specific installation and export paths |
+| [Architecture](docs/architecture.md) | Runtime model and boundaries |
+| [Deliberation](docs/deliberation.md) | Freshness, challenge, direction gate, backlog |
+| [Execution Brief](docs/execution-brief.md) | Durable work artifact and lifecycle |
+| [Validation](docs/validation.md) | Schema ownership, migration, CLI exit semantics |
+| [Domain packs](docs/domain-packs.md) | Selection and custom pack authoring |
+| [Adapters](docs/adapters.md) | 20 host/distribution contracts |
+| [Evaluation](docs/evaluation.md) | Behavioral run and comparison protocol |
+| [CI quality](docs/ci.md) | Runtime, package, lint, permission policy |
+| [Updating](docs/updating.md) | Self-update safety and channels |
+| [Release and recovery](docs/release.md) | Transactions, provenance, rollback |
 
 ## Contributing
 
-Issues and pull requests are welcome. Before opening a PR:
+Before opening a PR:
 
-1. Run `python scripts/gtd.py doctor` and `python scripts/adapters.py validate` to confirm the registry is healthy.
-2. Run `pytest` to confirm all deterministic tests pass.
-3. If adding a host adapter, update `adapters/registry.json` and add a corresponding export test in `tests/`.
-4. If authoring a new domain pack, use the [`building-gtd-domain-packs`](skills/building-gtd-domain-packs/) skill — do not modify the core contract.
+```bash
+python scripts/gtd.py doctor
+python scripts/adapters.py validate
+pytest
+```
 
----
-
-## Design principle
-
-> Never confuse thinking with progress
-
-A useful agent should make uncertainty visible, move the smallest consequential thing forward, and prove what changed.
-
----
+If you add a host adapter, update its registry contract and export tests. If you add a domain, preserve the core Ready/Done and evidence semantics.
 
 ## License
 
-MIT — see [LICENSE](LICENSE)
+MIT. See [LICENSE](LICENSE).
 
-Maintained by [Mamdouh Aboammar](https://github.com/imMamdouhaboammar)
+Maintained by [Mamdouh Aboammar](https://github.com/imMamdouhaboammar).
