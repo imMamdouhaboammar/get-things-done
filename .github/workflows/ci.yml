@@ -82,6 +82,7 @@ jobs:
           python scripts/gtd.py package --out ./dist
           test -f ./dist/get-things-done.zip
           test -f ./dist/building-gtd-domain-packs.zip
+          test -f ./dist/gtd-capability-router.zip
 
       - name: Verify Install Script Syntax
         run: |
