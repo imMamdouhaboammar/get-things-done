@@ -42,7 +42,7 @@ def package_all(root: Path, out_dir: Path) -> dict[str, Path]:
     results: dict[str, Path] = {}
     skills_root = root / "skills"
     
-    for skill_name in ["get-things-done", "building-gtd-domain-packs", "gtd-deliberation"]:
+    for skill_name in ["get-things-done", "building-gtd-domain-packs", "gtd-capability-router", "gtd-deliberation"]:
         s_dir = skills_root / skill_name
         if not s_dir.is_dir():
             continue
