@@ -1,0 +1,69 @@
+version: 1
+id: gtd-deliberation-activation
+
+default: bypass
+
+activate_when_any:
+  - proposed_solution_is_not_yet_tied_to_observed_problem
+  - hidden_assumptions_can_materially_change_direction
+  - outcome_or_causal_framing_is_contradictory
+  - decision_is_high_impact_or_expensive_to_reverse
+  - strategic_or_architectural_choice_has_multiple_plausible_directions
+  - current_evidence_may_contradict_user_framing
+  - second_order_effects_are_material
+  - user_explicitly_requests_deep_challenge_or_truth_seeking
+  - prior_attempt_failed_and_root_cause_is_not_established
+  - planning_now_would_lock_in_unvalidated_assumptions
+
+bypass_when_any:
+  - simple_one_step_task_with_known_answer
+  - fully_specified_low_risk_execution
+  - reversible_action_is_cheaper_than_further_analysis
+  - user_only_requests_transformation_or_formatting
+  - existing_approved_direction_and_no_material_new_evidence
+  - verification_only_task_with_stable_success_criteria
+
+freshness:
+  required_when_deliberation_activates: true
+  resolve_date_at_runtime: true
+  search_must_use_current_date_scope: true
+  remembered_knowledge_is_not_current_evidence: true
+
+depth:
+  light:
+    minimum:
+      - expose_assumptions
+      - current_date_freshness_check
+      - consider_one_alternative_framing
+      - record_exit_reason
+
+  standard:
+    minimum:
+      - hypotheses
+      - current_date_search
+      - targeted_research
+      - challenge
+      - reframe
+      - alternative_directions
+      - direction_gate
+
+  deep:
+    minimum:
+      - current_date_search
+      - explicit_falsification_attempt
+      - counterfactuals
+      - second_order_effects
+      - evidence_quality_review
+      - rejected_directions
+      - explicit_user_decision
+
+exit_rule:
+  principle: stop_when_expected_value_of_action_or_test_exceeds_expected_value_of_another_thinking_cycle
+  required:
+    - outcome_understood
+    - major_assumptions_visible
+    - freshness_complete_or_explicitly_blocked
+    - material_contradictions_investigated
+    - alternative_framing_considered
+    - evidence_sufficient_for_current_decision
+    - remaining_uncertainty_explicit

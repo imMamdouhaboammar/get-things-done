@@ -43,6 +43,10 @@ jobs:
         run: |
           pytest -q tests/test_capability_router_security.py
 
+      - name: Deliberation Security Regression
+        run: |
+          pytest -q tests/test_deliberation_security.py
+
       - name: Validate Skill Catalog Assets & Invariants
         run: |
           python scripts/catalog_stylist.py --validate
@@ -66,6 +70,7 @@ jobs:
           test -f ./dist/adapters/homebrew/Formula/get-things-done.rb
           test -f ./dist/adapters/shell/install.sh
           test -f ./dist/adapters/shell/skills/get-things-done/SKILL.md
+          test -f ./dist/adapters/shell/skills/gtd-deliberation/SKILL.md
           test -f ./dist/adapters/homebrew.zip
           test -f ./dist/adapters/shell.zip
           test -f ./dist/adapters/codex.zip
@@ -87,6 +92,7 @@ jobs:
           test -f ./dist/get-things-done.zip
           test -f ./dist/building-gtd-domain-packs.zip
           test -f ./dist/gtd-capability-router.zip
+          test -f ./dist/gtd-deliberation.zip
 
       - name: Verify Install Script Syntax
         run: |

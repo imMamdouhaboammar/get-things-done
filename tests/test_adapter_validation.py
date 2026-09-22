@@ -13,7 +13,7 @@ spec.loader.exec_module(adapters)
 
 def repo_copy(tmp_path: Path) -> Path:
     root = tmp_path / "repo"
-    for rel in ["adapters", "skills/get-things-done", "skills/building-gtd-domain-packs", "skills/gtd-capability-router", ".codex-plugin", ".claude-plugin", "Formula"]:
+    for rel in ["adapters", "skills/get-things-done", "skills/building-gtd-domain-packs", "skills/gtd-capability-router", "skills/gtd-deliberation", ".codex-plugin", ".claude-plugin", "Formula"]:
         (root / rel).mkdir(parents=True, exist_ok=True)
     for rel in [
         "adapters/registry.json",

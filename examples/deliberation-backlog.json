@@ -1,0 +1,85 @@
+{
+  "version": "1.0",
+  "title": "GTD Deliberation rollout",
+  "approved_direction": "Add risk-triggered deliberation with mandatory current-date freshness search before consequential planning.",
+  "source_problem_model": "examples/deliberation-problem-model.json",
+  "source_execution_brief": null,
+  "epics": [
+    {
+      "id": "E1",
+      "title": "Deliberation contract",
+      "outcome": "Agents can challenge and reframe messy requests using current evidence.",
+      "dependencies": [],
+      "acceptance_criteria": [
+        "Activation rules distinguish high-risk framing from direct low-risk work.",
+        "Freshness search is recorded as inspectable evidence."
+      ],
+      "evidence_required": [
+        "Schema validation",
+        "Behavioral pressure cases"
+      ],
+      "tasks": [
+        {
+          "id": "T1",
+          "action": "Define activation and sufficiency rules.",
+          "done_when": "Router contract and tests pass.",
+          "dependencies": []
+        },
+        {
+          "id": "T2",
+          "action": "Define current-date freshness record.",
+          "done_when": "Problem Model schema requires freshness context.",
+          "dependencies": [
+            "T1"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "E2",
+      "title": "Direction to execution handoff",
+      "outcome": "Approved direction becomes bounded backlog work without silently reintroducing rejected scope.",
+      "dependencies": [
+        "E1"
+      ],
+      "acceptance_criteria": [
+        "Direction Gate status is explicit.",
+        "Backlog items contain acceptance criteria and evidence requirements."
+      ],
+      "evidence_required": [
+        "Backlog schema validation",
+        "CLI scaffold test"
+      ],
+      "tasks": [
+        {
+          "id": "T3",
+          "action": "Define Superpowers planning handoff.",
+          "done_when": "Planning boundary reference exists and tests cover approval.",
+          "dependencies": [
+            "T2"
+          ]
+        },
+        {
+          "id": "T4",
+          "action": "Scaffold and validate backlog artifact.",
+          "done_when": "CLI-generated backlog validates against schema.",
+          "dependencies": [
+            "T3"
+          ]
+        }
+      ]
+    }
+  ],
+  "decision_log": [
+    {
+      "decision": "Use risk-triggered deliberation instead of mandatory deep thought for every task.",
+      "reason": "Preserves fast execution when framing risk is low.",
+      "source": "examples/deliberation-problem-model.json"
+    }
+  ],
+  "risks": [
+    "Deliberation could become verbose if sufficiency rules are ignored.",
+    "Freshness search can leak private context if search boundaries are not enforced."
+  ],
+  "next_action": "Run deterministic tests and behavioral evals for the deliberation layer."
+}

@@ -78,3 +78,23 @@ It does not prove every model-host combination follows the skill correctly under
 This corpus checks whether the optional gtd-capability-router preserves live source-of-truth precedence, nominal versus selected owner separation, one write owner per mutable surface, executable verification before readiness claims, open-PR bot and review context handling, stale-head invalidation, one primary independent reviewer by default, exact-state landing discipline, and evaluation/marketplace claim boundaries.
 
 The file is a behavioral corpus. Do not describe it as an executed benchmark until baseline/candidate runs have actually been performed.
+
+
+### 5. Deliberation behavioral evals (`evals/gtd-deliberation-cases.jsonl`)
+
+The deliberation corpus pressure-tests:
+
+- current-date freshness search instead of memory-only claims
+- evidence-backed disagreement with the user's framing
+- resistance to performative contrarianism
+- hidden-assumption discovery and falsification
+- no-build alternatives
+- Direction Gate authority
+- provisional reversible tests
+- Superpowers planning only after direction approval
+- backlog quality
+- contemplation sufficiency and stop conditions
+- search-blocked and no-web behavior
+- protection of private chain-of-thought
+
+The corpus is not an executed benchmark. A model comparison must be run separately before claiming measured behavioral improvement.

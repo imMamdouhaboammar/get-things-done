@@ -8,7 +8,19 @@ description: >
 
 Turn unclear intent into an executable work model, then continue through delivery when execution was requested and the runtime can act.
 
-Load `references/core-contract.md` at the start of every cycle — the knowledge ledger, mode router, and gate contracts live there.
+Load `references/core-contract.md` at the start of every cycle — the knowledge ledger, mode router, freshness rules, and gate contracts live there.
+
+## Freshness and deliberation preflight
+
+Before substantial work commits to a direction:
+
+- do not rely on model memory alone for external, current, or versioned facts
+- resolve today's date from the runtime and search current relevant sources when those facts can materially affect the decision
+- record when current search is unavailable or explicitly forbidden instead of implying freshness
+- load `gtd-deliberation` when the request is assumption-heavy, contradictory, strategically important, expensive to reverse, or framed around an unvalidated solution
+- bypass deliberation for simple, fully specified, low-risk work where action or testing has higher expected value than more thinking
+
+Deliberation is a pre-execution layer, not an excuse to delay obvious work.
 
 ## Domain quick-select
 

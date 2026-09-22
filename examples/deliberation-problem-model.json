@@ -1,0 +1,126 @@
+{
+  "version": "1.0",
+  "title": "Should a messy GTD request enter deliberation before execution?",
+  "status": "approved",
+  "original_request": "Make GTD think deeply before it works.",
+  "desired_outcome": "Reduce the chance that GTD executes a badly framed request while preserving fast execution for obvious work.",
+  "proposed_solution": "Make every request go through deep contemplation.",
+  "current_framing": "Use an activation router so deliberation is mandatory for high-risk or assumption-heavy work and bypassed for obvious low-risk work.",
+  "freshness_context": {
+    "status": "current",
+    "searched_at": "2026-09-22T12:00:00+03:00",
+    "search_scope": "Current portable agent packaging and skill standards relevant to the design",
+    "queries": [
+      "Agent Plugins specification September 2026",
+      "Agent Skills specification September 2026"
+    ],
+    "sources": [
+      "https://agent-plugins.org/specification",
+      "https://agentskills.io/specification"
+    ],
+    "freshness_findings": [
+      "Portable skills remain a suitable boundary for an optional deliberation layer."
+    ],
+    "stale_or_changed_claims": [],
+    "freshness_gaps": [
+      "Behavioral quality still requires model evals; standards conformance does not prove deliberation quality."
+    ]
+  },
+  "assumptions": [
+    {
+      "id": "A1",
+      "statement": "Mandatory deep contemplation on every request would add avoidable latency and analysis theater.",
+      "status": "supported",
+      "evidence_ids": [
+        "E1"
+      ]
+    },
+    {
+      "id": "A2",
+      "statement": "A separate pre-execution Skill can preserve the GTD core while adding deeper framing checks.",
+      "status": "supported",
+      "evidence_ids": [
+        "E2"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E1",
+      "claim": "The GTD core already routes only the current blocker instead of running every mode.",
+      "source": "skills/get-things-done/references/core-contract.md",
+      "effect": "supports",
+      "quality": "direct"
+    },
+    {
+      "id": "E2",
+      "claim": "Portable skill packaging supports focused skills with their own references and scripts.",
+      "source": "https://agentskills.io/specification",
+      "effect": "supports",
+      "quality": "strong"
+    }
+  ],
+  "contradictions": [
+    "The original proposal made contemplation universal, while GTD's existing architecture values the smallest mode needed for the current blocker."
+  ],
+  "alternative_framings": [
+    "Replace GTD direct execution entirely with contemplation.",
+    "Add a deliberation preflight only when framing risk is material.",
+    "Keep GTD unchanged and rely on user prompting for deeper thought."
+  ],
+  "second_order_effects": [
+    "A universal contemplation requirement could slow trivial tasks.",
+    "A separate Problem Model creates durable decision provenance before implementation."
+  ],
+  "candidate_directions": [
+    {
+      "id": "D1",
+      "summary": "Mandatory deep deliberation for every GTD request",
+      "rationale": "Strongest consistency but highest analysis overhead.",
+      "tradeoffs": [
+        "Simple tasks become slower"
+      ],
+      "risks": [
+        "Analysis theater"
+      ],
+      "verification_path": "Compare behavioral evals and task latency."
+    },
+    {
+      "id": "D2",
+      "summary": "Risk-triggered deliberation preflight",
+      "rationale": "Adds deep challenge where framing error matters while preserving direct execution elsewhere.",
+      "tradeoffs": [
+        "Activation routing must be reliable"
+      ],
+      "risks": [
+        "False bypass or unnecessary activation"
+      ],
+      "verification_path": "Pressure-test activation evals."
+    }
+  ],
+  "recommended_direction": {
+    "id": "D2",
+    "summary": "Risk-triggered deliberation preflight",
+    "why": "It preserves GTD's directness while adding evidence-backed challenge for high-risk framing.",
+    "confidence": "high"
+  },
+  "rejected_directions": [
+    {
+      "summary": "Mandatory deep deliberation for every request",
+      "reason": "It violates the smallest-useful-mode principle and can reward analysis volume over information value."
+    }
+  ],
+  "open_decisions": [],
+  "direction_gate": {
+    "requires_user_decision": true,
+    "status": "approved",
+    "decision": "Adopt risk-triggered deliberation with mandatory current-date freshness search when activated."
+  },
+  "contemplation_exit": {
+    "reason": "The framing, trade-offs, and implementation direction are sufficiently established to plan bounded work.",
+    "remaining_uncertainty": [
+      "Behavioral eval scores have not yet been executed against multiple models."
+    ],
+    "next_artifact": "backlog"
+  }
+}

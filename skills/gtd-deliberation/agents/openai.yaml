@@ -1,0 +1,19 @@
+schema_version: v1
+name: gtd-deliberation
+display_name: GTD Deliberation
+short_description: Challenge and refresh messy ideas before planning or execution
+default_prompt: 'Deeply examine this idea, refresh current evidence, and find the right direction before planning:'
+brand_color: '#7C3AED'
+categories:
+- productivity
+- developer-tools
+- project-management
+interface:
+  display_name: "GTD Deliberation"
+  short_description: "Challenge and refresh ideas before planning"
+  icon_small: "./assets/small-logo.svg"
+  icon_large: "./assets/large-logo.svg"
+  brand_color: "#7C3AED"
+  default_prompt: "Use $gtd-deliberation to challenge this idea with current evidence before planning."
+policy:
+  allow_implicit_invocation: true

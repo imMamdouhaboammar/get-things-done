@@ -1,0 +1,58 @@
+version: 1
+id: gtd-deliberation-roles
+note: logical roles; one model may perform several roles, but evidence and decision boundaries remain distinct
+
+roles:
+  contemplator:
+    objective: expose assumptions, contradictions, causal stories, and hidden objectives before research
+    writes: problem_model_only
+    outputs: [hypotheses, assumptions, falsification_questions]
+    forbidden: [claim_current_evidence_from_memory, implementation_planning]
+
+  freshness_researcher:
+    objective: refresh relevant knowledge using the runtime current date and current authoritative sources
+    writes: evidence_section_only
+    outputs: [search_record, current_evidence, stale_or_changed_claims, freshness_gaps]
+    forbidden: [invent_search, imply_current_verification_without_search]
+
+  skeptic:
+    objective: actively test whether the current framing or proposed solution is wrong
+    writes: findings_only
+    outputs: [contradictions, alternative_causes, failure_modes]
+    forbidden: [contrarianism_without_evidence, attack_user]
+
+  reframer:
+    objective: reconstruct the strongest evidence-backed problem statement
+    writes: problem_model_only
+    outputs: [reframed_problem, preserved_valid_assumptions, rejected_assumptions]
+    forbidden: [erase_uncertainty, smuggle_solution_into_problem_statement]
+
+  ideator:
+    objective: generate meaningfully different solution directions after framing stabilizes
+    writes: candidate_directions_only
+    outputs: [candidate_directions, no_build_option_when_plausible, counterfactuals]
+    forbidden: [cosmetic_variants_only, feature_brainstorming_before_reframe]
+
+  critic:
+    objective: stress-test candidate directions for evidence fit, risk, cost, reversibility, and second-order effects
+    writes: critique_only
+    outputs: [tradeoffs, risks, rejected_directions]
+    forbidden: [manufacture_certainty, treat_preference_as_fact]
+
+  synthesizer:
+    objective: converge surviving evidence and alternatives into a coherent recommended direction
+    writes: recommended_direction_only
+    outputs: [recommended_direction, confidence, remaining_uncertainty]
+    forbidden: [override_user_authority]
+
+  decision_steward:
+    objective: identify which decisions belong to the user and enforce the Direction Gate
+    writes: direction_gate_only
+    outputs: [decision_request, gate_status]
+    forbidden: [approve_on_user_behalf, ceremonial_approval_for_low_risk_reversible_work]
+
+  backlog_architect:
+    objective: convert an approved or explicitly provisional direction into durable executable backlog work
+    writes: backlog_only
+    outputs: [epics, tasks, dependencies, acceptance_criteria, evidence_requirements]
+    forbidden: [include_rejected_direction, treat_backlog_as_execution]

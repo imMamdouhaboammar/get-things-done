@@ -7,6 +7,7 @@ SKILL_DIRS = [
     ROOT / "skills" / "get-things-done",
     ROOT / "skills" / "building-gtd-domain-packs",
     ROOT / "skills" / "gtd-capability-router",
+    ROOT / "skills" / "gtd-deliberation",
 ]
 
 

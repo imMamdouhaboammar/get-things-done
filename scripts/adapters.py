@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILL_NAMES = ("get-things-done", "building-gtd-domain-packs", "gtd-capability-router")
+SKILL_NAMES = ("get-things-done", "building-gtd-domain-packs", "gtd-capability-router", "gtd-deliberation")
 SAFE_PATH_FIELDS = ("project_path", "fallback_path", "manifest", "requires")
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 RETIRED_REPO_NAME = "get-things-done-skillpack"
