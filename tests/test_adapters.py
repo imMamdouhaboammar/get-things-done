@@ -104,6 +104,7 @@ def test_shell_export_contains_installer_and_canonical_skills(tmp_path):
     assert (target / "install.sh").is_file()
     assert (target / "skills/get-things-done/SKILL.md").is_file()
     assert (target / "skills/building-gtd-domain-packs/SKILL.md").is_file()
+    assert (target / "skills/gtd-capability-router/SKILL.md").is_file()
     assert (target / "skills/gtd-deliberation/SKILL.md").is_file()
 
 
@@ -119,6 +120,7 @@ def test_cursor_export_uses_native_project_path(tmp_path):
     target = adapters.export_adapter("cursor", tmp_path / "dist", root)
     assert (target / ".cursor/skills/get-things-done/SKILL.md").is_file()
     assert (target / ".cursor/skills/building-gtd-domain-packs/SKILL.md").is_file()
+    assert (target / ".cursor/skills/gtd-capability-router/SKILL.md").is_file()
     assert (target / ".cursor/skills/gtd-deliberation/SKILL.md").is_file()
 
 
@@ -136,6 +138,7 @@ def test_openai_family_exports_same_canonical_skills(tmp_path):
         target = adapters.export_adapter(adapter_id, tmp_path / "dist", root)
         assert (target / ".codex-plugin/plugin.json").is_file()
         assert (target / "skills/get-things-done/SKILL.md").is_file()
+        assert (target / "skills/gtd-capability-router/SKILL.md").is_file()
         assert (target / "skills/gtd-deliberation/SKILL.md").is_file()
 
 
