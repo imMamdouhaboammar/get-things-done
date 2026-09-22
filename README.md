@@ -12,7 +12,7 @@ Turn messy intent into a clear work model · identify the real blocker · execut
 [![Agent Plugins 1.0](https://img.shields.io/badge/Agent_Plugins-1.0-111111.svg)](https://agent-plugins.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-111111.svg)](LICENSE)
 
-**One canonical GTD core · Agent Skills · Agent Plugins · Host adapters · Execution Briefs · Domain Packs · Evidence-based completion**
+**One canonical GTD core · Capability Router · Agent Skills · Agent Plugins · Host adapters · Execution Briefs · Domain Packs · Evidence-based completion**
 
 </div>
 
@@ -26,6 +26,7 @@ Turn messy intent into a clear work model · identify the real blocker · execut
 - [Quick start](#quick-start)
 - [Installation](#installation)
 - [Domain packs](#domain-packs)
+- [Capability routing](#capability-routing)
 - [Execution Brief](#execution-brief)
 - [CLI reference](#cli-reference)
 - [Supported surfaces](#supported-surfaces)
@@ -253,6 +254,18 @@ Need a custom domain (finance, sales, branding, media buying)?
 Use the companion [`building-gtd-domain-packs`](skills/building-gtd-domain-packs/) skill to create a pack without forking the core contract.
 
 See [docs/domain-packs.md](docs/domain-packs.md) for authoring guidance.
+
+---
+
+## Capability routing
+
+When one GTD cycle can be handled by several tools, connected sources, reviewers, bots, or executors, load [gtd-capability-router](skills/gtd-capability-router/).
+
+The router preserves one primary owner, one source of truth per fact domain, one write owner per mutable surface, executable verification, one primary independent review path, and one landing owner.
+
+Stable capability roles live in the Skill, while installation and availability are resolved at runtime. A tool being named in the registry is not proof that it is connected, callable, funded, or authorized in the current host.
+
+The routing pressure corpus lives at [evals/gtd-capability-router-cases.jsonl](evals/gtd-capability-router-cases.jsonl). It is a corpus, not a claim that a model benchmark has already been run.
 
 ---
 
