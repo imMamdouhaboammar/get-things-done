@@ -1,3 +1,5 @@
+> **Historical planning snapshot.** This file records the June 2026 planning/audit state. It is **not the current implementation status**. Current behavior is defined by the canonical Skills, schemas, CLI, tests, eval contracts, and current documentation on `main`.
+
 # Task Plan: Evolve the GTD Working Method
 
 ## Goal

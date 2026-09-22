@@ -95,3 +95,20 @@ A rollback is successful only after `gtd doctor` or the equivalent host verifica
 ## Workflow dispatch
 
 Manual `workflow_dispatch` runs are qualification runs unless the ref is a tag. The GitHub Release publication step is tag-gated.
+
+
+## Behavioral claims
+
+Deterministic release qualification does not prove a model behaves better.
+
+If release notes claim a behavioral improvement, link the exact executed evidence:
+
+- baseline run record
+- candidate run record
+- comparison artifact
+- suite revision
+- provider/model/host/settings metadata
+- source SHAs
+- retained response artifacts or equivalent evidence bound by the recorded response hashes
+
+Use `scripts/behavioral_evals.py` to create and validate those records. A pressure-case corpus by itself is not release evidence.

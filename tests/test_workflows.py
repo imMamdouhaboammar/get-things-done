@@ -116,3 +116,9 @@ def test_release_writes_provenance_before_publication():
 def test_release_uses_explicit_write_permission_only_for_release_job():
     workflow = load_workflow("release.yml")
     assert workflow["jobs"]["release"]["permissions"] == {"contents": "write"}
+
+
+def test_ci_validates_behavioral_eval_contracts_without_claiming_live_model_results():
+    commands = step_run_commands(load_workflow("ci.yml"), "test")
+    assert "python scripts/behavioral_evals.py validate-suite evals/cases.jsonl" in commands
+    assert "python scripts/behavioral_evals.py validate-suite evals/domain-routing-cases.jsonl" in commands

@@ -12,7 +12,7 @@ cd get-things-done
 ./install.sh --agents
 ```
 
-This installs both canonical skills under `~/.agents/skills`.
+This installs all four canonical GTD Skills under `~/.agents/skills`.
 
 For an agent with a different Agent Skills root:
 
@@ -168,7 +168,7 @@ Install GTD directly into Google Antigravity or Gemini CLI's skill configuration
 ./install.sh --target antigravity
 ```
 
-This copies both canonical skills to `~/.gemini/config/skills/`.
+This copies all four canonical GTD Skills to `~/.gemini/config/skills/`.
 
 For portable packaging:
 

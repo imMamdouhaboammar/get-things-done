@@ -29,6 +29,7 @@ def test_required_skill_files_exist():
         ROOT / 'skills/get-things-done/domains/product.md',
         ROOT / 'skills/get-things-done/domains/research.md',
         ROOT / 'scripts/gtd.py',
+        ROOT / 'scripts/behavioral_evals.py',
     ]
     missing = [str(p.relative_to(ROOT)) for p in required if not p.exists()]
     assert not missing, f'missing: {missing}'

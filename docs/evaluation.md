@@ -1,100 +1,131 @@
 # Evaluation
 
-GTD separates deterministic repository verification from behavioral agent evaluation
+GTD separates deterministic repository verification from behavioral agent evaluation. They answer different questions and must not be collapsed into one green badge.
 
-They answer different questions
+## Deterministic verification
 
-## Deterministic tests
+The Python/CLI suite can prove repository mechanics such as:
 
-The Python suite checks things the repository can prove directly
+- required Skill files and frontmatter
+- core and domain-pack structural invariants
+- Execution Brief schema and semantic validation
+- CLI behavior and exit contracts
+- package/install/release failure paths
+- adapter and companion conformance
+- deterministic packaging and checksums
+- behavioral suite and run-record structure
 
-- required skill files exist
-- skill frontmatter is discoverable
-- core invariants remain present
-- domain packs follow the required contract
-- Execution Brief JSON is structurally valid
-- CLI commands behave as expected
-- example briefs validate
-- packaging produces self-contained archives
-- catalog assets remain valid
-
-Run
+Run:
 
 ```bash
 pytest -v
 python scripts/catalog_stylist.py --validate
 python scripts/gtd.py doctor
+python scripts/behavioral_evals.py validate-suite evals/cases.jsonl
+python scripts/behavioral_evals.py validate-suite evals/domain-routing-cases.jsonl
 ```
 
-## Evaluation suites
+A green deterministic run does not prove live model behavior.
 
-### 1. Skill behavioral evals (`evals/cases.jsonl`)
+## Behavioral regression system
 
-The cases under [`evals/cases.jsonl`](../evals/cases.jsonl) test model behavior that cannot be proven by Python alone:
-
-- messy software idea
-- messy marketing idea
-- wrong-domain routing
-- best effort with no questions
-- fake-done pressure
-
-### 2. Adapter conformance evals (`evals/adapter-cases.jsonl`)
-
-The dataset under [`evals/adapter-cases.jsonl`](../evals/adapter-cases.jsonl) verifies expectations and distribution requirements across all **19 adapter contracts**:
-
-- Native standard discovery paths (`skills/`, `plugin.json`)
-- Vendor-specific manifests (`.claude-plugin/plugin.json`, `.codex-plugin/plugin.json`, `kimi.plugin.json`)
-- Package registries (`skills.sh.json`, `Formula/get-things-done.rb`, `install.sh`)
-- Boundary enforcement for conditional integrations (Glama fail-closed without `mcp.json`)
-
-### 3. Companion interoperability evals (`evals/interop-cases.jsonl`)
-
-The dataset under [`evals/interop-cases.jsonl`](../evals/interop-cases.jsonl) verifies separation of concerns for all **5 companion profiles**:
-
-- Plugin Autopilot (agent orchestration vs GTD execution brief)
-- Plugin Eval (evaluation findings vs GTD exit conditions)
-- Superpowers (methodology vs GTD readiness & done semantics)
-- ArmorCodex (independent security severity vs GTD evidence routing)
-- Context7 (external documentation retrieval vs local code authority)
-
-## Running evaluation verification
+The canonical recorder/comparator is:
 
 ```bash
-pytest tests/test_adapter_evals.py -v
+python scripts/behavioral_evals.py --help
 ```
+
+It deliberately does not call a model provider itself. The response can come from ChatGPT, Claude, Codex, another agent host, or a controlled test harness. GTD records the evidence and comparison contract without pretending provider execution is deterministic.
+
+Every run records:
+
+- suite SHA-256 and case count
+- label
+- provider
+- model
+- host
+- exact source commit SHA
+- Skill mode
+- provider/host settings
+- per-case response SHA-256
+- expected behaviors observed
+- forbidden behaviors observed
+- grader kind and identity
+- derived pass/fail
+
+The grader may be `human`, `model`, or `hybrid`. The record makes that choice explicit rather than treating model grading as ground truth.
+
+## Core behavior suite
+
+[`evals/cases.jsonl`](../evals/cases.jsonl) covers pressure classes including:
+
+- unnecessary question dumping
+- discoverable-fact delegation
+- assumptions presented as facts
+- solution/channel-first framing
+- plan-only behavior when execution is authorized
+- false completion claims
+- ceremony inflation
+- wrong-domain forcing
+- unsafe autonomy
+- stale-state continuation
+- simulated unavailable tools
+
+Each case has named expected and forbidden behaviors.
+
+## Domain routing suite
+
+[`evals/domain-routing-cases.jsonl`](../evals/domain-routing-cases.jsonl) gives every built-in domain pack:
+
+- a positive selection case
+- explicit non-selection evidence
+
+It also includes:
+
+- zero-pack routing
+- wrong-pack routing
+- the zero-or-one-pack invariant
+
+The pack text and the corpus are checked together by `tests/test_domain_pack_audit.py`.
+
+## Other pressure corpora
+
+The repository also carries adapter, companion, capability-router, and deliberation corpora. Unless a run record and comparison artifact exist, describe them as corpora or pressure cases, not measured benchmarks.
+
+## Running a controlled comparison
+
+Create baseline and candidate templates with the same provider/model/host/settings:
+
+```bash
+python scripts/behavioral_evals.py new-run --suite evals/cases.jsonl \
+  --label baseline --provider PROVIDER --model MODEL --host HOST \
+  --source-sha BASELINE_SHA --skill-mode without_skill \
+  --settings-json '{"temperature":0}' --out baseline.json
+
+python scripts/behavioral_evals.py new-run --suite evals/cases.jsonl \
+  --label candidate --provider PROVIDER --model MODEL --host HOST \
+  --source-sha CANDIDATE_SHA --skill-mode with_skill \
+  --settings-json '{"temperature":0}' --out candidate.json
+```
+
+Execute each case in a fresh context, preserve the response artifact, and record the judgment with `grade`.
+
+Validate both runs, then compare:
+
+```bash
+python scripts/behavioral_evals.py validate-run baseline.json
+python scripts/behavioral_evals.py validate-run candidate.json
+python scripts/behavioral_evals.py compare baseline.json candidate.json --out comparison.json
+```
+
+The comparator rejects environment drift rather than producing a misleading score.
 
 ## Release rule
 
-Do not collapse deterministic CI and behavioral evals into one green badge.
+A release may claim deterministic repository checks passed when the deterministic checks passed.
 
-A passing CI run means the repository mechanics and adapter contracts pass their checks.
+A release must not claim behavioral improvement without recorded behavioral evidence. Such a claim should link to the baseline run, candidate run, comparison artifact, exact suite revision, environment metadata, and retained response evidence.
 
-It does not prove every model-host combination follows the skill correctly under every pressure case.
+No percentage target should be invented before a controlled baseline exists.
 
-
-
-### 4. Capability routing evals (evals/gtd-capability-router-cases.jsonl)
-
-This corpus checks whether the optional gtd-capability-router preserves live source-of-truth precedence, nominal versus selected owner separation, one write owner per mutable surface, executable verification before readiness claims, open-PR bot and review context handling, stale-head invalidation, one primary independent reviewer by default, exact-state landing discipline, and evaluation/marketplace claim boundaries.
-
-The file is a behavioral corpus. Do not describe it as an executed benchmark until baseline/candidate runs have actually been performed.
-
-
-### 5. Deliberation behavioral evals (`evals/gtd-deliberation-cases.jsonl`)
-
-The deliberation corpus pressure-tests:
-
-- current-date freshness search instead of memory-only claims
-- evidence-backed disagreement with the user's framing
-- resistance to performative contrarianism
-- hidden-assumption discovery and falsification
-- no-build alternatives
-- Direction Gate authority
-- provisional reversible tests
-- Superpowers planning only after direction approval
-- backlog quality
-- contemplation sufficiency and stop conditions
-- search-blocked and no-web behavior
-- protection of private chain-of-thought
-
-The corpus is not an executed benchmark. A model comparison must be run separately before claiming measured behavioral improvement.
+See [`evals/README.md`](../evals/README.md) for the operational commands and result policy.

@@ -392,7 +392,7 @@ python scripts/gtd.py update                                   # update installe
 
 ```bash
 # Status and discovery
-python scripts/adapters.py status                               # ecosystem status across all 19 targets
+python scripts/adapters.py status                               # ecosystem status across all 20 targets
 python scripts/adapters.py list                                 # list adapter registry entries
 python scripts/adapters.py capabilities                         # capability matrix
 python scripts/adapters.py query --capability skills            # filter by capability
@@ -525,7 +525,7 @@ adapters/
 skills/
   get-things-done/                  Core GTD skill
     SKILL.md
-    domains/                        Built-in domain packs (software, marketing, product, research, advisory)
+    domains/                        9 built-in domain packs (software, marketing, product, research, advisory, data-ai, design-ux, operations, legal-compliance)
     references/                     Schemas and core contract
     templates/                      Brief templates
   building-gtd-domain-packs/        Companion skill for authoring custom packs
@@ -536,6 +536,8 @@ scripts/
   adapters.py                       Adapter CLI
   package_skills.py                 Skill packaging
   release_checksums.py              Deterministic SHA-256 release checksums
+  release_provenance.py             Source/version/artifact provenance
+  behavioral_evals.py               Behavioral run recorder and comparator
   catalog_stylist.py                Catalog metadata tooling
 docs/                               Extended documentation
 evals/                              Behavioral model evaluations
@@ -547,7 +549,7 @@ tests/                              Deterministic test suite (24 modules)
 
 ## Verification
 
-CI verifies deterministic repository behavior across **Python 3.10, 3.11, 3.12, and 3.13**:
+CI verifies deterministic repository behavior across **Python 3.10, 3.11, 3.12, 3.13, and 3.14**:
 
 - Python bytecode compilation (`python -m compileall scripts tests`)
 - GTD core tests and CLI wrapper behavior
@@ -563,6 +565,8 @@ CI verifies deterministic repository behavior across **Python 3.10, 3.11, 3.12, 
 - Cross-manifest SemVer and canonical identity alignment
 
 Behavioral model evals remain separate from deterministic tests — see [docs/evaluation.md](docs/evaluation.md).
+
+The executable behavioral recorder/comparator is `python scripts/behavioral_evals.py`. Corpus validation runs deterministically; live model execution and grading remain separate qualification evidence.
 
 Run the full suite locally:
 

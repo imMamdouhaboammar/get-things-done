@@ -6,6 +6,7 @@ extends: gtd-core-v1
 # GTD Domain Pack: Marketing
 ## Selection signals
 Campaigns, positioning, brand, paid media, acquisition, retention, content, CRM, funnels, offers, audience research, measurement, channel planning, experiments
+Non-selection signal: Marketing nouns that merely name a database object, software feature, dataset, or approved requirement do not justify this pack when the active outcome belongs to another domain.
 ## Domain vocabulary
 Keep distinct: audience, market, objective, behavior, trigger, proposition, offer, message, channel, creative, conversion, budget, measurement, incrementality, experiment
 ## Diagnostic questions

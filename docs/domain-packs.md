@@ -84,3 +84,39 @@ python scripts/gtd.py new-brief --title "Campaign budget review" --domain media-
 python scripts/gtd.py validate-brief brief.json --root .
 ```
 
+
+
+## Runtime selection contract
+
+Start from the universal GTD core.
+
+Load **zero or one** specialist domain pack for the active task. Select a pack only when its vocabulary, diagnostic questions, readiness additions, review rules, or completion evidence materially changes how the current outcome should be handled.
+
+A noun match is not enough. The routing corpus under [`evals/domain-routing-cases.jsonl`](../evals/domain-routing-cases.jsonl) includes positive selection, non-selection, zero-pack, and wrong-pack cases for all nine built-in packs.
+
+The **core remains authoritative**. A domain pack can add stricter field-specific checks, but it cannot weaken core authority, evidence, readiness, Done, handoff, or tool-honesty rules.
+
+## Capability degradation
+
+Domain packs describe specialist reasoning and evidence requirements; they do not prove that a host has every tool needed to satisfy those requirements.
+
+When a useful capability is unavailable:
+
+- keep the affected fact or verification state explicit
+- degrade to the strongest available evidence
+- hand off the missing executable check when necessary
+- do not simulate a tool, external source, deployment, approval, or verification result
+- do not claim Done merely because the domain pack describes the desired check
+
+Host capability routing remains separate from domain selection. The optional capability router can select an available implementation path without changing which domain semantics are authoritative.
+
+## Auditing selection behavior
+
+Validate the routing corpus contract:
+
+```bash
+python scripts/behavioral_evals.py validate-suite evals/domain-routing-cases.jsonl
+pytest -q tests/test_domain_pack_audit.py
+```
+
+A live behavioral run should record the actual response or routing trace, grade the named expected/forbidden behavior IDs, and preserve provider/model/host metadata. See [evaluation.md](evaluation.md).

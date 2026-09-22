@@ -6,6 +6,7 @@ extends: gtd-core-v1
 # GTD Domain Pack: Research
 ## Selection signals
 Research questions, literature review, market research, technical investigation, evidence synthesis, source verification, comparative analysis, feasibility study
+Non-selection signal: Do not select this pack merely because a task contains research-related nouns when the requested outcome is to build software, execute a campaign, produce a design, or perform another operational change.
 ## Domain vocabulary
 Keep distinct: question, hypothesis, claim, evidence, source, method, sample, uncertainty, limitation, confounder, inference, conclusion
 ## Diagnostic questions
