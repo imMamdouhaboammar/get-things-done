@@ -5,6 +5,7 @@ This directory contains evaluation suites for skill behavior, host adapter compl
 - **`cases.jsonl`**: Cross-domain behavioral pressure scenarios for Get Things Done.
 - **`adapter-cases.jsonl`**: Conformance expectations across all 19 host adapter contracts.
 - **`interop-cases.jsonl`**: Separation of concerns and boundary expectations for all 5 companion profiles.
+- **`gtd-capability-router-cases.jsonl`**: Capability ownership, availability, evidence, PR, review, and landing pressure cases. This is a corpus, not an executed benchmark.
 
 ## Behavioral pressure scenarios (`cases.jsonl`)
 
