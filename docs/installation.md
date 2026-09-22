@@ -192,6 +192,41 @@ gtd doctor
 
 Use the shell installer when you also want the skills copied into a host's user skill root.
 
+## Self-update
+
+A normal Agent Skills installation can refresh itself through the canonical GTD CLI:
+
+```bash
+python ~/.agents/skills/get-things-done/scripts/gtd.py update --check
+python ~/.agents/skills/get-things-done/scripts/gtd.py update
+```
+
+The default `latest` channel prefers the latest GitHub Release and falls back explicitly to the exact current `main` commit when no release exists.
+
+To require a published release:
+
+```bash
+python ~/.agents/skills/get-things-done/scripts/gtd.py update --channel stable
+```
+
+To update another host's Skill root:
+
+```bash
+python ~/.agents/skills/get-things-done/scripts/gtd.py update --target-path ~/.cursor/skills
+```
+
+The updater stages and validates all four GTD Skills before replacing the installed set. It preserves non-colliding custom domain files and records canonical file hashes so later local modifications can be detected before overwrite.
+
+Repository checkouts and package-manager installs stay under their own update authority:
+
+```bash
+git pull --ff-only
+brew upgrade --fetch-HEAD get-things-done
+npx skills update
+```
+
+See [updating.md](updating.md) for the full safety contract and channel behavior.
+
 ## skills.sh
 
 The repository ships `skills.sh.json` for skills.sh discovery and distribution. The CLI can install directly from the GitHub repository:
