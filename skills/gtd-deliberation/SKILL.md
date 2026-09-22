@@ -18,6 +18,8 @@ Load only what the current phase needs:
 - `references/truth-contract.md` when the user's framing may be wrong or weakly supported
 - `references/problem-model.schema.json` for the durable Problem Model
 - `references/superpowers-handoff.md` before implementation planning
+- `references/security-boundaries.md` before external research involving sensitive or private context
+- `references/references.md` for standards and source lineage
 - `references/backlog.schema.json` after direction approval
 - `agents/roles.yaml` when multiple logical roles help
 
