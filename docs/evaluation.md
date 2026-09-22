@@ -73,7 +73,14 @@ It does not prove every model-host combination follows the skill correctly under
 
 
 
-### 4. Deliberation behavioral evals (`evals/gtd-deliberation-cases.jsonl`)
+### 4. Capability routing evals (evals/gtd-capability-router-cases.jsonl)
+
+This corpus checks whether the optional gtd-capability-router preserves live source-of-truth precedence, nominal versus selected owner separation, one write owner per mutable surface, executable verification before readiness claims, open-PR bot and review context handling, stale-head invalidation, one primary independent reviewer by default, exact-state landing discipline, and evaluation/marketplace claim boundaries.
+
+The file is a behavioral corpus. Do not describe it as an executed benchmark until baseline/candidate runs have actually been performed.
+
+
+### 5. Deliberation behavioral evals (`evals/gtd-deliberation-cases.jsonl`)
 
 The deliberation corpus pressure-tests:
 
