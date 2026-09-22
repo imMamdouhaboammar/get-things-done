@@ -3,7 +3,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-SKILLS = ("get-things-done", "building-gtd-domain-packs")
+SKILLS = ("get-things-done", "building-gtd-domain-packs", "gtd-deliberation")
 
 
 def test_openai_skill_interfaces_match_current_shape_and_assets_exist():
