@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL_DIRS = [
     ROOT / "skills" / "get-things-done",
     ROOT / "skills" / "building-gtd-domain-packs",
+    ROOT / "skills" / "gtd-deliberation",
 ]
 
 
