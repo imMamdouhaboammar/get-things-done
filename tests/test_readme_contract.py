@@ -56,7 +56,9 @@ def test_readme_adapter_count_tracks_registry():
     registry = json.loads((ROOT / "adapters/registry.json").read_text(encoding="utf-8"))
     count = len(registry["adapters"])
     text = readme_text()
+    architecture = (ROOT / "docs/architecture.md").read_text(encoding="utf-8")
     assert f"Current adapter contracts cover **{count} targets**" in text
+    assert f"The repository maintains **{count} adapter contracts**" in architecture
 
 
 def test_readme_domain_pack_table_tracks_built_in_domains():
