@@ -12,7 +12,7 @@ Turn messy intent into evidence-backed direction · refresh current knowledge ·
 [![Agent Plugins 1.0](https://img.shields.io/badge/Agent_Plugins-1.0-111111.svg)](https://agent-plugins.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-111111.svg)](LICENSE)
 
-**One canonical GTD core · Agent Skills · Agent Plugins · Host adapters · Execution Briefs · Domain Packs · Evidence-based completion**
+**One canonical GTD core · Deliberation · Capability Router · Agent Skills · Agent Plugins · Host adapters · Execution Briefs · Domain Packs · Evidence-based completion**
 
 </div>
 
@@ -26,6 +26,7 @@ Turn messy intent into evidence-backed direction · refresh current knowledge ·
 - [Quick start](#quick-start)
 - [Installation](#installation)
 - [Domain packs](#domain-packs)
+- [Capability routing](#capability-routing)
 - [Deliberation](#deliberation)
 - [Execution Brief](#execution-brief)
 - [CLI reference](#cli-reference)
@@ -267,6 +268,18 @@ See [docs/domain-packs.md](docs/domain-packs.md) for authoring guidance.
 
 ---
 
+## Capability routing
+
+When one GTD cycle can be handled by several tools, connected sources, reviewers, bots, or executors, load [gtd-capability-router](skills/gtd-capability-router/).
+
+The router preserves one primary owner, one source of truth per fact domain, one write owner per mutable surface, executable verification, one primary independent review path, and one landing owner.
+
+Stable capability roles live in the Skill, while installation and availability are resolved at runtime. A tool being named in the registry is not proof that it is connected, callable, funded, or authorized in the current host.
+
+The routing pressure corpus lives at [evals/gtd-capability-router-cases.jsonl](evals/gtd-capability-router-cases.jsonl). It is a corpus, not a claim that a model benchmark has already been run.
+
+---
+
 ## Deliberation
 
 Use [`gtd-deliberation`](skills/gtd-deliberation/) when a request is assumption-heavy, contradictory, strategically important, expensive to reverse, or framed around an unvalidated proposed solution.
@@ -291,6 +304,8 @@ Direction Gate
 Superpowers-style planning
   ↓
 Backlog
+  ↓
+GTD execution + capability routing
 ```
 
 It is not mandatory deep thinking for every task. The activation router bypasses deliberation when work is obvious, low risk, already approved, or cheaper to test than to discuss.
@@ -508,6 +523,7 @@ skills/
     references/                     Schemas and core contract
     templates/                      Brief templates
   building-gtd-domain-packs/        Companion skill for authoring custom packs
+  gtd-capability-router/             Capability ownership and execution routing
   gtd-deliberation/                  Evidence-backed framing and direction layer
 scripts/
   gtd.py                            GTD core CLI
