@@ -39,6 +39,10 @@ jobs:
         run: |
           pytest -v
 
+      - name: Capability Router Security Regression
+        run: |
+          pytest -q tests/test_capability_router_security.py
+
       - name: Deliberation Security Regression
         run: |
           pytest -q tests/test_deliberation_security.py
@@ -87,6 +91,7 @@ jobs:
           python scripts/gtd.py package --out ./dist
           test -f ./dist/get-things-done.zip
           test -f ./dist/building-gtd-domain-packs.zip
+          test -f ./dist/gtd-capability-router.zip
           test -f ./dist/gtd-deliberation.zip
 
       - name: Verify Install Script Syntax
