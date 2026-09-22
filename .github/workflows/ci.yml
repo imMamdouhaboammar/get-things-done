@@ -47,6 +47,11 @@ jobs:
         run: |
           pytest -v
 
+      - name: Validate Behavioral Evaluation Contracts
+        run: |
+          python scripts/behavioral_evals.py validate-suite evals/cases.jsonl
+          python scripts/behavioral_evals.py validate-suite evals/domain-routing-cases.jsonl
+
       - name: Ruff Static Quality Gate
         run: |
           python -m ruff check scripts tests skills/get-things-done/scripts
