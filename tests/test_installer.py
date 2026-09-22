@@ -63,6 +63,7 @@ def test_default_install_uses_universal_agent_skills_root(tmp_path):
     assert result.returncode == 0, result.stderr
     assert (tmp_path / "home/.agents/skills/get-things-done/SKILL.md").is_file()
     assert (tmp_path / "home/.agents/skills/building-gtd-domain-packs/SKILL.md").is_file()
+    assert (tmp_path / "home/.agents/skills/gtd-capability-router/SKILL.md").is_file()
     assert (tmp_path / "home/.agents/skills/gtd-deliberation/SKILL.md").is_file()
 
 
@@ -72,6 +73,7 @@ def test_custom_path_install_supports_any_agent_skill_root(tmp_path):
     assert result.returncode == 0, result.stderr
     assert (custom / "get-things-done/SKILL.md").is_file()
     assert (custom / "building-gtd-domain-packs/SKILL.md").is_file()
+    assert (custom / "gtd-capability-router/SKILL.md").is_file()
     assert (custom / "gtd-deliberation/SKILL.md").is_file()
 
 
@@ -96,6 +98,7 @@ def test_named_targets_sharing_a_root_are_deduplicated(tmp_path):
     assert result.returncode == 0, result.stderr
     assert result.stdout.count("Installed get-things-done ->") == 1
     assert result.stdout.count("Installed building-gtd-domain-packs ->") == 1
+    assert result.stdout.count("Installed gtd-capability-router ->") == 1
     assert result.stdout.count("Installed gtd-deliberation ->") == 1
 
 
