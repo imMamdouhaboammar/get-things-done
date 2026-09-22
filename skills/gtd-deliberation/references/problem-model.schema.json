@@ -1,0 +1,382 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/imMamdouhaboammar/get-things-done/skills/gtd-deliberation/references/problem-model.schema.json",
+  "title": "GTD Deliberation Problem Model",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "title",
+    "status",
+    "original_request",
+    "desired_outcome",
+    "current_framing",
+    "freshness_context",
+    "assumptions",
+    "evidence",
+    "alternative_framings",
+    "candidate_directions",
+    "rejected_directions",
+    "open_decisions",
+    "direction_gate",
+    "contemplation_exit"
+  ],
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "enum": [
+        "contemplating",
+        "refreshing",
+        "researching",
+        "challenging",
+        "reframing",
+        "ideating",
+        "converging",
+        "direction-ready",
+        "approved",
+        "rejected"
+      ]
+    },
+    "original_request": {
+      "type": "string",
+      "minLength": 1
+    },
+    "desired_outcome": {
+      "type": "string",
+      "minLength": 1
+    },
+    "proposed_solution": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "current_framing": {
+      "type": "string",
+      "minLength": 1
+    },
+    "freshness_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "searched_at",
+        "search_scope",
+        "queries",
+        "sources",
+        "freshness_findings",
+        "stale_or_changed_claims",
+        "freshness_gaps"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "current",
+            "partial",
+            "blocked"
+          ]
+        },
+        "searched_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "search_scope": {
+          "type": "string"
+        },
+        "queries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "freshness_findings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stale_or_changed_claims": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "freshness_gaps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "statement",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "untested",
+              "supported",
+              "contradicted",
+              "uncertain"
+            ]
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "claim",
+          "effect"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claim": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "effect": {
+            "enum": [
+              "supports",
+              "contradicts",
+              "weakly-informs",
+              "unresolved"
+            ]
+          },
+          "quality": {
+            "enum": [
+              "direct",
+              "strong",
+              "moderate",
+              "weak",
+              "unknown"
+            ]
+          }
+        }
+      }
+    },
+    "contradictions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "alternative_framings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "second_order_effects": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "candidate_directions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "summary",
+          "rationale",
+          "tradeoffs",
+          "risks"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "tradeoffs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "risks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "verification_path": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "recommended_direction": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "why": {
+          "type": "string"
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        }
+      }
+    },
+    "rejected_directions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "summary",
+          "reason"
+        ],
+        "properties": {
+          "summary": {
+            "type": "string",
+            "minLength": 1
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "open_decisions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "direction_gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requires_user_decision",
+        "status"
+      ],
+      "properties": {
+        "requires_user_decision": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "approved",
+            "rejected",
+            "provisional"
+          ]
+        },
+        "decision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "contemplation_exit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reason",
+        "remaining_uncertainty",
+        "next_artifact"
+      ],
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "remaining_uncertainty": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "next_artifact": {
+          "enum": [
+            "problem-model",
+            "execution-brief",
+            "backlog",
+            "experiment",
+            "none"
+          ]
+        }
+      }
+    }
+  }
+}
