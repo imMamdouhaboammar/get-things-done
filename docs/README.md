@@ -7,6 +7,7 @@ Use these docs based on what you are trying to do.
 | [Quickstart](quickstart.md) | Start from a messy idea and produce a usable Execution Brief |
 | [Installation](installation.md) | Install GTD across universal Agent Skills, Claude, ChatGPT, Codex, Cursor, Kimi, Grok, DeepSeek, Homebrew, shell, skills.sh, Skill Kit, and conditional Glama paths |
 | [Updating](updating.md) | Refresh installed GTD Skills safely from the latest release or current main commit |
+| [Release and recovery](release.md) | Understand transactional installs, release qualification, provenance, and rollback |
 | [Execution Brief](execution-brief.md) | Understand the durable work artifact and its Ready and Done relationship |
 | [Validation](validation.md) | Understand schema ownership, version routing, migration safety, and assessment exit codes |
 | [Deliberation](deliberation.md) | Challenge messy framing, refresh current evidence, pass the Direction Gate, and create backlog work |

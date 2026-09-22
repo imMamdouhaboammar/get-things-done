@@ -71,6 +71,7 @@ done
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SEEN_PATHS=()
+SKILLS=(get-things-done building-gtd-domain-packs gtd-capability-router gtd-deliberation)
 
 has_seen() {
   local target="$1"
@@ -83,6 +84,29 @@ has_seen() {
   return 1
 }
 
+rollback_install() {
+  local base="$1"
+  local stage_root="$2"
+  local backup_root="$3"
+  local installed_list="$4"
+  local skill
+
+  for skill in $installed_list; do
+    rm -rf "$base/$skill"
+  done
+
+  for skill in "${SKILLS[@]}"; do
+    if [[ -e "$backup_root/$skill" ]]; then
+      rm -rf "$base/$skill"
+      mv "$backup_root/$skill" "$base/$skill" || {
+        echo "ROLLBACK ERROR: could not restore $base/$skill" >&2
+      }
+    fi
+  done
+
+  rm -rf "$stage_root" "$backup_root"
+}
+
 install_to() {
   local base="$1"
   [[ -n "$base" ]] || { echo "Install root cannot be empty" >&2; exit 2; }
@@ -90,33 +114,75 @@ install_to() {
     return 0
   fi
   SEEN_PATHS+=("$base")
-  if [[ "$DRY_RUN" != "true" ]]; then
-    mkdir -p "$base"
-  fi
-  for skill in get-things-done building-gtd-domain-packs gtd-capability-router gtd-deliberation; do
+
+  local skill
+  for skill in "${SKILLS[@]}"; do
     local source="$ROOT/skills/$skill"
     local dest="$base/$skill"
-    [[ -f "$source/SKILL.md" ]] || { echo "Missing canonical skill: $source/SKILL.md" >&2; exit 2; }
-    if [[ "$DRY_RUN" == "true" ]]; then
-      echo "Would install $skill -> $dest"
-      continue
-    fi
-    if [[ -e "$dest" && "$FORCE" != "true" ]]; then
+    [[ -f "$source/SKILL.md" ]] || { echo "Missing canonical skill: $source/SKILL.md" >&2; return 2; }
+    if [[ "$DRY_RUN" != "true" && -e "$dest" && "$FORCE" != "true" ]]; then
       echo "Refusing to overwrite $dest. Use --force" >&2
-      exit 2
+      return 2
     fi
-    local tmp_dest="${dest}.tmp.$$"
-    rm -rf "$tmp_dest"
-    cp -R "$source" "$tmp_dest"
-    if [[ ! -f "$tmp_dest/SKILL.md" ]]; then
-      rm -rf "$tmp_dest"
-      echo "Failed to stage $skill at $tmp_dest" >&2
-      exit 2
-    fi
-    rm -rf "$dest"
-    mv "$tmp_dest" "$dest"
-    echo "Installed $skill -> $dest"
   done
+
+  if [[ "$DRY_RUN" == "true" ]]; then
+    for skill in "${SKILLS[@]}"; do
+      echo "Would install $skill -> $base/$skill"
+    done
+    return 0
+  fi
+
+  mkdir -p "$base"
+  local stage_root="$base/.gtd-install-stage.$$"
+  local backup_root="$base/.gtd-install-backup.$$"
+  rm -rf "$stage_root" "$backup_root"
+  mkdir -p "$stage_root" "$backup_root"
+
+  for skill in "${SKILLS[@]}"; do
+    local source="$ROOT/skills/$skill"
+    if ! cp -R "$source" "$stage_root/$skill"; then
+      rollback_install "$base" "$stage_root" "$backup_root" ""
+      echo "Failed to stage $skill" >&2
+      return 1
+    fi
+    if [[ ! -f "$stage_root/$skill/SKILL.md" ]]; then
+      rollback_install "$base" "$stage_root" "$backup_root" ""
+      echo "Failed to validate staged skill: $skill" >&2
+      return 1
+    fi
+  done
+
+  if [[ "$FORCE" == "true" ]]; then
+    for skill in "${SKILLS[@]}"; do
+      if [[ -e "$base/$skill" ]]; then
+        if ! mv "$base/$skill" "$backup_root/$skill"; then
+          rollback_install "$base" "$stage_root" "$backup_root" ""
+          echo "Failed to back up existing skill: $skill" >&2
+          return 1
+        fi
+      fi
+    done
+  fi
+
+  local installed_list=""
+  for skill in "${SKILLS[@]}"; do
+    if ! mv "$stage_root/$skill" "$base/$skill"; then
+      rollback_install "$base" "$stage_root" "$backup_root" "$installed_list"
+      echo "Install failed while replacing $skill; previous installation restored" >&2
+      return 1
+    fi
+    installed_list="$installed_list $skill"
+    echo "Installed $skill -> $base/$skill"
+
+    if [[ "${GTD_TEST_FAIL_AFTER_SKILL:-}" == "$skill" ]]; then
+      rollback_install "$base" "$stage_root" "$backup_root" "$installed_list"
+      echo "Install failed after $skill; previous installation restored" >&2
+      return 1
+    fi
+  done
+
+  rm -rf "$stage_root" "$backup_root"
 }
 
 if [[ ${#TARGETS[@]} -gt 0 ]]; then

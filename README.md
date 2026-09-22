@@ -582,6 +582,7 @@ pytest
 | [docs/architecture.md](docs/architecture.md) | Runtime model, state machine, adapter tiers |
 | [docs/deliberation.md](docs/deliberation.md) | Freshness, challenge, direction gate, and backlog workflow |
 | [docs/updating.md](docs/updating.md) | Self-update channels, safety, rollback, and package-manager boundaries |
+| [docs/release.md](docs/release.md) | Transactional install recovery, release qualification, provenance, and rollback |
 | [docs/adapters.md](docs/adapters.md) | Full host adapter and companion documentation |
 | [docs/execution-brief.md](docs/execution-brief.md) | Brief schema, lifecycle, and handoff contract |
 | [docs/validation.md](docs/validation.md) | Schema runtime, version routing, migration, and CLI exit semantics |
