@@ -61,3 +61,28 @@ def test_release_generates_and_verifies_checksums():
     assert "python scripts/release_checksums.py ./dist --verify ./dist/SHA256SUMS" in commands
     assert "python scripts/release_checksums.py ./dist/adapters --verify ./dist/adapters/SHA256SUMS" in commands
 
+
+
+def test_ci_matrix_matches_advertised_python_support():
+    workflow = load_workflow("ci.yml")
+    versions = workflow["jobs"]["test"]["strategy"]["matrix"]["python-version"]
+    assert versions == ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
+
+def test_ci_installs_package_and_smokes_installed_entrypoint():
+    commands = step_run_commands(load_workflow("ci.yml"), "test")
+    assert 'python -m pip install -e ".[dev]"' in commands
+    assert "gtd --help" in commands
+
+
+def test_ci_enforces_ruff_and_has_explicit_security_bounds():
+    workflow = load_workflow("ci.yml")
+    commands = step_run_commands(workflow, "test")
+    assert "python -m ruff check scripts tests skills/get-things-done/scripts" in commands
+    assert workflow["permissions"] == {"contents": "read"}
+    assert workflow["jobs"]["test"]["timeout-minutes"] == 20
+
+
+def test_ci_explicitly_smokes_antigravity_export():
+    commands = step_run_commands(load_workflow("ci.yml"), "test")
+    assert "dist/adapters/antigravity/.gemini/config/skills/get-things-done/SKILL.md" in commands

@@ -14,6 +14,7 @@ Use these docs based on what you are trying to do.
 | [Host adapters](adapters.md) | Understand multi-host packaging, install paths, support levels, adapter exports, and companion interoperability |
 | [Domain packs](domain-packs.md) | Adapt GTD to a new field without copying or weakening the core |
 | [Evaluation](evaluation.md) | Run repository checks and design behavioral agent evaluations |
+| [CI quality](ci.md) | Understand runtime support, package smoke, lint, coverage policy, permissions, and time bounds |
 | [v1.3 change notes](changelog-v1.3.md) | Review multi-host adapter interoperability, companion contracts, and packaging updates |
 | [v1.1 change notes](changelog-v1.1.md) | Review core contract, Execution Brief, and domain pack foundations |
 

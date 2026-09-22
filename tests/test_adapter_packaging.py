@@ -1,5 +1,4 @@
 import importlib.util
-import shutil
 import zipfile
 from pathlib import Path
 

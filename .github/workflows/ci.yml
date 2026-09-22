@@ -7,14 +7,18 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test & Validate Skill Pack (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - name: Checkout repository
@@ -26,18 +30,26 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
 
-      - name: Install dependencies
+      - name: Install package and development dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install jsonschema pyyaml pytest pytest-cov
+          python -m pip install -e ".[dev]"
+
+      - name: Smoke installed GTD entrypoint
+        run: |
+          gtd --help
 
       - name: Bytecode Compilation Check
         run: |
-          python -m compileall scripts tests
+          python -m compileall scripts tests skills/get-things-done/scripts
 
       - name: Run Test Suite
         run: |
           pytest -v
+
+      - name: Ruff Static Quality Gate
+        run: |
+          python -m ruff check scripts tests skills/get-things-done/scripts
 
       - name: Capability Router Security Regression
         run: |
@@ -68,6 +80,7 @@ jobs:
           python scripts/adapters.py export-all --out ./dist/adapters --package --report ./dist/export-report.json
           test -f ./dist/export-report.json
           test -f ./dist/adapters/cursor/.cursor/skills/get-things-done/SKILL.md
+          test -f ./dist/adapters/antigravity/.gemini/config/skills/get-things-done/SKILL.md
           test -f ./dist/adapters/kimi/kimi.plugin.json
           test -f ./dist/adapters/chatgpt-plugin/.codex-plugin/plugin.json
           test -f ./dist/adapters/claude-marketplace/.claude-plugin/marketplace.json

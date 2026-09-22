@@ -17,7 +17,9 @@ def repo_copy(tmp_path: Path) -> Path:
         (root / rel).mkdir(parents=True, exist_ok=True)
     for rel in [
         "adapters/registry.json",
+        "adapters/registry.schema.json",
         "adapters/companions.json",
+        "skills/get-things-done/scripts/schema_validation.py",
         "plugin.json",
         ".codex-plugin/plugin.json",
         ".claude-plugin/plugin.json",
@@ -101,3 +103,65 @@ def test_invalid_semver_in_manifest_is_rejected(tmp_path):
     errors = adapters.validate_manifests(root)
     assert any("invalid semver" in error for error in errors)
 
+
+
+def test_antigravity_is_part_of_required_adapter_contract(tmp_path):
+    root = repo_copy(tmp_path)
+    path = root / "adapters/registry.json"
+    data = json.loads(path.read_text())
+    data["adapters"] = [item for item in data["adapters"] if item["id"] != "antigravity"]
+    path.write_text(json.dumps(data))
+    errors = adapters.validate_registry(root)
+    assert any("missing required adapters: antigravity" in error for error in errors)
+
+
+def test_registry_schema_rejects_undeclared_adapter_property(tmp_path):
+    root = repo_copy(tmp_path)
+    mutate_registry(root, "cursor", "invented_property", True)
+    errors = adapters.validate_registry(root)
+    assert any("additional property is not allowed" in error and "invented_property" in error for error in errors)
+
+
+def test_normal_export_refuses_invalid_manifest_contract(tmp_path):
+    root = repo_copy(tmp_path)
+    path = root / "kimi.plugin.json"
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["version"] = "9.9.9"
+    path.write_text(json.dumps(data), encoding="utf-8")
+
+    try:
+        adapters.export_adapter("cursor", tmp_path / "dist", root)
+    except RuntimeError as exc:
+        assert "invalid adapter distribution contract" in str(exc)
+        assert "version mismatch" in str(exc)
+    else:
+        raise AssertionError("export must fail when repository manifests are invalid")
+
+
+def test_required_adapter_ids_exactly_match_shipped_registry():
+    ids = {item["id"] for item in adapters.load_registry()["adapters"]}
+    assert ids == adapters.REQUIRED_ADAPTER_IDS
+
+
+def test_invalid_capability_item_reports_schema_error_without_typeerror(tmp_path):
+    root = repo_copy(tmp_path)
+    mutate_registry(root, "shell", "capabilities", ["skills", {"bad": "value"}])
+    errors = adapters.validate_registry(root)
+    assert errors
+    assert any("capabilities" in error for error in errors)
+
+
+def test_export_validates_before_registry_lookup_on_malformed_entry(tmp_path):
+    root = repo_copy(tmp_path)
+    path = root / "adapters/registry.json"
+    data = json.loads(path.read_text())
+    data["adapters"][0] = None
+    path.write_text(json.dumps(data))
+
+    try:
+        adapters.export_adapter("cursor", tmp_path / "dist", root)
+    except RuntimeError as exc:
+        assert "invalid adapter distribution contract" in str(exc)
+        assert "registry.json" in str(exc)
+    else:
+        raise AssertionError("malformed registry must fail through validation before lookup")

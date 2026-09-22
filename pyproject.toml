@@ -7,7 +7,7 @@ name = "get-things-done"
 version = "1.4.0"
 description = "Turn messy intent into executable work models with explicit decisions, readiness checks, completion evidence, and multi-host agent adapters."
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     { name = "Mamdouh Aboammar", email = "mamdouhfces1997@gmail.com" }
 ]
@@ -32,7 +32,6 @@ keywords = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -50,12 +49,14 @@ dependencies = [
 dev = [
     "jsonschema>=4.0.0",
     "pytest>=8.0.0",
-    "pytest-cov>=4.0.0",
     "ruff>=0.4.0",
 ]
 
 [project.scripts]
 gtd = "scripts.gtd:main"
+
+[tool.setuptools]
+packages = ["scripts"]
 
 [tool.pytest.ini_options]
 minversion = "7.0"
@@ -68,5 +69,5 @@ line-length = 120
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I"]
-ignore = ["E501"]
+# Blocking correctness policy. Style normalization is intentionally not a release gate.
+select = ["E9", "F"]

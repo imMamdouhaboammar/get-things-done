@@ -14,8 +14,15 @@ def make_repo(tmp_path: Path) -> Path:
     for rel in ["adapters", ".codex-plugin", ".claude-plugin", "Formula", "skills/get-things-done/assets", "skills/building-gtd-domain-packs"]:
         (root / rel).mkdir(parents=True, exist_ok=True)
     source_root = Path(__file__).resolve().parents[1]
-    for rel in ["adapters/registry.json", "adapters/companions.json"]:
-        (root / rel).write_text((source_root / rel).read_text())
+    for rel in [
+        "adapters/registry.json",
+        "adapters/registry.schema.json",
+        "adapters/companions.json",
+        "skills/get-things-done/scripts/schema_validation.py",
+    ]:
+        dest = root / rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text((source_root / rel).read_text())
     for name in adapters.SKILL_NAMES:
         p = root / "skills" / name / "SKILL.md"
         p.parent.mkdir(parents=True, exist_ok=True)

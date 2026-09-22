@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import runpy
 import shutil
 import sys
 import zipfile
@@ -15,6 +16,28 @@ SKILL_NAMES = ("get-things-done", "building-gtd-domain-packs", "gtd-capability-r
 SAFE_PATH_FIELDS = ("project_path", "fallback_path", "manifest", "requires")
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 RETIRED_REPO_NAME = "get-things-done-skillpack"
+REQUIRED_ADAPTER_IDS = {
+    "agent-skills",
+    "agent-plugins",
+    "claude-ai",
+    "claude-code",
+    "claude-marketplace",
+    "claude-cowork",
+    "chatgpt-web",
+    "chatgpt-work",
+    "chatgpt-plugin",
+    "codex",
+    "cursor",
+    "kimi",
+    "grok",
+    "deepseek",
+    "antigravity",
+    "homebrew",
+    "shell",
+    "skills-sh",
+    "skill-kit",
+    "glama",
+}
 SEMVER_PATTERN = re.compile(
     r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"
 )
@@ -85,52 +108,73 @@ def _copy_skills(root: Path, destination: Path) -> None:
         shutil.copytree(source, target)
 
 
+def _schema_validation_errors(root: Path, document: Path, schema_path: Path) -> list[str]:
+    try:
+        data = json.loads(document.read_text(encoding="utf-8"))
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError, UnicodeError) as exc:
+        return [f"{document.name} unreadable: {exc}"]
+
+    validator_path = root / "skills" / "get-things-done" / "scripts" / "schema_validation.py"
+    if not validator_path.is_file():
+        return [f"schema validator missing: {validator_path}"]
+    namespace = runpy.run_path(str(validator_path), run_name="gtd_adapter_schema_validation")
+    validate_instance = namespace.get("validate_instance")
+    if not callable(validate_instance):
+        return ["schema validator has no validate_instance()"]
+    try:
+        return [f"{document.name}: {error}" for error in validate_instance(data, schema)]
+    except Exception as exc:
+        return [f"{document.name} schema validation failed: {exc}"]
+
+
 def validate_registry(root: Path = ROOT) -> list[str]:
-    errors: list[str] = []
+    errors = _schema_validation_errors(
+        root,
+        root / "adapters" / "registry.json",
+        root / "adapters" / "registry.schema.json",
+    )
     try:
         data = load_registry(root)
     except (json.JSONDecodeError, OSError, KeyError) as exc:
-        return [f"registry unreadable: {exc}"]
-    if data.get("$schema") != "./registry.schema.json":
-        errors.append("registry must reference ./registry.schema.json")
+        return errors or [f"registry unreadable: {exc}"]
+
     items = data.get("adapters")
-    if not isinstance(items, list) or not items:
-        return errors + ["registry adapters must be a non-empty array"]
+    if not isinstance(items, list):
+        return errors
+
     ids: set[str] = set()
     for item in items:
         if not isinstance(item, dict):
-            errors.append("adapter entry must be an object")
             continue
         ident = item.get("id")
         if not isinstance(ident, str) or not ident:
-            errors.append("adapter id must be a non-empty string")
             continue
         if ident in ids:
             errors.append(f"duplicate adapter id: {ident}")
         ids.add(ident)
-        for key in ("label", "family", "support", "kind", "export"):
-            if not isinstance(item.get(key), str) or not item[key]:
-                errors.append(f"{ident}: missing {key}")
         capabilities = item.get("capabilities")
-        if not isinstance(capabilities, list) or not capabilities or not all(isinstance(value, str) and value for value in capabilities):
-            errors.append(f"{ident}: capabilities must be a non-empty string array")
-        elif len(capabilities) != len(set(capabilities)):
+        if (
+            isinstance(capabilities, list)
+            and all(isinstance(capability, str) for capability in capabilities)
+            and len(capabilities) != len(set(capabilities))
+        ):
             errors.append(f"{ident}: duplicate capabilities")
         for key in SAFE_PATH_FIELDS:
             if key in item and not _safe_relative_path(item[key]):
                 errors.append(f"{ident}: unsafe {key}: {item[key]}")
         if item.get("support") == "conditional" and not item.get("requires"):
             errors.append(f"{ident}: conditional adapter must declare requires")
-    required = {
-        "agent-skills", "agent-plugins", "claude-ai", "claude-code", "claude-marketplace",
-        "claude-cowork", "chatgpt-web", "chatgpt-work", "chatgpt-plugin", "codex", "cursor",
-        "kimi", "grok", "deepseek", "homebrew", "shell", "skills-sh", "skill-kit", "glama"
-    }
-    missing = sorted(required - ids)
+
+    missing = sorted(REQUIRED_ADAPTER_IDS - ids)
     if missing:
         errors.append("missing required adapters: " + ", ".join(missing))
-    if not data.get("portability_contract"):
-        errors.append("registry must declare portability_contract")
+    unexpected = sorted(ids - REQUIRED_ADAPTER_IDS)
+    if unexpected:
+        errors.append(
+            "unregistered adapter IDs require an explicit REQUIRED_ADAPTER_IDS contract update: "
+            + ", ".join(unexpected)
+        )
     return errors
 
 
@@ -274,13 +318,13 @@ def validate(root: Path = ROOT) -> list[str]:
 
 
 def export_adapter(adapter_id: str, out: Path, root: Path = ROOT) -> Path:
+    repository_errors = validate(root)
+    if repository_errors:
+        raise RuntimeError("invalid adapter distribution contract: " + "; ".join(repository_errors))
     registry = adapters_by_id(root)
     if adapter_id not in registry:
         raise KeyError(f"unknown adapter: {adapter_id}")
     adapter = registry[adapter_id]
-    registry_errors = validate_registry(root)
-    if registry_errors:
-        raise RuntimeError("invalid adapter registry: " + "; ".join(registry_errors))
     if adapter["support"] == "conditional":
         required = root / adapter["requires"]
         if not required.exists():
