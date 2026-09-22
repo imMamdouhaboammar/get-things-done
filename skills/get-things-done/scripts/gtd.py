@@ -204,8 +204,12 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         required.extend([builder, router, deliberation])
     missing = [str(p.relative_to(root)) for p in required if not p.exists()]
     try:
-        schema = read_json(references_dir(root) / "execution-brief.schema.json")
-        schema_ok = schema.get("title") == "Execution Brief v1"
+        schema_v1 = read_json(references_dir(root) / "execution-brief.schema.json")
+        schema_v2 = read_json(references_dir(root) / "execution-brief-v2.schema.json")
+        schema_ok = (
+            schema_v1.get("title") == "Execution Brief v1"
+            and schema_v2.get("title") == "Execution Brief v2"
+        )
     except (json.JSONDecodeError, OSError, KeyError):
         schema_ok = False
     names = sorted(p.stem for p in domains_dir(root).glob("*.md")) if domains_dir(root).exists() else []
@@ -913,6 +917,12 @@ def cmd_export_brief(args: argparse.Namespace) -> int:
         for error in errors:
             print(f"- {error}", file=sys.stderr)
         return 1
+    if payload.get("version") == "2.0":
+        print(
+            "ERROR: export-brief currently supports v1 only; use render-brief for v2 or migrate/export downstream explicitly",
+            file=sys.stderr,
+        )
+        return 2
 
     if args.format == "all":
         selected = list(EXPORT_SUFFIXES)
