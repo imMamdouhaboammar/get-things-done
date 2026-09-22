@@ -177,6 +177,8 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         skill / "references/domain-pack-spec.md",
         skill / "references/execution-brief.schema.json",
         skill / "templates/execution-brief.md",
+        skill / "scripts/updater.py",
+        skill / "references/updating.md",
     ]
     builder = root / "skills/building-gtd-domain-packs/SKILL.md"
     router = root / "skills/gtd-capability-router/SKILL.md"
