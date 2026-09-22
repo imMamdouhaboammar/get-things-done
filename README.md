@@ -4,7 +4,7 @@
 
 ### Your idea is not a task yet
 
-Turn messy intent into a clear work model · identify the real blocker · execute the next useful action · require evidence before calling anything done
+Turn messy intent into evidence-backed direction · refresh current knowledge · challenge weak framing · execute the next useful action · require proof before calling anything done
 
 [![CI](https://github.com/imMamdouhaboammar/get-things-done/actions/workflows/ci.yml/badge.svg)](https://github.com/imMamdouhaboammar/get-things-done/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
@@ -26,6 +26,7 @@ Turn messy intent into a clear work model · identify the real blocker · execut
 - [Quick start](#quick-start)
 - [Installation](#installation)
 - [Domain packs](#domain-packs)
+- [Deliberation](#deliberation)
 - [Execution Brief](#execution-brief)
 - [CLI reference](#cli-reference)
 - [Supported surfaces](#supported-surfaces)
@@ -60,6 +61,10 @@ Messy idea
    ↓
 Capture outcome (separate result from proposed solution)
    ↓
+Freshness + deliberation preflight
+   ├─ low-risk / fully specified → continue directly
+   └─ framing risk → contemplate · current-date search · challenge · reframe · direction gate
+   ↓
 Classify current blocker
    ↓  clarify · research · decompose · decide · validate · model · execute · verify
 Resolve the current frontier
@@ -93,6 +98,12 @@ The core behavior is **intentionally domain-independent**. Software, marketing, 
 | **Unknown** | information that is still unresolved |
 
 This prevents an unanswered question from quietly becoming a made-up fact.
+
+### Fresh knowledge before consequential decisions
+
+When external or versioned facts can materially change the direction, GTD does not rely on model memory alone. It resolves the current date, searches current relevant sources, and records any stale claims or evidence gaps.
+
+For assumption-heavy or high-impact requests, the `gtd-deliberation` skill challenges the framing before implementation planning.
 
 ### One active blocker at a time
 
@@ -253,6 +264,44 @@ Need a custom domain (finance, sales, branding, media buying)?
 Use the companion [`building-gtd-domain-packs`](skills/building-gtd-domain-packs/) skill to create a pack without forking the core contract.
 
 See [docs/domain-packs.md](docs/domain-packs.md) for authoring guidance.
+
+---
+
+## Deliberation
+
+Use [`gtd-deliberation`](skills/gtd-deliberation/) when a request is assumption-heavy, contradictory, strategically important, expensive to reverse, or framed around an unvalidated proposed solution.
+
+The deliberation loop is:
+
+```text
+Contemplate
+  ↓
+Search current evidence using today's runtime date
+  ↓
+Challenge
+  ↓
+Reframe
+  ↓
+Ideate
+  ↓
+Critique + synthesize
+  ↓
+Direction Gate
+  ↓
+Superpowers-style planning
+  ↓
+Backlog
+```
+
+It is not mandatory deep thinking for every task. The activation router bypasses deliberation when work is obvious, low risk, already approved, or cheaper to test than to discuss.
+
+Durable artifacts:
+
+- Problem Model: [schema](skills/gtd-deliberation/references/problem-model.schema.json)
+- Backlog: [schema](skills/gtd-deliberation/references/backlog.schema.json)
+- Example Problem Model: [examples/deliberation-problem-model.json](examples/deliberation-problem-model.json)
+- Example Backlog: [examples/deliberation-backlog.json](examples/deliberation-backlog.json)
+- Full guide: [docs/deliberation.md](docs/deliberation.md)
 
 ---
 
@@ -459,6 +508,7 @@ skills/
     references/                     Schemas and core contract
     templates/                      Brief templates
   building-gtd-domain-packs/        Companion skill for authoring custom packs
+  gtd-deliberation/                  Evidence-backed framing and direction layer
 scripts/
   gtd.py                            GTD core CLI
   adapters.py                       Adapter CLI
@@ -508,6 +558,7 @@ pytest
 | [docs/README.md](docs/README.md) | Docs index |
 | [docs/quickstart.md](docs/quickstart.md) | First brief in five steps |
 | [docs/architecture.md](docs/architecture.md) | Runtime model, state machine, adapter tiers |
+| [docs/deliberation.md](docs/deliberation.md) | Freshness, challenge, direction gate, and backlog workflow |
 | [docs/adapters.md](docs/adapters.md) | Full host adapter and companion documentation |
 | [docs/execution-brief.md](docs/execution-brief.md) | Brief schema, lifecycle, and handoff contract |
 | [docs/domain-packs.md](docs/domain-packs.md) | Built-in packs and authoring guide |
