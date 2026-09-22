@@ -373,9 +373,13 @@ The brief is intentionally useful even when the next agent does not have the ori
 python scripts/gtd.py doctor                                    # repository health check
 python scripts/gtd.py list-domains                              # list registered domain packs
 python scripts/gtd.py new-brief --title "…" --domain software \
-  --out brief.json                                              # create a new brief
-python scripts/gtd.py validate-brief brief.json --root .        # schema validation
-python scripts/gtd.py assess-brief brief.json                   # Ready/Done gate assessment
+  --out brief.json                                              # create a v1 brief
+python scripts/gtd.py new-brief --version 2.0 --title "…" \
+  --out brief-v2.json                                           # create an opt-in v2 brief
+python scripts/gtd.py validate-brief brief.json --root .        # version-aware schema validation
+python scripts/gtd.py assess-brief brief.json                   # human-readable Ready/Done assessment
+python scripts/gtd.py assess-brief brief-v2.json --require done # machine gate: 0 met, 2 unmet
+python scripts/gtd.py migrate-brief brief.json --out brief-v2.json # explicit v1 → v2 migration
 python scripts/gtd.py render-brief brief.json --out brief.md    # backward-compatible Markdown render
 python scripts/gtd.py export-brief brief.json --format all \
   --out dist/brief                                              # MD, JSON, TOON, Mermaid, graph JSON
@@ -580,6 +584,7 @@ pytest
 | [docs/updating.md](docs/updating.md) | Self-update channels, safety, rollback, and package-manager boundaries |
 | [docs/adapters.md](docs/adapters.md) | Full host adapter and companion documentation |
 | [docs/execution-brief.md](docs/execution-brief.md) | Brief schema, lifecycle, and handoff contract |
+| [docs/validation.md](docs/validation.md) | Schema runtime, version routing, migration, and CLI exit semantics |
 | [docs/domain-packs.md](docs/domain-packs.md) | Built-in packs and authoring guide |
 | [docs/installation.md](docs/installation.md) | Per-host installation and export commands |
 | [docs/evaluation.md](docs/evaluation.md) | Behavioral evaluation approach |
