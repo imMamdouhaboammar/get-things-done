@@ -31,6 +31,11 @@
       "description": "Extend GTD for a specialized field without forking the core"
     },
     {
+      "name": "gtd-capability-router",
+      "path": "../skills/gtd-capability-router",
+      "description": "Route GTD work to the smallest safe source, executor, verifier, reviewer, and landing stack"
+    },
+    {
       "name": "gtd-deliberation",
       "path": "../skills/gtd-deliberation",
       "description": "Challenge messy ideas with current evidence before planning and execution"
