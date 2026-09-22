@@ -17,7 +17,7 @@ class GetThingsDone < Formula
         #{opt_libexec}/skills
 
       To copy them into a host-specific user skill root, use the repository
-      shell installer or copy the two skill directories from that location.
+      shell installer or copy the GTD skill directories from that location.
 
       This formula is HEAD-only until GTD publishes a stable Homebrew release artifact.
     EOS
