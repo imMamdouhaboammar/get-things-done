@@ -141,3 +141,27 @@ def test_normal_export_refuses_invalid_manifest_contract(tmp_path):
 def test_required_adapter_ids_exactly_match_shipped_registry():
     ids = {item["id"] for item in adapters.load_registry()["adapters"]}
     assert ids == adapters.REQUIRED_ADAPTER_IDS
+
+
+def test_invalid_capability_item_reports_schema_error_without_typeerror(tmp_path):
+    root = repo_copy(tmp_path)
+    mutate_registry(root, "shell", "capabilities", ["skills", {"bad": "value"}])
+    errors = adapters.validate_registry(root)
+    assert errors
+    assert any("capabilities" in error for error in errors)
+
+
+def test_export_validates_before_registry_lookup_on_malformed_entry(tmp_path):
+    root = repo_copy(tmp_path)
+    path = root / "adapters/registry.json"
+    data = json.loads(path.read_text())
+    data["adapters"][0] = None
+    path.write_text(json.dumps(data))
+
+    try:
+        adapters.export_adapter("cursor", tmp_path / "dist", root)
+    except RuntimeError as exc:
+        assert "invalid adapter distribution contract" in str(exc)
+        assert "registry.json" in str(exc)
+    else:
+        raise AssertionError("malformed registry must fail through validation before lookup")
