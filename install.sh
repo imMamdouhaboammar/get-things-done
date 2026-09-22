@@ -120,7 +120,7 @@ install_to() {
     local source="$ROOT/skills/$skill"
     local dest="$base/$skill"
     [[ -f "$source/SKILL.md" ]] || { echo "Missing canonical skill: $source/SKILL.md" >&2; return 2; }
-    if [[ -e "$dest" && "$FORCE" != "true" ]]; then
+    if [[ "$DRY_RUN" != "true" && -e "$dest" && "$FORCE" != "true" ]]; then
       echo "Refusing to overwrite $dest. Use --force" >&2
       return 2
     fi
