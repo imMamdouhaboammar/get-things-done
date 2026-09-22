@@ -86,3 +86,33 @@ def test_ci_enforces_ruff_and_has_explicit_security_bounds():
 def test_ci_explicitly_smokes_antigravity_export():
     commands = step_run_commands(load_workflow("ci.yml"), "test")
     assert "dist/adapters/antigravity/.gemini/config/skills/get-things-done/SKILL.md" in commands
+
+
+def test_release_installs_the_declared_package_and_runs_static_gate():
+    workflow = load_workflow("release.yml")
+    commands = step_run_commands(workflow, "release")
+    assert 'python -m pip install -e ".[dev]"' in commands
+    assert "gtd --help" in commands
+    assert "python -m ruff check scripts tests skills/get-things-done/scripts" in commands
+    assert workflow["jobs"]["release"]["timeout-minutes"] == 30
+
+
+def test_release_writes_provenance_before_publication():
+    workflow = load_workflow("release.yml")
+    commands = step_run_commands(workflow, "release")
+    assert "python scripts/release_provenance.py" in commands
+    assert '--source-sha "$GITHUB_SHA"' in commands
+    assert '--ref "$GITHUB_REF"' in commands
+    assert "--out ./dist/PROVENANCE.json" in commands
+
+    release_step = next(
+        step
+        for step in workflow["jobs"]["release"]["steps"]
+        if step.get("name") == "Create GitHub Release"
+    )
+    assert "dist/PROVENANCE.json" in release_step["with"]["files"]
+
+
+def test_release_uses_explicit_write_permission_only_for_release_job():
+    workflow = load_workflow("release.yml")
+    assert workflow["jobs"]["release"]["permissions"] == {"contents": "write"}
