@@ -22,7 +22,7 @@ CI installs the project through its own package metadata:
 python -m pip install -e ".[dev]"
 ```
 
-It then invokes the installed `gtd` entrypoint before running repository-specific commands.
+It then invokes `gtd --help` from the installed console entrypoint before running repository/Skill-specific commands. `doctor` remains a separate repository/Skill distribution check because the Python console package intentionally contains the CLI package rather than duplicating the canonical Skill payload.
 
 This catches packaging and console-entrypoint drift that a manual dependency install cannot detect.
 
