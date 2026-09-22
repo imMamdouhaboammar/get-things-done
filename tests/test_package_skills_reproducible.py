@@ -17,7 +17,7 @@ def test_package_skills_produces_deterministic_checksums(tmp_path):
     r2 = subprocess.run([sys.executable, str(SCRIPT), "--root", str(ROOT), "--out", str(out2)], capture_output=True, text=True, check=False)
     assert r2.returncode == 0, r2.stderr
     
-    for skill_name in ["get-things-done", "building-gtd-domain-packs"]:
+    for skill_name in ["get-things-done", "building-gtd-domain-packs", "gtd-deliberation"]:
         f1 = out1 / f"{skill_name}.zip"
         f2 = out2 / f"{skill_name}.zip"
         assert f1.is_file()
