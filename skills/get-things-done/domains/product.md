@@ -6,6 +6,7 @@ extends: gtd-core-v1
 # GTD Domain Pack: Product
 ## Selection signals
 Product discovery, feature definition, user problems, requirements, MVP scope, prioritization, roadmap decisions, onboarding, retention, pricing, product metrics
+Non-selection signal: Do not select this pack when product decisions are already fixed and the active work is implementation, campaign execution, research synthesis, or design production.
 ## Domain vocabulary
 Keep distinct: user, buyer, job, problem, current behavior, constraint, opportunity, solution, feature, requirement, trade-off, metric, adoption, retention
 ## Diagnostic questions
