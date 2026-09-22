@@ -58,6 +58,7 @@ jobs:
           files: |
             dist/get-things-done.zip
             dist/building-gtd-domain-packs.zip
+            dist/gtd-deliberation.zip
             dist/SHA256SUMS
             dist/adapters/*.zip
             dist/adapters/SHA256SUMS
