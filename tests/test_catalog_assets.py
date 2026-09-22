@@ -10,6 +10,7 @@ SKILLS_DIR = ROOT / "skills"
 @pytest.mark.parametrize("skill_name,expected_color,expected_display", [
     ("get-things-done", "#2563EB", "Get Things Done"),
     ("building-gtd-domain-packs", "#059669", "GTD Domain Pack Builder"),
+    ("gtd-deliberation", "#7C3AED", "GTD Deliberation"),
 ])
 def test_skill_brand_assets_and_manifests_exist_and_conform(skill_name, expected_color, expected_display):
     skill_dir = SKILLS_DIR / skill_name
