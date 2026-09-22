@@ -7,6 +7,7 @@ import json
 import math
 import os
 import re
+import runpy
 import sys
 import zipfile
 from decimal import Decimal
@@ -82,35 +83,43 @@ def read_json(path: Path) -> Any:
         return json.load(fh)
 
 
-def validate_brief(payload: Any) -> list[str]:
-    errors: list[str] = []
+def _runtime_script(root: Path, filename: str) -> dict[str, Any]:
+    path = skill_dir(root) / "scripts" / filename
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    return runpy.run_path(str(path), run_name=f"gtd_runtime_{path.stem}")
+
+
+def _schema_errors(payload: Any, root: Path) -> list[str]:
     if not isinstance(payload, dict):
-        return ["brief must be a JSON object"]
-    for key in REQUIRED_TOP:
-        if key not in payload:
-            errors.append(f"missing required field: {key}")
-    if errors:
-        return errors
-    if payload.get("version") != "1.0":
-        errors.append("version must be 1.0")
-    if not isinstance(payload.get("title"), str) or not payload["title"].strip():
-        errors.append("title must be a non-empty string")
-    if payload.get("status") not in STATUSES:
-        errors.append(f"status must be one of: {', '.join(sorted(STATUSES))}")
-    if payload.get("domain") is not None and not isinstance(payload.get("domain"), str):
-        errors.append("domain must be a string or null")
-    for parent, keys in NESTED_REQUIRED.items():
-        obj = payload.get(parent)
-        if not isinstance(obj, dict):
-            errors.append(f"{parent} must be an object")
-            continue
-        for key in keys:
-            if key not in obj:
-                errors.append(f"missing required field: {parent}.{key}")
-    for key in ("decisions", "open_decisions", "workstreams", "deliverables", "risks", "blockers"):
-        if key in payload and not isinstance(payload.get(key), list):
-            errors.append(f"{key} must be an array")
+        return ["$: brief must be a JSON object"]
+
+    version = payload.get("version")
+    if version is None:
+        return ["$.version: required property is missing"]
+    if version not in {"1.0", "2.0"}:
+        return [f"$.version: unsupported brief version {version!r}"]
+
+    schema_name = "execution-brief.schema.json" if version == "1.0" else "execution-brief-v2.schema.json"
+    schema = read_json(references_dir(root) / schema_name)
+    validator_ns = _runtime_script(root, "schema_validation.py")
+    validate_instance = validator_ns.get("validate_instance")
+    if not callable(validate_instance):
+        raise RuntimeError("schema validator has no validate_instance()")
+    errors = list(validate_instance(payload, schema))
+
+    if version == "2.0" and not errors:
+        v2_ns = _runtime_script(root, "brief_v2.py")
+        semantic = v2_ns.get("semantic_validation_errors_v2")
+        if not callable(semantic):
+            raise RuntimeError("brief_v2 runtime has no semantic_validation_errors_v2()")
+        errors.extend(semantic(payload))
     return errors
+
+
+def validate_brief(payload: Any, root: Path | None = None) -> list[str]:
+    return _schema_errors(payload, root or pack_root())
+
 
 
 def _nonempty_text(value: Any) -> bool:
@@ -140,7 +149,7 @@ def readiness_gaps(payload: dict[str, Any]) -> list[str]:
 
 
 def done_gaps(payload: dict[str, Any]) -> list[str]:
-    """Return deterministic structural gaps for the core Definition of Done."""
+    """Return deterministic structural gaps for the legacy v1 Definition of Done."""
     gaps: list[str] = []
     verification = payload.get("verification") if isinstance(payload.get("verification"), dict) else {}
 
@@ -150,6 +159,10 @@ def done_gaps(payload: dict[str, Any]) -> list[str]:
         gaps.append("success criteria are empty")
     if not verification.get("evidence"):
         gaps.append("verification evidence is empty")
+    else:
+        gaps.append(
+            "v1 verification evidence is unlinked and cannot prove verified Done; migrate to v2 for criterion-linked evidence"
+        )
     if payload.get("open_decisions"):
         gaps.append("blocking decisions remain open")
     if payload.get("blockers"):
@@ -161,6 +174,7 @@ def assess_brief(payload: dict[str, Any]) -> dict[str, Any]:
     ready_gaps = readiness_gaps(payload)
     completion_gaps = done_gaps(payload)
     return {
+        "version": "1.0",
         "ready": not ready_gaps,
         "done": not completion_gaps,
         "ready_gaps": ready_gaps,
@@ -323,60 +337,151 @@ def cmd_new_brief(args: argparse.Namespace) -> int:
     if out.exists() and not args.force:
         print(f"ERROR: exists: {out}", file=sys.stderr)
         return 2
+    if args.version == "2.0":
+        namespace = _runtime_script(pack_root(args.root), "brief_v2.py")
+        constructor = namespace.get("blank_brief_v2")
+        if not callable(constructor):
+            print("ERROR: brief_v2 runtime has no blank_brief_v2()", file=sys.stderr)
+            return 1
+        payload = constructor(args.title, args.domain)
+    else:
+        payload = blank_brief(args.title, args.domain)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(blank_brief(args.title, args.domain), indent=2) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(out)
     return 0
 
 
-def cmd_validate_brief(args: argparse.Namespace) -> int:
-    path = Path(args.path).expanduser().resolve()
+def _read_payload_for_cli(path: Path) -> tuple[dict[str, Any] | None, str | None]:
     try:
         payload = read_json(path)
-    except Exception as exc:
-        print(f"INVALID: cannot read JSON: {exc}")
-        return 1
-    errors = validate_brief(payload)
+    except (json.JSONDecodeError, OSError, UnicodeError) as exc:
+        return None, f"cannot read JSON: {exc}"
+    if not isinstance(payload, dict):
+        return None, "brief must be a JSON object"
+    return payload, None
+
+
+def _domain_error(payload: dict[str, Any], root: Path) -> str | None:
     domain = payload.get("domain")
     if isinstance(domain, str):
-        # Resolve default or explicit pack root; reject unknown non-null domains.
-        domain_path = domains_dir(pack_root(args.root)) / f"{domain}.md"
+        domain_path = domains_dir(root) / f"{domain}.md"
         if not domain_path.exists():
-            errors.append(f"domain pack not found: {domain}")
+            return f"domain pack not found: {domain}"
+    return None
+
+
+def cmd_validate_brief(args: argparse.Namespace) -> int:
+    path = Path(args.path).expanduser().resolve()
+    payload, read_error = _read_payload_for_cli(path)
+    if read_error:
+        print(f"INVALID: {read_error}")
+        return 1
+    assert payload is not None
+    root = pack_root(args.root)
+    errors = validate_brief(payload, root)
+    domain_error = _domain_error(payload, root)
+    if domain_error:
+        errors.append(domain_error)
     if errors:
         print("INVALID")
         for error in errors:
             print(f"- {error}")
         return 1
-    print("VALID")
+    print(f"VALID v{payload['version']}")
     return 0
 
 
 def cmd_assess_brief(args: argparse.Namespace) -> int:
     path = Path(args.path).expanduser().resolve()
-    try:
-        payload = read_json(path)
-    except Exception as exc:
-        print(f"INVALID: cannot read JSON: {exc}")
+    payload, read_error = _read_payload_for_cli(path)
+    if read_error:
+        print(f"INVALID: {read_error}")
         return 1
-    errors = validate_brief(payload)
+    assert payload is not None
+    root = pack_root(args.root)
+    errors = validate_brief(payload, root)
+    domain_error = _domain_error(payload, root)
+    if domain_error:
+        errors.append(domain_error)
     if errors:
         print("INVALID")
         for error in errors:
             print(f"- {error}")
         return 1
 
-    assessment = assess_brief(payload)
+    if payload["version"] == "2.0":
+        namespace = _runtime_script(root, "brief_v2.py")
+        assessor = namespace.get("assess_brief_v2")
+        if not callable(assessor):
+            print("ERROR: brief_v2 runtime has no assess_brief_v2()", file=sys.stderr)
+            return 1
+        assessment = assessor(payload)
+    else:
+        assessment = assess_brief(payload)
+
+    requirement_met = (
+        args.require == "valid"
+        or (args.require == "ready" and bool(assessment["ready"]))
+        or (args.require == "done" and bool(assessment["done"]))
+    )
+    assessment["requirement"] = args.require
+    assessment["requirement_met"] = requirement_met
+
     if args.json:
         print(json.dumps(assessment, indent=2))
     else:
+        print(f"VERSION: {assessment['version']}")
         print(f"READY: {'YES' if assessment['ready'] else 'NO'}")
         for gap in assessment["ready_gaps"]:
             print(f"- ready gap: {gap}")
         print(f"DONE: {'YES' if assessment['done'] else 'NO'}")
         for gap in assessment["done_gaps"]:
             print(f"- done gap: {gap}")
+        print(f"REQUIREMENT {args.require.upper()}: {'MET' if requirement_met else 'NOT MET'}")
+    return 0 if requirement_met else 2
+
+
+def cmd_migrate_brief(args: argparse.Namespace) -> int:
+    source = Path(args.path).expanduser().resolve()
+    out = Path(args.out).expanduser().resolve()
+    if out.exists() and not args.force:
+        print(f"ERROR: exists: {out}", file=sys.stderr)
+        return 2
+    payload, read_error = _read_payload_for_cli(source)
+    if read_error:
+        print(f"INVALID: {read_error}")
+        return 1
+    assert payload is not None
+    root = pack_root(args.root)
+    if payload.get("version") != "1.0":
+        print("INVALID: migration requires an Execution Brief with version 1.0")
+        return 1
+    errors = validate_brief(payload, root)
+    if errors:
+        print("INVALID SOURCE")
+        for error in errors:
+            print(f"- {error}")
+        return 1
+
+    namespace = _runtime_script(root, "brief_v2.py")
+    migrate = namespace.get("migrate_v1_to_v2")
+    if not callable(migrate):
+        print("ERROR: brief_v2 runtime has no migrate_v1_to_v2()", file=sys.stderr)
+        return 1
+    migrated = migrate(payload)
+    migrated_errors = validate_brief(migrated, root)
+    if migrated_errors:
+        print("INVALID MIGRATION OUTPUT", file=sys.stderr)
+        for error in migrated_errors:
+            print(f"- {error}", file=sys.stderr)
+        return 1
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(migrated, indent=2) + "\n", encoding="utf-8")
+    print(out)
     return 0
+
 
 
 def render_brief(payload: dict[str, Any]) -> str:
@@ -833,14 +938,27 @@ def cmd_export_brief(args: argparse.Namespace) -> int:
 
 def cmd_render_brief(args: argparse.Namespace) -> int:
     path = Path(args.path).expanduser().resolve()
-    payload = read_json(path)
-    errors = validate_brief(payload)
+    payload, read_error = _read_payload_for_cli(path)
+    if read_error:
+        print(f"INVALID: {read_error}", file=sys.stderr)
+        return 1
+    assert payload is not None
+    root = pack_root(args.root)
+    errors = validate_brief(payload, root)
     if errors:
         print("INVALID", file=sys.stderr)
         for error in errors:
             print(f"- {error}", file=sys.stderr)
         return 1
-    text = render_brief(payload)
+    if payload["version"] == "2.0":
+        namespace = _runtime_script(root, "brief_v2.py")
+        renderer = namespace.get("render_brief_v2")
+        if not callable(renderer):
+            print("ERROR: brief_v2 runtime has no render_brief_v2()", file=sys.stderr)
+            return 1
+        text = renderer(payload)
+    else:
+        text = render_brief(payload)
     if args.out:
         out = Path(args.out).expanduser().resolve()
         out.parent.mkdir(parents=True, exist_ok=True)
@@ -918,7 +1036,9 @@ def build_parser() -> argparse.ArgumentParser:
     x = sub.add_parser("new-brief")
     x.add_argument("--title", required=True)
     x.add_argument("--domain")
+    x.add_argument("--version", choices=["1.0", "2.0"], default="1.0")
     x.add_argument("--out", required=True)
+    x.add_argument("--root")
     x.add_argument("--force", action="store_true")
     x.set_defaults(func=cmd_new_brief)
 
@@ -930,11 +1050,21 @@ def build_parser() -> argparse.ArgumentParser:
     x = sub.add_parser("assess-brief")
     x.add_argument("path")
     x.add_argument("--json", action="store_true")
+    x.add_argument("--require", choices=["valid", "ready", "done"], default="valid")
+    x.add_argument("--root")
     x.set_defaults(func=cmd_assess_brief)
+
+    x = sub.add_parser("migrate-brief")
+    x.add_argument("path")
+    x.add_argument("--out", required=True)
+    x.add_argument("--root")
+    x.add_argument("--force", action="store_true")
+    x.set_defaults(func=cmd_migrate_brief)
 
     x = sub.add_parser("render-brief")
     x.add_argument("path")
     x.add_argument("--out")
+    x.add_argument("--root")
     x.set_defaults(func=cmd_render_brief)
 
     x = sub.add_parser("export-brief")
