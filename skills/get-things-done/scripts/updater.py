@@ -294,6 +294,7 @@ def update_from_archive(
     force: bool = False,
 ) -> dict[str, Any]:
     target_skills_root = target_skills_root.expanduser().resolve()
+    target_skills_root.parent.mkdir(parents=True, exist_ok=True)
     state = _read_state(target_skills_root)
     modified = local_modifications(target_skills_root, state)
     if modified and not force:
@@ -398,5 +399,6 @@ def run_update(
     print(f"canonical files: {result['canonical_files']}")
     if result["preserved_custom_domains"]:
         print("preserved custom domains: " + ", ".join(result["preserved_custom_domains"]))
-    print("Run: python get-things-done/scripts/gtd.py doctor")
+    doctor = skills_root / "get-things-done" / "scripts" / "gtd.py"
+    print(f"Run: python {doctor} doctor")
     return 0
