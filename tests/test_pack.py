@@ -10,6 +10,9 @@ def test_required_skill_files_exist():
     required = [
         ROOT / 'skills/get-things-done/SKILL.md',
         ROOT / 'skills/get-things-done/scripts/updater.py',
+        ROOT / 'skills/get-things-done/scripts/schema_validation.py',
+        ROOT / 'skills/get-things-done/scripts/brief_v2.py',
+        ROOT / 'skills/get-things-done/references/execution-brief-v2.schema.json',
         ROOT / 'skills/get-things-done/references/updating.md',
         ROOT / 'skills/building-gtd-domain-packs/SKILL.md',
         ROOT / 'skills/gtd-capability-router/SKILL.md',

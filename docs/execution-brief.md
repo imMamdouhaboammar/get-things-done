@@ -71,3 +71,32 @@ The relational graph includes workstreams and their dependencies, deliverables, 
 ## Schema
 
 The machine-readable contract is [`execution-brief.schema.json`](../skills/get-things-done/references/execution-brief.schema.json)
+
+
+## Version policy
+
+v1 remains supported for existing brief creation, structural validation, readiness assessment, rendering, and explicit migration.
+
+v2 is opt-in through the canonical CLI:
+
+```bash
+python scripts/gtd.py new-brief --version 2.0 --title "…" --out brief-v2.json
+python scripts/gtd.py validate-brief brief-v2.json
+python scripts/gtd.py assess-brief brief-v2.json
+```
+
+The CLI dispatches only from the declared `version`. It never guesses a version and never migrates implicitly.
+
+### Verified completion
+
+v1 evidence is not linked to individual criteria. A non-empty v1 evidence list therefore no longer qualifies as verified completion.
+
+Use explicit migration when evidence-backed Done semantics are required:
+
+```bash
+python scripts/gtd.py migrate-brief legacy.json --out migrated-v2.json
+```
+
+Migration is conservative: unknowns remain blocking, legacy top-level Done does not mark v2 workstreams or deliverables complete, migrated evidence is inconclusive until relinked, and `parallel_safe` defaults to false.
+
+See [validation.md](validation.md) for the complete runtime and compatibility contract.

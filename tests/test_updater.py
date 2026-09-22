@@ -176,3 +176,14 @@ def test_canonical_cli_registers_update_command():
     assert "--check" in result.stdout
     assert "--target-path" in result.stdout
     assert "--force" in result.stdout
+
+
+def test_canonical_cli_imports_runpy_for_real_update_execution():
+    import importlib.util
+
+    cli_path = ROOT / "skills/get-things-done/scripts/gtd.py"
+    spec = importlib.util.spec_from_file_location("gtd_cli_update_runtime", cli_path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    assert module.runpy is not None

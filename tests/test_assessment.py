@@ -32,11 +32,11 @@ def test_assess_brief_rejects_structurally_unready_and_unverified_work(tmp_path)
     assert "verification evidence is empty" in assessed.stdout
 
 
-def test_assess_brief_accepts_structurally_ready_and_evidenced_work(tmp_path):
+def test_assess_brief_keeps_v1_ready_but_requires_v2_for_verified_done(tmp_path):
     brief = tmp_path / "brief.json"
     payload = {
         "version": "1.0",
-        "title": "Validated deliverable",
+        "title": "Validated legacy deliverable",
         "domain": "software",
         "intent": {
             "problem": "A behavior is missing",
@@ -65,9 +65,9 @@ def test_assess_brief_accepts_structurally_ready_and_evidenced_work(tmp_path):
     assert assessed.returncode == 0, assessed.stdout + assessed.stderr
     result = json.loads(assessed.stdout)
     assert result["ready"] is True
-    assert result["done"] is True
+    assert result["done"] is False
     assert result["ready_gaps"] == []
-    assert result["done_gaps"] == []
+    assert any("migrate to v2" in gap for gap in result["done_gaps"])
 
 
 def test_professional_docs_are_linkable_from_readme():
