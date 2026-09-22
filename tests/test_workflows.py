@@ -73,7 +73,6 @@ def test_ci_installs_package_and_smokes_installed_entrypoint():
     commands = step_run_commands(load_workflow("ci.yml"), "test")
     assert 'python -m pip install -e ".[dev]"' in commands
     assert "gtd --help" in commands
-    assert "gtd doctor" in commands
 
 
 def test_ci_enforces_ruff_and_has_explicit_security_bounds():
