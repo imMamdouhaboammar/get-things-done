@@ -71,3 +71,23 @@ A passing CI run means the repository mechanics and adapter contracts pass their
 
 It does not prove every model-host combination follows the skill correctly under every pressure case.
 
+
+
+### 4. Deliberation behavioral evals (`evals/gtd-deliberation-cases.jsonl`)
+
+The deliberation corpus pressure-tests:
+
+- current-date freshness search instead of memory-only claims
+- evidence-backed disagreement with the user's framing
+- resistance to performative contrarianism
+- hidden-assumption discovery and falsification
+- no-build alternatives
+- Direction Gate authority
+- provisional reversible tests
+- Superpowers planning only after direction approval
+- backlog quality
+- contemplation sufficiency and stop conditions
+- search-blocked and no-web behavior
+- protection of private chain-of-thought
+
+The corpus is not an executed benchmark. A model comparison must be run separately before claiming measured behavioral improvement.
