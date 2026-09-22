@@ -2,6 +2,25 @@
 
 Every domain pack inherits this contract
 
+## 0. Freshness and deliberation preflight
+
+For substantial work, do not treat model memory as sufficient evidence for claims whose truth may have changed.
+
+Before a direction depends on external, current, or versioned knowledge:
+
+1. resolve the current date from the runtime
+2. search current relevant sources using a date-aware or version-aware scope
+3. compare current evidence with remembered or previously supplied knowledge
+4. record material changes, stale claims, and remaining freshness gaps
+
+If current search is unavailable or the user explicitly forbids it, state that limitation. Do not imply current verification.
+
+Activate the `gtd-deliberation` layer before planning or execution when the request is assumption-heavy, contradictory, high-impact, expensive to reverse, strategically or architecturally consequential, or framed around an unvalidated proposed solution.
+
+Deliberation is not a ninth blocker mode. It is a pre-execution reasoning layer that may invoke clarify, research, decide, validate, or model work before the normal GTD loop continues.
+
+Bypass deliberation when the task is simple, fully specified, low-risk, or when a reversible action or test has higher expected value than another thinking cycle.
+
 ## 1. Canonical knowledge ledger
 
 Every important statement belongs to one category
@@ -111,6 +130,7 @@ Work is Ready when all are true
 7. blocking Unknowns are represented as blockers rather than hidden
 8. success can be checked
 9. one next executable action exists
+10. when external or versioned knowledge materially affects the direction, current-date or current-version freshness evidence exists, or the freshness limitation is an explicit blocker or accepted reversible risk
 
 Not every Unknown must disappear. Only blocking Unknowns prevent Ready
 
