@@ -1,0 +1,79 @@
+version: 1
+id: gtd-capability-router
+extends: gtd-core-v1
+purpose: route a GTD work cycle to the smallest safe callable capability stack
+
+principles:
+  - current_state_before_routing
+  - one_primary_owner
+  - one_source_of_truth_per_fact_domain
+  - one_write_owner_per_mutable_surface
+  - executable_verification_before_readiness_claim
+  - one_primary_independent_reviewer_by_default
+  - one_landing_owner
+  - refresh_after_mutation
+  - tool_honesty
+  - graceful_degradation
+
+availability_policy:
+  registry_meaning: stable_capability_metadata_only
+  runtime_requirement: discover_current_availability_before_selection
+  nominal_owner: best_capability_in_principle
+  selected_owner: callable_capability_actually_used
+  blocked_nominal_owner: select_smallest_safe_fallback_or_record_evidence_gap
+  unresolved_name: do_not_invent_capability
+
+surface_types:
+  - skill
+  - connected_source
+  - external_authority
+  - repository_native_gate
+  - github_app_or_bot
+  - local_runtime
+
+role_order:
+  - source_of_truth
+  - primary_owner
+  - planner
+  - executor
+  - verifier
+  - reviewer
+  - landing_owner
+
+routes:
+  research:
+    trigger: discoverable external or connected fact blocks GTD progress
+    required: [authoritative_source, citation_or_inspectable_evidence]
+    forbidden: [research_as_decoration]
+  implementation:
+    trigger: GTD Ready passes and delivery was requested
+    required: [live_source_state, exactly_one_write_owner_per_mutable_surface, focused_verification, broader_required_gates_when_risk_justifies]
+    forbidden: [reviewer_as_executor_without_explicit_write_ownership]
+  verification:
+    trigger: deliverable exists and needs proof
+    evidence_precedence: [executable_checks, runtime_observation, current_head_ci, inspected_artifact, independent_review]
+    forbidden: [reviewer_agreement_as_executable_proof]
+  open_pull_request:
+    trigger: an open pull request is in scope
+    playbook: repository-playbook.md
+    required: [current_head, top_level_pr_comments, review_submissions, inline_review_threads, relevant_resolved_history, checks_and_statuses, bot_authored_context, claim_verification_against_current_state]
+    refresh_after: [push, bot_authored_commit, conflict_resolution, rerun_that_changes_evidence]
+  landing:
+    trigger: work is ready to merge, deploy, publish, or otherwise land
+    required: [current_exact_state, fresh_required_gates, one_active_landing_owner]
+    forbidden: [stale_head_approval, queue_submission_treated_as_completion, silent_admin_bypass]
+  plugin_skill_engineering:
+    trigger: creating, modifying, packaging, evaluating, or submitting an Agent Skill or Agent Plugin
+    playbook: plugin-skill-playbook.md
+    required: [current_spec_when_contract_sensitive, progressive_disclosure, portable_skill_contract, evaluation_evidence_labels]
+    forbidden: [corpus_called_executed_benchmark, local_validity_called_marketplace_approval, unsupported_portability_claim]
+
+refresh_triggers:
+  - mutable_state_changed
+  - repository_head_changed
+  - bot_or_reviewer_output_targets_old_state
+  - deployment_or_external_action_changed_runtime
+  - before_final_readiness
+  - before_landing
+
+completion_statuses: [completed, verified, partially_verified, blocked, not_started]

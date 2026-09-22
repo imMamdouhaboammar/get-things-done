@@ -10,6 +10,9 @@ def test_required_skill_files_exist():
     required = [
         ROOT / 'skills/get-things-done/SKILL.md',
         ROOT / 'skills/building-gtd-domain-packs/SKILL.md',
+        ROOT / 'skills/gtd-capability-router/SKILL.md',
+        ROOT / 'skills/gtd-capability-router/references/router.yaml',
+        ROOT / 'skills/gtd-capability-router/references/capability-registry.yaml',
         ROOT / 'skills/get-things-done/references/core-contract.md',
         ROOT / 'skills/get-things-done/references/domain-pack-spec.md',
         ROOT / 'skills/get-things-done/references/execution-brief.schema.json',
@@ -146,9 +149,13 @@ def test_install_script_and_readme_exist():
 def test_individual_skill_folders_are_self_contained():
     main = ROOT / 'skills/get-things-done'
     builder = ROOT / 'skills/building-gtd-domain-packs'
+    router = ROOT / 'skills/gtd-capability-router'
     assert (main / 'scripts/gtd.py').exists()
     assert (builder / 'references/core-contract.md').exists()
     assert (builder / 'references/domain-pack-spec.md').exists()
+    assert (router / 'references/router.yaml').exists()
+    assert (router / 'references/capability-registry.yaml').exists()
+    assert (router / 'references/core-contract.md').read_text() == (main / 'references/core-contract.md').read_text()
     assert (builder / 'references/core-contract.md').read_text() == (main / 'references/core-contract.md').read_text()
     assert (builder / 'references/domain-pack-spec.md').read_text() == (main / 'references/domain-pack-spec.md').read_text()
 
@@ -169,7 +176,7 @@ def test_package_skills_creates_valid_archives(tmp_path):
     assert 'PASS' in result.stdout
 
     import zipfile
-    for name in ['get-things-done.zip', 'building-gtd-domain-packs.zip']:
+    for name in ['get-things-done.zip', 'building-gtd-domain-packs.zip', 'gtd-capability-router.zip']:
         zip_path = out_dir / name
         assert zip_path.exists()
         with zipfile.ZipFile(zip_path, 'r') as zf:

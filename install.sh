@@ -93,7 +93,7 @@ install_to() {
   if [[ "$DRY_RUN" != "true" ]]; then
     mkdir -p "$base"
   fi
-  for skill in get-things-done building-gtd-domain-packs; do
+  for skill in get-things-done building-gtd-domain-packs gtd-capability-router; do
     local source="$ROOT/skills/$skill"
     local dest="$base/$skill"
     [[ -f "$source/SKILL.md" ]] || { echo "Missing canonical skill: $source/SKILL.md" >&2; exit 2; }

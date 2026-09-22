@@ -29,10 +29,26 @@
       "name": "building-gtd-domain-packs",
       "path": "../skills/building-gtd-domain-packs",
       "description": "Extend GTD for a specialized field without forking the core"
+    },
+    {
+      "name": "gtd-capability-router",
+      "path": "../skills/gtd-capability-router",
+      "description": "Route GTD work to the smallest safe source, executor, verifier, reviewer, and landing stack"
     }
   ],
-  "categories": ["Productivity", "Planning", "Developer Tools"],
-  "tags": ["execution", "planning", "workflow", "decision-making", "agent-skills", "gtd"],
+  "categories": [
+    "Productivity",
+    "Planning",
+    "Developer Tools"
+  ],
+  "tags": [
+    "execution",
+    "planning",
+    "workflow",
+    "decision-making",
+    "agent-skills",
+    "gtd"
+  ],
   "assets": {
     "icon": "../skills/get-things-done/assets/small-logo.svg",
     "logo": "../skills/get-things-done/assets/large-logo.svg"

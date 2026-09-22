@@ -133,3 +133,19 @@ GTD defines machine-readable interoperability contracts for 5 companion tools in
 
 Companions never own GTD core behavior, cannot bypass exit gates, and do not become mandatory runtime dependencies. All companion interactions follow explicit inputs, outputs, evidence contracts, failure policies, and authority boundaries.
 
+
+
+## Capability routing extension
+
+gtd-capability-router is an optional cross-domain execution extension.
+
+The GTD core still decides the active blocker mode and owns Ready/Done semantics. The capability router starts after the work mode is known and answers a different question:
+
+    current GTD state
+       -> classify execution surfaces
+       -> discover live capability availability
+       -> select smallest safe role stack
+       -> assign source / write / verify / review / landing authority
+       -> execute and refresh after mutation
+
+Stable capability roles are stored in the Skill. Installation, connectivity, rate limits, billing state, and other transient availability are discovered at runtime rather than frozen into the contract.
