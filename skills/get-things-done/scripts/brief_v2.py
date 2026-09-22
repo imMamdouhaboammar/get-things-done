@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import deque
 from datetime import datetime, timezone
 from typing import Any
+from uuid import uuid4
 
 EVIDENCE_LEVELS = {"claim": 0, "direct": 1, "independent": 2}
 FINISHED_WORKSTREAM_STATES = {"done", "skipped"}
@@ -10,8 +11,21 @@ ACTIVE_WORKSTREAM_STATES = {"pending", "ready", "executing", "blocked", "verifyi
 
 
 def blank_brief_v2(title: str, domain: str | None) -> dict[str, Any]:
+    brief_id = f"brief-{uuid4().hex}"
     return {
         "version": "2.0",
+        "brief_id": brief_id,
+        "revision": 1,
+        "plan_changes": [
+            {
+                "revision": 1,
+                "changed_at": None,
+                "trigger": "initial",
+                "summary": "Execution Brief v2 created",
+                "changed_refs": [],
+                "checkpoint_id": None,
+            }
+        ],
         "title": title,
         "domain": domain,
         "mode": "standard",
@@ -19,8 +33,10 @@ def blank_brief_v2(title: str, domain: str | None) -> dict[str, Any]:
         "outcome": {"problem": "", "desired_result": "", "actor": None, "acceptance_summary": ""},
         "scope": {"in": [], "out": [], "constraints": []},
         "knowledge": {"facts": [], "assumptions": [], "unknowns": []},
-        "authority": {"autonomous_actions": [], "approval_required": [], "approved_actions": []},
+        "authority": {"actions": []},
         "active_frontier": {"mode": "model", "reason": "", "exit_condition": ""},
+        "attempts": [],
+        "reviews": [],
         "decisions": [],
         "open_decisions": [],
         "workstreams": [],
@@ -78,7 +94,7 @@ def migrate_v1_to_v2(payload: dict[str, Any]) -> dict[str, Any]:
                 "acceptance_summary": "; ".join(str(item) for item in criteria),
             },
             "scope": payload.get("scope", {"in": [], "out": [], "constraints": []}),
-            "authority": {"autonomous_actions": [], "approval_required": [], "approved_actions": []},
+            "authority": {"actions": []},
             "active_frontier": {
                 "mode": _frontier_from_status(status),
                 "reason": f"Migrated from v1 status: {status}",
@@ -107,7 +123,7 @@ def migrate_v1_to_v2(payload: dict[str, Any]) -> dict[str, Any]:
             {
                 "id": _record_id("unknown", index),
                 "statement": str(value),
-                "blocking": False,
+                "blocking": True,
                 "owner": None,
             }
             for index, value in enumerate(knowledge.get("unknowns", []))
@@ -148,9 +164,10 @@ def migrate_v1_to_v2(payload: dict[str, Any]) -> dict[str, Any]:
                 "name": name,
                 "outcome": str(value.get("outcome", "")),
                 "dependencies": [],
-                "status": "done" if status == "done" else "pending",
+                "status": "pending",
                 "owner": None,
                 "estimate": 1,
+                "parallel_safe": False,
                 "completion_criteria": [],
             }
         )
@@ -177,6 +194,7 @@ def migrate_v1_to_v2(payload: dict[str, Any]) -> dict[str, Any]:
                             "status": "blocked",
                             "owner": None,
                             "estimate": 0,
+                            "parallel_safe": False,
                             "completion_criteria": [],
                         }
                     )
@@ -188,7 +206,7 @@ def migrate_v1_to_v2(payload: dict[str, Any]) -> dict[str, Any]:
         {
             "id": _record_id("deliverable", index),
             "name": str(value),
-            "status": "done" if status == "done" else "pending",
+            "status": "pending",
             "workstream_id": None,
         }
         for index, value in enumerate(payload.get("deliverables", []))
@@ -245,6 +263,20 @@ def migrate_v1_to_v2(payload: dict[str, Any]) -> dict[str, Any]:
         }
         for index, value in enumerate(payload.get("blockers", []))
     ]
+    migrated["plan_changes"] = [
+        {
+            "revision": 1,
+            "changed_at": None,
+            "trigger": "migration",
+            "summary": (
+                f"Migrated from Execution Brief v1 status={status}. "
+                "Legacy unknowns default to blocking; workstream and deliverable completion "
+                "must be re-verified under v2."
+            ),
+            "changed_refs": ["knowledge", "workstreams", "deliverables", "verification"],
+            "checkpoint_id": None,
+        }
+    ]
     migrated["terminal_state"] = "blocked" if status == "blocked" else "unverified" if status == "done" else "active"
     return migrated
 
@@ -258,6 +290,94 @@ def _duplicate_ids(items: list[dict[str, Any]]) -> list[str]:
             duplicates.append(item_id)
         seen.add(item_id)
     return duplicates
+
+
+def semantic_validation_errors_v2(payload: dict[str, Any]) -> list[str]:
+    """Validate relationships and the single global ID namespace used by v2 references."""
+    errors: list[str] = []
+    collections: list[tuple[str, list[dict[str, Any]]]] = [
+        ("knowledge.facts", list(payload.get("knowledge", {}).get("facts", []))),
+        ("knowledge.assumptions", list(payload.get("knowledge", {}).get("assumptions", []))),
+        ("knowledge.unknowns", list(payload.get("knowledge", {}).get("unknowns", []))),
+        ("authority.actions", list(payload.get("authority", {}).get("actions", []))),
+        ("attempts", list(payload.get("attempts", []))),
+        ("reviews", list(payload.get("reviews", []))),
+        ("decisions", list(payload.get("decisions", []))),
+        ("open_decisions", list(payload.get("open_decisions", []))),
+        ("workstreams", list(payload.get("workstreams", []))),
+        ("deliverables", list(payload.get("deliverables", []))),
+        ("risks", list(payload.get("risks", []))),
+        ("checkpoints", list(payload.get("checkpoints", []))),
+        ("handoffs", list(payload.get("handoffs", []))),
+        ("verification.criteria", list(payload.get("verification", {}).get("criteria", []))),
+        ("verification.evidence", list(payload.get("verification", {}).get("evidence", []))),
+        ("blockers", list(payload.get("blockers", []))),
+    ]
+
+    seen: dict[str, str] = {}
+    for collection_name, items in collections:
+        for index, item in enumerate(items):
+            item_id = item.get("id")
+            if not isinstance(item_id, str) or not item_id:
+                continue
+            location = f"{collection_name}[{index}]"
+            previous = seen.get(item_id)
+            if previous is not None:
+                errors.append(f"duplicate v2 id {item_id!r}: {previous} and {location}")
+            else:
+                seen[item_id] = location
+
+    for review_index, review in enumerate(payload.get("reviews", [])):
+        for finding_index, finding in enumerate(review.get("findings", [])):
+            finding_id = finding.get("id")
+            if not isinstance(finding_id, str) or not finding_id:
+                continue
+            location = f"reviews[{review_index}].findings[{finding_index}]"
+            previous = seen.get(finding_id)
+            if previous is not None:
+                errors.append(f"duplicate v2 id {finding_id!r}: {previous} and {location}")
+            else:
+                seen[finding_id] = location
+
+    workstream_ids = {item.get("id") for item in payload.get("workstreams", [])}
+    criterion_ids = {item.get("id") for item in payload.get("verification", {}).get("criteria", [])}
+    decision_ids = {item.get("id") for item in payload.get("decisions", [])}
+    checkpoint_ids = {item.get("id") for item in payload.get("checkpoints", [])}
+
+    for item in payload.get("attempts", []):
+        ref = item.get("workstream_id")
+        if ref is not None and ref not in workstream_ids:
+            errors.append(f"attempt {item.get('id')} references unknown workstream: {ref}")
+    for item in payload.get("deliverables", []):
+        ref = item.get("workstream_id")
+        if ref is not None and ref not in workstream_ids:
+            errors.append(f"deliverable {item.get('id')} references unknown workstream: {ref}")
+    for item in payload.get("verification", {}).get("evidence", []):
+        ref = item.get("criterion_id")
+        if ref is not None and ref not in criterion_ids:
+            errors.append(f"evidence {item.get('id')} references unknown criterion: {ref}")
+    for item in payload.get("plan_changes", []):
+        ref = item.get("checkpoint_id")
+        if ref is not None and ref not in checkpoint_ids:
+            errors.append(f"plan change revision {item.get('revision')} references unknown checkpoint: {ref}")
+    for review in payload.get("reviews", []):
+        for finding in review.get("findings", []):
+            ref = finding.get("waiver_decision_id")
+            if ref is not None and ref not in decision_ids:
+                errors.append(f"review finding {finding.get('id')} references unknown waiver decision: {ref}")
+
+    for action in payload.get("authority", {}).get("actions", []):
+        approval = action.get("approval")
+        status = action.get("status")
+        if approval == "approved" and status not in {"authorized", "completed"}:
+            errors.append(
+                f"authority action {action.get('id')} says approval=approved but status={status}"
+            )
+        if approval == "required" and status in {"authorized", "completed"}:
+            errors.append(
+                f"authority action {action.get('id')} is authorized without approval being recorded as approved"
+            )
+    return errors
 
 
 def plan_brief_v2(payload: dict[str, Any]) -> dict[str, Any]:
@@ -347,7 +467,7 @@ def _nonempty_text(value: Any) -> bool:
 
 
 def readiness_gaps_v2(payload: dict[str, Any]) -> list[str]:
-    gaps: list[str] = []
+    gaps: list[str] = list(semantic_validation_errors_v2(payload))
     outcome = payload.get("outcome", {})
     scope = payload.get("scope", {})
     frontier = payload.get("active_frontier", {})
@@ -394,9 +514,11 @@ def readiness_gaps_v2(payload: dict[str, Any]) -> list[str]:
         gaps.append(f"next action references unknown workstream: {next_workstream}")
 
     if payload.get("mode") == "high-assurance":
-        authority = payload.get("authority", {})
+        actions = payload.get("authority", {}).get("actions", [])
         pending = [
-            item for item in authority.get("approval_required", []) if item not in authority.get("approved_actions", [])
+            str(item.get("id"))
+            for item in actions
+            if item.get("approval") == "required" and item.get("status") not in {"authorized", "completed"}
         ]
         if pending:
             gaps.append("required approvals are missing: " + ", ".join(pending))
@@ -445,6 +567,8 @@ def evidence_coverage_v2(payload: dict[str, Any], now: datetime | None = None) -
                 reason = f"evidence level {latest.get('level')} is below {criterion.get('evidence_level')}"
             elif observed_at is None:
                 reason = "evidence timestamp is missing"
+            elif observed_at > current_time:
+                reason = "evidence timestamp is in the future"
             elif criterion.get("freshness_hours") is not None:
                 age_hours = (current_time - observed_at).total_seconds() / 3600
                 if age_hours > float(criterion["freshness_hours"]):
@@ -524,6 +648,7 @@ def assess_brief_v2(payload: dict[str, Any], now: datetime | None = None) -> dic
     return {
         "version": "2.0",
         "mode": payload.get("mode"),
+        "semantic_errors": semantic_validation_errors_v2(payload),
         "ready": not ready_gaps,
         "done": not completion_gaps,
         "ready_gaps": ready_gaps,
@@ -572,12 +697,13 @@ def render_brief_v2(payload: dict[str, Any]) -> str:
         _bullets(payload["scope"].get("constraints", [])),
         "",
         "## Authority",
-        "### Autonomous actions",
-        _bullets(authority.get("autonomous_actions", [])),
-        "### Approval required",
-        _bullets(authority.get("approval_required", [])),
-        "### Approved actions",
-        _bullets(authority.get("approved_actions", [])),
+        _bullets(
+            authority.get("actions", []),
+            lambda item: (
+                f"{item['id']}: {item['description']} -> {item['target']} "
+                f"(side_effect={item['side_effect']}, approval={item['approval']}, status={item['status']})"
+            ),
+        ),
         "",
         "## Workstreams",
         "| ID | Kind | Workstream | Status | Dependencies | Owner | Estimate |",
