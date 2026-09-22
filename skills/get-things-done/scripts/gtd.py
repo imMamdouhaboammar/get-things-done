@@ -870,6 +870,29 @@ def cmd_package(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_update(args: argparse.Namespace) -> int:
+    root = pack_root(args.root)
+    updater_path = skill_dir(root) / "scripts" / "updater.py"
+    if not updater_path.is_file():
+        print(f"UPDATE ERROR: updater not found: {updater_path}", file=sys.stderr)
+        return 1
+    namespace = runpy.run_path(str(updater_path), run_name="gtd_updater_runtime")
+    run_update = namespace.get("run_update")
+    if not callable(run_update):
+        print(f"UPDATE ERROR: updater has no run_update(): {updater_path}", file=sys.stderr)
+        return 1
+    return int(
+        run_update(
+            pack_root=root,
+            channel=args.channel,
+            target_path=args.target_path,
+            check=args.check,
+            force=args.force,
+            timeout=args.timeout,
+        )
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="gtd", description="Get Things Done skill pack utilities")
     sub = p.add_subparsers(dest="command", required=True)
@@ -922,6 +945,15 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--out")
     x.add_argument("--root")
     x.set_defaults(func=cmd_package)
+
+    x = sub.add_parser("update", help="refresh installed GTD Skills from the canonical GitHub repository")
+    x.add_argument("--channel", choices=["latest", "stable", "main"], default="latest")
+    x.add_argument("--target-path", help="Agent Skills root to update; inferred for a normal Skill install")
+    x.add_argument("--check", action="store_true", help="check for an update without changing files")
+    x.add_argument("--force", action="store_true", help="replace canonical files modified since the last managed update")
+    x.add_argument("--timeout", type=float, default=15.0, help="network timeout in seconds")
+    x.add_argument("--root", help=argparse.SUPPRESS)
+    x.set_defaults(func=cmd_update)
     return p
 
 
