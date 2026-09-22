@@ -69,6 +69,8 @@ Existing GTD skill directories are not overwritten unless you opt in:
 ./install.sh --all --force
 ```
 
+Forced replacement is transactional per target Skill root. The installer stages all four GTD Skills first, backs up the previous GTD directories, and restores that previous set automatically if replacement fails after mutation starts. See [release.md](release.md) for the transaction and recovery contract.
+
 ## Claude AI Skills and Claude Code
 
 Direct skill install:
