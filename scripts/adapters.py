@@ -154,7 +154,11 @@ def validate_registry(root: Path = ROOT) -> list[str]:
             errors.append(f"duplicate adapter id: {ident}")
         ids.add(ident)
         capabilities = item.get("capabilities")
-        if isinstance(capabilities, list) and len(capabilities) != len(set(capabilities)):
+        if (
+            isinstance(capabilities, list)
+            and all(isinstance(capability, str) for capability in capabilities)
+            and len(capabilities) != len(set(capabilities))
+        ):
             errors.append(f"{ident}: duplicate capabilities")
         for key in SAFE_PATH_FIELDS:
             if key in item and not _safe_relative_path(item[key]):
@@ -314,13 +318,13 @@ def validate(root: Path = ROOT) -> list[str]:
 
 
 def export_adapter(adapter_id: str, out: Path, root: Path = ROOT) -> Path:
+    repository_errors = validate(root)
+    if repository_errors:
+        raise RuntimeError("invalid adapter distribution contract: " + "; ".join(repository_errors))
     registry = adapters_by_id(root)
     if adapter_id not in registry:
         raise KeyError(f"unknown adapter: {adapter_id}")
     adapter = registry[adapter_id]
-    repository_errors = validate(root)
-    if repository_errors:
-        raise RuntimeError("invalid adapter distribution contract: " + "; ".join(repository_errors))
     if adapter["support"] == "conditional":
         required = root / adapter["requires"]
         if not required.exists():
