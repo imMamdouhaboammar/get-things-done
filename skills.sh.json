@@ -5,7 +5,11 @@
     {
       "title": "Get Things Done",
       "description": "Turn unclear work into executable, verifiable outcomes.",
-      "skills": ["get-things-done", "building-gtd-domain-packs"]
+      "skills": [
+        "get-things-done",
+        "building-gtd-domain-packs",
+        "gtd-deliberation"
+      ]
     }
   ]
 }
