@@ -153,6 +153,9 @@ def validate_registry(root: Path = ROOT) -> list[str]:
         if ident in ids:
             errors.append(f"duplicate adapter id: {ident}")
         ids.add(ident)
+        capabilities = item.get("capabilities")
+        if isinstance(capabilities, list) and len(capabilities) != len(set(capabilities)):
+            errors.append(f"{ident}: duplicate capabilities")
         for key in SAFE_PATH_FIELDS:
             if key in item and not _safe_relative_path(item[key]):
                 errors.append(f"{ident}: unsafe {key}: {item[key]}")
