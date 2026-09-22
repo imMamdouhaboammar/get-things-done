@@ -17,6 +17,7 @@ Load references/core-contract.md first. Then load:
 - agents/roles.yaml when the mission needs multiple logical roles
 - references/repository-playbook.md for repository, Issue, Pull Request, CI, bot, or landing work
 - references/plugin-skill-playbook.md for Agent Skill or Agent Plugin work
+- references/security-boundaries.md when authority, credentials, destructive actions, or sensitive surfaces are in scope
 - references/source-lineage.md when maintaining or extending this pack
 
 ## Routing loop
