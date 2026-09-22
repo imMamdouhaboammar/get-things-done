@@ -95,3 +95,13 @@ def test_cli_scaffolds_and_validates_backlog(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     result = subprocess.run([sys.executable, str(CLI), "validate-backlog", str(out)], capture_output=True, text=True)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_deliberation_examples_validate():
+    for name, command in [
+        ("deliberation-problem-model.json", "validate-problem-model"),
+        ("deliberation-backlog.json", "validate-backlog"),
+    ]:
+        path = ROOT / "examples" / name
+        result = subprocess.run([sys.executable, str(CLI), command, str(path)], capture_output=True, text=True)
+        assert result.returncode == 0, result.stdout + result.stderr
