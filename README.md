@@ -588,6 +588,7 @@ pytest
 | [docs/domain-packs.md](docs/domain-packs.md) | Built-in packs and authoring guide |
 | [docs/installation.md](docs/installation.md) | Per-host installation and export commands |
 | [docs/evaluation.md](docs/evaluation.md) | Behavioral evaluation approach |
+| [docs/ci.md](docs/ci.md) | CI runtime support, package-install, lint, coverage, and permission policy |
 | [docs/changelog-v1.3.md](docs/changelog-v1.3.md) | v1.3 release notes |
 
 ---
