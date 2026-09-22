@@ -161,3 +161,50 @@ def test_installer_empty_target_path_fails(tmp_path):
     assert result.returncode == 2
     assert "cannot be empty" in result.stderr
 
+
+
+def test_force_failure_rolls_back_previous_install(tmp_path):
+    first = run_installer(tmp_path)
+    assert first.returncode == 0, first.stderr
+
+    root = tmp_path / "home/.agents/skills"
+    marker = root / "get-things-done/marker.txt"
+    marker.write_text("preserve-me")
+
+    failed = run_installer(
+        tmp_path,
+        "--force",
+        env_overrides={"GTD_TEST_FAIL_AFTER_SKILL": "get-things-done"},
+    )
+    assert failed.returncode != 0
+    assert "previous installation restored" in failed.stderr
+    assert marker.read_text() == "preserve-me"
+    for skill in ["get-things-done", "building-gtd-domain-packs", "gtd-capability-router", "gtd-deliberation"]:
+        assert (root / skill / "SKILL.md").is_file()
+    assert not list(root.glob(".gtd-install-stage.*"))
+    assert not list(root.glob(".gtd-install-backup.*"))
+
+
+def test_force_success_cleans_transaction_directories(tmp_path):
+    first = run_installer(tmp_path)
+    assert first.returncode == 0, first.stderr
+
+    second = run_installer(tmp_path, "--force")
+    assert second.returncode == 0, second.stderr
+
+    root = tmp_path / "home/.agents/skills"
+    assert not list(root.glob(".gtd-install-stage.*"))
+    assert not list(root.glob(".gtd-install-backup.*"))
+
+
+def test_dry_run_can_preview_force_candidate_without_overwriting(tmp_path):
+    first = run_installer(tmp_path)
+    assert first.returncode == 0, first.stderr
+
+    marker = tmp_path / "home/.agents/skills/get-things-done/marker.txt"
+    marker.write_text("old")
+    preview = run_installer(tmp_path, "--dry-run")
+
+    assert preview.returncode == 0, preview.stderr
+    assert "Would install get-things-done" in preview.stdout
+    assert marker.read_text() == "old"
