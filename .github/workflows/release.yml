@@ -10,6 +10,7 @@ jobs:
   release:
     name: Build & Publish Release Bundles
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
 
@@ -21,35 +22,44 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: "pip"
 
-      - name: Install dependencies
+      - name: Install package and release dependencies
         run: |
-          pip install jsonschema pyyaml pytest
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
 
-      - name: Validate Skills And Adapters
+      - name: Validate source and distribution contracts
         run: |
+          gtd --help
           python scripts/catalog_stylist.py --validate
           python scripts/adapters.py validate
+          python -m ruff check scripts tests skills/get-things-done/scripts
           pytest -q
 
-      - name: Package Canonical Skills
+      - name: Package canonical skills
         run: |
           python scripts/package_skills.py --out ./dist
 
-      - name: Build Adapter Bundles
+      - name: Build adapter bundles
         run: |
-          python scripts/adapters.py export-all --out ./dist/adapters --package
+          python scripts/adapters.py export-all --out ./dist/adapters --package --report ./dist/export-report.json
           test -f ./dist/adapters/homebrew.zip
           test -f ./dist/adapters/shell.zip
           test -f ./dist/adapters/codex.zip
           test ! -e ./dist/adapters/glama.zip
 
-      - name: Write Release Checksums
+      - name: Write and verify release checksums
         run: |
           python scripts/release_checksums.py ./dist --out ./dist/SHA256SUMS
           python scripts/release_checksums.py ./dist/adapters --out ./dist/adapters/SHA256SUMS
           python scripts/release_checksums.py ./dist --verify ./dist/SHA256SUMS
           python scripts/release_checksums.py ./dist/adapters --verify ./dist/adapters/SHA256SUMS
+
+      - name: Write release provenance
+        run: |
+          python scripts/release_provenance.py             --root .             --dist ./dist             --source-sha "$GITHUB_SHA"             --ref "$GITHUB_REF"             --out ./dist/PROVENANCE.json
+          test -s ./dist/PROVENANCE.json
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -61,6 +71,7 @@ jobs:
             dist/gtd-capability-router.zip
             dist/gtd-deliberation.zip
             dist/SHA256SUMS
+            dist/PROVENANCE.json
             dist/adapters/*.zip
             dist/adapters/SHA256SUMS
           draft: false
