@@ -28,13 +28,15 @@ This catches packaging and console-entrypoint drift that a manual dependency ins
 
 ## Static quality
 
-Ruff is a blocking CI gate over:
+Ruff is a blocking correctness gate over:
 
 - `scripts/`
 - `tests/`
 - `skills/get-things-done/scripts/`
 
-The repository should fix or explicitly configure lint rules rather than silently skipping the configured tool.
+The enforced rule families are `E9` and `F`: syntax/runtime-level errors, undefined names, and related Pyflakes correctness findings.
+
+Import ordering, whitespace normalization, and one-statement-per-line style are intentionally not release gates. They can be cleaned independently without mixing broad formatting churn into reliability changes.
 
 ## Coverage policy
 
