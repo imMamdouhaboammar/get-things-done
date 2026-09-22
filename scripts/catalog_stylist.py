@@ -46,6 +46,17 @@ CATALOG_CONFIG: dict[str, SkillStyling] = {
         accent_color="#6EE7B7",
         categories=["developer-tools", "productivity"],
     ),
+    "gtd-deliberation": SkillStyling(
+        name="gtd-deliberation",
+        display_name="GTD Deliberation",
+        short_description="Challenge and refresh messy ideas before planning or execution",
+        default_prompt="Deeply examine this idea, refresh current evidence, and find the right direction before planning:",
+        brand_color="#7C3AED",
+        gradient_start="#8B5CF6",
+        gradient_end="#312E81",
+        accent_color="#DDD6FE",
+        categories=["productivity", "developer-tools", "project-management"],
+    ),
 }
 
 
@@ -238,6 +249,30 @@ def build_builder_small_svg() -> str:
 </svg>"""
 
 
+def build_deliberation_large_svg() -> str:
+    return """<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+<defs><linearGradient id="g" x1="64" y1="56" x2="448" y2="456" gradientUnits="userSpaceOnUse"><stop stop-color="#8B5CF6"/><stop offset="1" stop-color="#312E81"/></linearGradient></defs>
+<rect x="40" y="40" width="432" height="432" rx="96" fill="url(#g)"/>
+<circle cx="256" cy="256" r="164" stroke="#C4B5FD" stroke-opacity=".35" stroke-width="4"/>
+<circle cx="256" cy="256" r="136" stroke="#DDD6FE" stroke-opacity=".7" stroke-width="8" stroke-dasharray="16 18"/>
+<path d="M142 264C174 190 216 154 256 154C296 154 338 190 370 264C338 338 296 374 256 374C216 374 174 338 142 264Z" stroke="white" stroke-width="22" stroke-linejoin="round"/>
+<circle cx="256" cy="264" r="54" fill="#DDD6FE"/>
+<circle cx="256" cy="264" r="22" fill="#312E81"/>
+<path d="M256 112V86M256 442V416M112 256H86M442 256H416" stroke="#C4B5FD" stroke-width="10" stroke-linecap="round"/>
+</svg>"""
+
+
+def build_deliberation_small_svg() -> str:
+    return """<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 512 512" fill="none">
+<defs><linearGradient id="g" x1="72" y1="64" x2="440" y2="448" gradientUnits="userSpaceOnUse"><stop stop-color="#8B5CF6"/><stop offset="1" stop-color="#312E81"/></linearGradient></defs>
+<rect x="40" y="40" width="432" height="432" rx="96" fill="url(#g)"/>
+<circle cx="256" cy="256" r="142" stroke="#C4B5FD" stroke-width="12" stroke-dasharray="18 18"/>
+<path d="M160 270C188 204 225 172 256 172C287 172 324 204 352 270C324 336 287 368 256 368C225 368 188 336 160 270Z" stroke="white" stroke-width="24" stroke-linejoin="round"/>
+<circle cx="256" cy="270" r="42" fill="#DDD6FE"/>
+<circle cx="256" cy="270" r="16" fill="#312E81"/>
+</svg>"""
+
+
 def build_openai_manifest(styling: SkillStyling) -> str:
     data = {
         "schema_version": "v1",
@@ -247,6 +282,15 @@ def build_openai_manifest(styling: SkillStyling) -> str:
         "default_prompt": styling.default_prompt,
         "brand_color": styling.brand_color,
         "categories": styling.categories,
+        "interface": {
+            "display_name": styling.display_name,
+            "short_description": styling.short_description,
+            "icon_small": "./assets/small-logo.svg",
+            "icon_large": "./assets/large-logo.svg",
+            "brand_color": styling.brand_color,
+            "default_prompt": f"Use ${styling.name} to {styling.default_prompt[0].lower() + styling.default_prompt[1:]}",
+        },
+        "policy": {"allow_implicit_invocation": True},
     }
     return yaml.dump(data, sort_keys=False, allow_unicode=True, width=1000)
 
@@ -271,6 +315,15 @@ def generate_all_assets(root: Path) -> None:
     (builder_dir / "assets" / "large-logo.svg").write_text(build_builder_large_svg(), encoding="utf-8")
     (builder_dir / "assets" / "small-logo.svg").write_text(build_builder_small_svg(), encoding="utf-8")
     (builder_dir / "agents" / "openai.yaml").write_text(build_openai_manifest(CATALOG_CONFIG["building-gtd-domain-packs"]), encoding="utf-8")
+
+    # 3. gtd-deliberation
+    deliberation_dir = skills_root / "gtd-deliberation"
+    (deliberation_dir / "assets").mkdir(parents=True, exist_ok=True)
+    (deliberation_dir / "agents").mkdir(parents=True, exist_ok=True)
+
+    (deliberation_dir / "assets" / "large-logo.svg").write_text(build_deliberation_large_svg(), encoding="utf-8")
+    (deliberation_dir / "assets" / "small-logo.svg").write_text(build_deliberation_small_svg(), encoding="utf-8")
+    (deliberation_dir / "agents" / "openai.yaml").write_text(build_openai_manifest(CATALOG_CONFIG["gtd-deliberation"]), encoding="utf-8")
     
     print(f"Generated brand assets & openai.yaml manifests for {len(CATALOG_CONFIG)} skills.")
 
