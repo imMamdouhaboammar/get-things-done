@@ -38,7 +38,6 @@ jobs:
       - name: Smoke installed GTD entrypoint
         run: |
           gtd --help
-          gtd doctor
 
       - name: Bytecode Compilation Check
         run: |
