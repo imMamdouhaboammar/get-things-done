@@ -77,6 +77,7 @@ def test_professional_docs_are_linkable_from_readme():
         "docs/quickstart.md",
         "docs/domain-packs.md",
         "docs/evaluation.md",
+        "docs/deliberation.md",
     ]:
         assert (ROOT / path).exists(), path
         assert path in readme
@@ -86,3 +87,10 @@ def test_skill_and_builder_share_the_same_core_contract():
     main = ROOT / "skills/get-things-done/references/core-contract.md"
     builder = ROOT / "skills/building-gtd-domain-packs/references/core-contract.md"
     assert main.read_text(encoding="utf-8") == builder.read_text(encoding="utf-8")
+
+
+def test_core_contract_requires_freshness_for_current_external_knowledge():
+    core = (ROOT / "skills/get-things-done/references/core-contract.md").read_text(encoding="utf-8").lower()
+    assert "resolve the current date from the runtime" in core
+    assert "search current relevant sources" in core
+    assert "gtd-deliberation" in core
