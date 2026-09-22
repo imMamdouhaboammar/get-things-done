@@ -25,6 +25,10 @@ Capture outcome
    ↓
 Load core contract
    ↓
+Freshness + deliberation preflight
+   ├─ bypass → normal GTD
+   └─ activate → Problem Model → Direction Gate
+   ↓
 Select zero or one domain pack
    ↓
 Classify active blocker
@@ -133,3 +137,16 @@ GTD defines machine-readable interoperability contracts for 5 companion tools in
 
 Companions never own GTD core behavior, cannot bypass exit gates, and do not become mandatory runtime dependencies. All companion interactions follow explicit inputs, outputs, evidence contracts, failure policies, and authority boundaries.
 
+
+
+## Deliberation layer
+
+`gtd-deliberation` is a pre-execution layer, not a replacement state machine.
+
+It activates when framing error is material: hidden assumptions, weak causal stories, strategic or architectural choices, high reversal cost, or an unvalidated proposed solution.
+
+Its durable boundary object is the Problem Model. The Problem Model records current-date freshness evidence, assumptions, contradictions, alternative framings, candidate directions, rejected directions, and the Direction Gate.
+
+After approval, planning may use Superpowers-style methodology. The approved direction is converted into the normal GTD Execution Brief and a durable backlog.
+
+Freshness is part of the architecture: remembered model knowledge is not accepted as current evidence when external or versioned facts materially affect the decision.
