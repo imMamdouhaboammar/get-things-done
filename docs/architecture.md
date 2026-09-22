@@ -117,7 +117,7 @@ The CLI does not replace contextual judgment, and the skill does not pretend mod
 
 ## Host adapter architecture
 
-The repository maintains **19 adapter contracts** across three primary delivery tiers:
+The repository maintains **20 adapter contracts** across three primary delivery tiers:
 
 1. **Native standard (`native-standard`)**: Pure Agent Skills (`skills/`) and Agent Plugins (`plugin.json`) consumed without wrapping.
 2. **First-class adapters (`first-class`)**: Manifests, packaging layouts, or installers for Claude, ChatGPT/Codex, Cursor, Kimi, Grok, DeepSeek, Homebrew, Shell, and skills.sh.

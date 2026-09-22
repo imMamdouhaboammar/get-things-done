@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title desc">
+  <title id="title">Get Things Done turns a messy request into verified work</title>
+  <desc id="desc">A three-stage diagram showing a messy request, the GTD work model separating facts, assumptions and unknowns into one next action, and a verified result with evidence.</desc>
+  <style>
+    :root{color-scheme:light dark}
+    .bg{fill:#f6f8fa}.panel{fill:#ffffff;stroke:#d0d7de}.ink{fill:#1f2328}.muted{fill:#59636e}.line{stroke:#d0d7de}.accent{fill:#0969da}.accentSoft{fill:#ddf4ff}.success{fill:#1a7f37}.successSoft{fill:#dafbe1}.warn{fill:#9a6700}.warnSoft{fill:#fff8c5}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}.sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    @media (prefers-color-scheme: dark){.bg{fill:#0d1117}.panel{fill:#161b22;stroke:#30363d}.ink{fill:#f0f6fc}.muted{fill:#8b949e}.line{stroke:#30363d}.accent{fill:#58a6ff}.accentSoft{fill:#0c2d4a}.success{fill:#3fb950}.successSoft{fill:#173b24}.warn{fill:#d29922}.warnSoft{fill:#3b2e11}}
+  </style>
+  <rect class="bg" x="0" y="0" width="1280" height="640" rx="32"/>
+
+  <text class="sans muted" x="74" y="72" font-size="19" font-weight="600" letter-spacing="1.8">MESSY REQUEST</text>
+  <text class="sans ink" x="74" y="126" font-size="34" font-weight="700">“Build an AI assistant</text>
+  <text class="sans ink" x="74" y="169" font-size="34" font-weight="700">for our marketing team.</text>
+  <text class="sans muted" x="74" y="215" font-size="22">Maybe RAG. Maybe memory. Just make it work.”</text>
+
+  <line class="line" x1="74" y1="276" x2="1206" y2="276" stroke-width="2"/>
+
+  <text class="sans muted" x="74" y="325" font-size="17" font-weight="700" letter-spacing="1.6">GTD WORK MODEL</text>
+
+  <g transform="translate(74 356)">
+    <rect class="panel" x="0" y="0" width="240" height="126" rx="18" stroke-width="2"/>
+    <circle class="success" cx="28" cy="31" r="7"/>
+    <text class="sans ink" x="48" y="37" font-size="20" font-weight="700">FACT</text>
+    <text class="sans muted" x="24" y="73" font-size="17">The team already stores</text>
+    <text class="sans muted" x="24" y="98" font-size="17">approved brand examples.</text>
+  </g>
+
+  <g transform="translate(334 356)">
+    <rect class="panel" x="0" y="0" width="240" height="126" rx="18" stroke-width="2"/>
+    <circle class="warn" cx="28" cy="31" r="7"/>
+    <text class="sans ink" x="48" y="37" font-size="20" font-weight="700">ASSUMPTION</text>
+    <text class="sans muted" x="24" y="73" font-size="17">RAG is the right</text>
+    <text class="sans muted" x="24" y="98" font-size="17">mechanism.</text>
+  </g>
+
+  <g transform="translate(594 356)">
+    <rect class="panel" x="0" y="0" width="240" height="126" rx="18" stroke-width="2"/>
+    <circle class="accent" cx="28" cy="31" r="7"/>
+    <text class="sans ink" x="48" y="37" font-size="20" font-weight="700">UNKNOWN</text>
+    <text class="sans muted" x="24" y="73" font-size="17">Is memory the actual</text>
+    <text class="sans muted" x="24" y="98" font-size="17">failure mode?</text>
+  </g>
+
+  <path class="line" d="M314 419 H334 M574 419 H594 M834 419 H871" fill="none" stroke-width="3" stroke-linecap="round"/>
+  <path class="accent" d="M865 411 L881 419 L865 427 Z"/>
+
+  <g transform="translate(884 334)">
+    <rect class="accentSoft" x="0" y="0" width="322" height="170" rx="22"/>
+    <text class="sans accent" x="26" y="39" font-size="16" font-weight="800" letter-spacing="1.6">NEXT ACTION</text>
+    <text class="sans ink" x="26" y="79" font-size="24" font-weight="700">Run a controlled</text>
+    <text class="sans ink" x="26" y="111" font-size="24" font-weight="700">generation comparison</text>
+    <text class="sans muted" x="26" y="143" font-size="17">before changing architecture.</text>
+  </g>
+
+  <g transform="translate(74 538)">
+    <text class="sans success" x="0" y="31" font-size="18" font-weight="800">VERIFIED WORK</text>
+    <text class="mono ink" x="178" y="31" font-size="17">artifact changed</text>
+    <circle class="success" cx="350" cy="25" r="6"/>
+    <text class="mono ink" x="370" y="31" font-size="17">checks passed</text>
+    <circle class="success" cx="530" cy="25" r="6"/>
+    <text class="mono ink" x="550" y="31" font-size="17">evidence attached</text>
+  </g>
+</svg>

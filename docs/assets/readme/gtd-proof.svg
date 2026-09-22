@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="470" viewBox="0 0 1200 470" role="img" aria-labelledby="title desc">
+  <title id="title">GTD separates deterministic verification from model-driven judgment</title>
+  <desc id="desc">The left side lists deterministic mechanics such as schema validation, package integrity, adapter exports and rollback. The right side lists model-driven tasks such as interpreting intent, reframing, trade-offs and domain judgment. A note states that CI proves mechanics while behavioral claims need recorded evaluation runs.</desc>
+  <style>
+    :root{color-scheme:light dark}
+    .bg{fill:#f6f8fa}.panel{fill:#ffffff;stroke:#d0d7de}.ink{fill:#1f2328}.muted{fill:#59636e}.line{stroke:#d0d7de}.blue{fill:#0969da}.green{fill:#1a7f37}.softBlue{fill:#ddf4ff}.softGreen{fill:#dafbe1}.sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
+    @media (prefers-color-scheme: dark){.bg{fill:#0d1117}.panel{fill:#161b22;stroke:#30363d}.ink{fill:#f0f6fc}.muted{fill:#8b949e}.line{stroke:#30363d}.blue{fill:#58a6ff}.green{fill:#3fb950}.softBlue{fill:#0c2d4a}.softGreen{fill:#173b24}}
+  </style>
+  <rect class="bg" width="1200" height="470" rx="30"/>
+  <text class="sans ink" x="62" y="72" font-size="32" font-weight="750">Two kinds of proof. Kept separate on purpose.</text>
+  <text class="sans muted" x="62" y="108" font-size="19">GTD does not turn model judgment into a green check by naming it “verified.”</text>
+
+  <g transform="translate(62 148)">
+    <rect class="panel" width="505" height="216" rx="22" stroke-width="2"/>
+    <rect class="softGreen" x="22" y="22" width="160" height="34" rx="17"/>
+    <text class="sans green" x="42" y="45" font-size="15" font-weight="800" letter-spacing="1.1">DETERMINISTIC</text>
+    <circle class="green" cx="31" cy="86" r="5"/><text class="mono ink" x="48" y="92" font-size="17">schema validation</text>
+    <circle class="green" cx="31" cy="116" r="5"/><text class="mono ink" x="48" y="122" font-size="17">package + manifest integrity</text>
+    <circle class="green" cx="31" cy="146" r="5"/><text class="mono ink" x="48" y="152" font-size="17">adapter export contracts</text>
+    <circle class="green" cx="31" cy="176" r="5"/><text class="mono ink" x="48" y="182" font-size="17">checksums, provenance, rollback</text>
+  </g>
+
+  <g transform="translate(633 148)">
+    <rect class="panel" width="505" height="216" rx="22" stroke-width="2"/>
+    <rect class="softBlue" x="22" y="22" width="160" height="34" rx="17"/>
+    <text class="sans blue" x="43" y="45" font-size="15" font-weight="800" letter-spacing="1.1">MODEL-DRIVEN</text>
+    <text class="mono ink" x="26" y="92" font-size="17">• interpret messy intent</text>
+    <text class="mono ink" x="26" y="122" font-size="17">• challenge framing</text>
+    <text class="mono ink" x="26" y="152" font-size="17">• evaluate trade-offs</text>
+    <text class="mono ink" x="26" y="182" font-size="17">• apply domain judgment</text>
+  </g>
+
+  <line class="line" x1="62" y1="398" x2="1138" y2="398" stroke-width="2"/>
+  <text class="sans green" x="62" y="436" font-size="18" font-weight="800">CI proves mechanics.</text>
+  <text class="sans ink" x="282" y="436" font-size="16">Behavioral claims need recorded eval runs with provider, model, host, settings and response evidence.</text>
+</svg>
