@@ -47,6 +47,10 @@ jobs:
         run: |
           pytest -q tests/test_deliberation_security.py
 
+      - name: Self-Updater Security Regression
+        run: |
+          pytest -q tests/test_updater.py tests/test_updater_security.py
+
       - name: Validate Skill Catalog Assets & Invariants
         run: |
           python scripts/catalog_stylist.py --validate
