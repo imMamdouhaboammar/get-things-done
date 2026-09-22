@@ -50,7 +50,7 @@ def test_routing_corpus_has_non_selection_evidence_for_every_domain():
     rejected = {
         domain
         for case in cases
-        if case["metadata"]["case_type"] in {"non-selection", "wrong-pack", "zero-pack"}
+        if case["metadata"]["case_type"] in {"non-selection", "wrong-pack"}
         for domain in case["metadata"]["forbidden_packs"]
     }
     assert EXPECTED_DOMAINS <= rejected
