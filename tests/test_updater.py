@@ -11,6 +11,7 @@ UPDATER_PATH = ROOT / "skills/get-things-done/scripts/updater.py"
 
 spec = importlib.util.spec_from_file_location("gtd_updater", UPDATER_PATH)
 updater = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = updater
 assert spec.loader is not None
 spec.loader.exec_module(updater)
 
