@@ -25,6 +25,8 @@ def test_deliberation_skill_is_self_contained():
         "references/problem-model.schema.json",
         "references/backlog.schema.json",
         "references/superpowers-handoff.md",
+        "references/security-boundaries.md",
+        "references/references.md",
     ]
     missing = [path for path in required if not (SKILL / path).is_file()]
     assert not missing, missing
