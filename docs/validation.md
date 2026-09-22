@@ -31,6 +31,16 @@ The old validator duplicated a small subset of the schema contract and already d
 
 That approach is retired.
 
+### Candidate comparison
+
+| Approach | Runtime dependency | Offline copied Skill | Drift risk | Decision |
+|---|---|---|---|---|
+| Require `jsonschema` | Adds a Python runtime dependency | Not guaranteed unless the host also installs dependencies | Low | Rejected for the portable Skill runtime |
+| Keep handwritten field checks | None | Works | High; this is the drift that caused #10/#11 | Rejected |
+| Vendor a narrow local validator driven by shipped schemas | None | Works | Low when conformance-tested against `jsonschema` | Selected |
+
+The selected validator is 159 lines / roughly 6.2 KB of source at this change. It adds no runtime package dependency and performs no network schema resolution.
+
 ### Chosen model
 
 The repository ships:
