@@ -1,0 +1,19 @@
+schema_version: v1
+name: gtd-capability-router
+display_name: GTD Capability Router
+short_description: Route GTD work to the smallest safe tool stack
+default_prompt: 'Route this GTD task to the smallest safe source, executor, verifier, reviewer, and landing stack:'
+brand_color: '#7C3AED'
+categories:
+- productivity
+- developer-tools
+- workflow-automation
+interface:
+  display_name: "GTD Capability Router"
+  short_description: "Route GTD work to the smallest safe tool stack"
+  icon_small: "./assets/small-logo.svg"
+  icon_large: "./assets/large-logo.svg"
+  brand_color: "#7C3AED"
+  default_prompt: "Use $gtd-capability-router to route this task to the smallest safe tool and evidence stack."
+policy:
+  allow_implicit_invocation: true

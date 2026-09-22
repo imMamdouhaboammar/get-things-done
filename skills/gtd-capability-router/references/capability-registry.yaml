@@ -1,0 +1,169 @@
+version: 1
+id: gtd-capability-registry
+availability_contract: discover_at_runtime
+notes:
+  - Entries describe stable roles and authority boundaries, not current installation or connectivity.
+  - A missing entry may still be usable after its capability contract is resolved from the current host.
+  - Never infer capability from a product name alone.
+
+capabilities:
+  github:
+    display_name: GitHub
+    surface: connected_source
+    availability: discover_at_runtime
+    roles: [repository_source_of_truth, repository_write_owner, pull_request_lifecycle, landing_owner]
+    writes: true
+    authority: live_repository_state
+    cannot: [replace_runtime_tests, replace_external_api_documentation]
+  remote_desktop_commander:
+    display_name: Remote Desktop Commander
+    surface: local_runtime
+    availability: discover_at_runtime
+    roles: [local_source_of_truth, executor, runtime_verifier]
+    writes: true
+    authority: authorized_local_machine_state
+  context7:
+    display_name: Context7
+    surface: connected_source
+    availability: discover_at_runtime
+    roles: [current_library_documentation]
+    writes: false
+    authority: current_library_and_framework_docs
+    cannot: [prove_local_implementation]
+  parallel_search:
+    display_name: Parallel Search
+    surface: connected_source
+    availability: discover_at_runtime
+    roles: [broad_current_external_research]
+    writes: false
+    authority: retrieved_external_sources
+  ai_task_brief_builder:
+    display_name: AI Task Brief Builder
+    surface: connected_source
+    availability: discover_at_runtime
+    roles: [supplied_material_requirements_extraction]
+    writes: false
+    cannot: [inspect_repository_unless_supplied, run_tests, invent_requirements]
+  superpowers:
+    display_name: Superpowers
+    surface: skill
+    availability: discover_at_runtime
+    roles: [engineering_methodology, planning, tdd, debugging, review_handling]
+    writes: conditional
+    authority: process_methodology
+    cannot: [replace_execution_evidence]
+  get_fable:
+    display_name: get-fable
+    surface: skill
+    availability: discover_at_runtime
+    roles: [repository_lifecycle_routing, recovery, verification, handoff]
+    writes: conditional
+    authority: lifecycle_process
+  codex_engineering_guardrails:
+    display_name: Codex Engineering Guardrails
+    surface: skill
+    availability: discover_at_runtime
+    roles: [bounded_code_work, read_only_code_verification]
+    writes: mode_dependent
+    authority: selected_mode_contract
+  codex_process_jobs:
+    display_name: Codex Process Jobs
+    surface: local_runtime
+    availability: discover_at_runtime
+    roles: [finite_long_running_local_process]
+    writes: process_side_effects
+    cannot: [persistent_server, remote_service, generic_background_coding_agent]
+  coderabbit:
+    display_name: CodeRabbit
+    surface: github_app_or_bot
+    availability: discover_at_runtime
+    roles: [independent_code_review]
+    writes: configuration_dependent
+    authority: review_findings_only
+    cannot: [replace_tests, prove_runtime_behavior]
+  fallow:
+    display_name: Fallow Code Analysis
+    surface: local_runtime
+    availability: discover_at_runtime
+    roles: [graph_grounded_static_analysis, blast_radius, structural_review]
+    writes: normally_false
+    authority: static_graph_evidence
+    cannot: [prove_runtime_behavior]
+  sonarqube:
+    display_name: SonarQube
+    surface: connected_source
+    availability: discover_at_runtime
+    roles: [static_quality, security_findings, quality_gate]
+    writes: false
+    authority: configured_static_analysis_results
+  pr_readiness_check:
+    display_name: PR Readiness Check
+    surface: connected_source
+    availability: discover_at_runtime
+    roles: [supplied_evidence_readiness_analysis]
+    writes: false
+    cannot: [inspect_github, run_tests, inspect_ci, approve, merge]
+  pr_completion:
+    display_name: PR Completion
+    surface: skill
+    availability: discover_at_runtime
+    roles: [pull_request_lifecycle, exact_head_landing]
+    writes: true
+    authority: selected_pr_landing_contract
+  armorcodex:
+    display_name: ArmorCodex
+    surface: connected_source
+    availability: discover_at_runtime
+    roles: [agent_tool_policy, security_governance]
+    writes: policy_only
+    authority: configured_agent_policy
+  codex_security:
+    display_name: Codex Security
+    surface: skill
+    availability: discover_at_runtime
+    roles: [security_review]
+    writes: false
+    authority: security_findings
+  testifly:
+    display_name: Testifly
+    surface: connected_source
+    availability: discover_at_runtime
+    roles: [browser_e2e, runtime_validation]
+    writes: conditional
+    authority: executed_browser_test_evidence
+  impeccable:
+    display_name: Impeccable
+    surface: skill
+    availability: discover_at_runtime
+    roles: [ui_quality, accessibility, interaction_review]
+    writes: conditional
+    authority: ui_ux_specialist_evidence
+  openai_developers:
+    display_name: OpenAI Developers
+    surface: connected_source
+    availability: discover_at_runtime
+    roles: [openai_developer_contracts]
+    writes: conditional
+    authority: current_openai_developer_guidance
+  plugin_autopilot:
+    display_name: Plugin Autopilot
+    surface: skill
+    availability: discover_at_runtime
+    roles: [workflow_to_plugin_product, packaging_guidance]
+    writes: conditional
+    authority: plugin_engineering_process
+  plugin_eval:
+    display_name: Plugin Eval
+    surface: skill
+    availability: discover_at_runtime
+    roles: [skill_plugin_evaluation]
+    writes: evaluation_artifacts
+    authority: executed_evaluation_results
+    cannot: [claim_benchmark_without_execution]
+  create_state:
+    display_name: Create State
+    surface: connected_source
+    availability: discover_at_runtime
+    roles: [durable_project_context, session_handoff]
+    writes: explicit_persistent_capture_only
+    cannot: [replace_live_repository_state]

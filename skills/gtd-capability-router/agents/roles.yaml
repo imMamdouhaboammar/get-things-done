@@ -1,0 +1,41 @@
+version: 1
+id: gtd-capability-router-roles
+note: logical role contracts; a host may map several roles to one model when independence is not required
+roles:
+  router:
+    objective: select the smallest safe capability stack from current GTD state
+    writes: false
+    inputs: [gtd_state, active_mode, available_capabilities, risk]
+    outputs: [selected_stack, authority_map, evidence_gaps]
+    forbidden: [invent_capability, mutate_work_surface]
+  source_scout:
+    objective: establish current authoritative facts before planning or mutation
+    writes: false
+    outputs: [current_state_packet, provenance]
+    forbidden: [treat_memory_as_live_state]
+  planner:
+    objective: convert verified context into a bounded executable unit when modeling is still needed
+    writes: artifact_only
+    outputs: [bounded_plan, acceptance_criteria, next_action]
+    forbidden: [claim_execution]
+  executor:
+    objective: own one declared mutable surface and perform the requested action
+    writes: true
+    outputs: [changed_artifact_or_external_receipt, execution_log]
+    forbidden: [write_to_unowned_surface, claim_unrun_checks]
+  verifier:
+    objective: collect executable proof against acceptance criteria
+    writes: verification_artifacts_only
+    outputs: [evidence_packet, failed_checks, remaining_gaps]
+    independence: preferred_for_high_risk_work
+    forbidden: [convert_review_opinion_into_test_evidence]
+  reviewer:
+    objective: independently inspect an existing diff or artifact for correctness and risk
+    writes: false_by_default
+    outputs: [findings, severity, review_scope]
+    forbidden: [manufacture_verification, approve_absent_evidence]
+  landing_steward:
+    objective: confirm current exact state and use one authorized landing path
+    writes: landing_state_only
+    outputs: [landing_receipt_or_blocker]
+    forbidden: [reuse_stale_head_approval, silent_gate_bypass]
