@@ -21,6 +21,8 @@ class SkillStyling(NamedTuple):
     gradient_end: str
     accent_color: str
     categories: list[str]
+    interface_short_description: str
+    interface_default_prompt: str
 
 
 CATALOG_CONFIG: dict[str, SkillStyling] = {
@@ -34,6 +36,8 @@ CATALOG_CONFIG: dict[str, SkillStyling] = {
         gradient_end="#0F172A",
         accent_color="#38BDF8",
         categories=["productivity", "project-management", "workflow-automation"],
+        interface_short_description="Turn messy ideas into executable, verifiable work",
+        interface_default_prompt="Use $get-things-done to turn this into an executable work model.",
     ),
     "building-gtd-domain-packs": SkillStyling(
         name="building-gtd-domain-packs",
@@ -45,6 +49,8 @@ CATALOG_CONFIG: dict[str, SkillStyling] = {
         gradient_end="#064E3B",
         accent_color="#6EE7B7",
         categories=["developer-tools", "productivity"],
+        interface_short_description="Build focused GTD domain extensions",
+        interface_default_prompt="Use $building-gtd-domain-packs to design a focused GTD domain pack.",
     ),
     "gtd-deliberation": SkillStyling(
         name="gtd-deliberation",
@@ -56,6 +62,8 @@ CATALOG_CONFIG: dict[str, SkillStyling] = {
         gradient_end="#312E81",
         accent_color="#DDD6FE",
         categories=["productivity", "developer-tools", "project-management"],
+        interface_short_description="Challenge and refresh ideas before planning",
+        interface_default_prompt="Use $gtd-deliberation to challenge this idea with current evidence before planning.",
     ),
 }
 
@@ -284,11 +292,11 @@ def build_openai_manifest(styling: SkillStyling) -> str:
         "categories": styling.categories,
         "interface": {
             "display_name": styling.display_name,
-            "short_description": styling.short_description,
+            "short_description": styling.interface_short_description,
             "icon_small": "./assets/small-logo.svg",
             "icon_large": "./assets/large-logo.svg",
             "brand_color": styling.brand_color,
-            "default_prompt": f"Use ${styling.name} to {styling.default_prompt[0].lower() + styling.default_prompt[1:]}",
+            "default_prompt": styling.interface_default_prompt,
         },
         "policy": {"allow_implicit_invocation": True},
     }
