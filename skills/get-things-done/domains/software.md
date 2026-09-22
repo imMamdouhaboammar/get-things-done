@@ -6,6 +6,7 @@ extends: gtd-core-v1
 # GTD Domain Pack: Software
 ## Selection signals
 Software features, codebases, APIs, services, data models, architecture, migrations, bugs, infrastructure, deployment, security, performance, developer tooling
+Non-selection signal: Tasks that only mention technical objects while the requested outcome is research, marketing, design, operations, or another specialist decision rather than changing software behavior.
 ## Domain vocabulary
 Keep distinct: requirement, behavior, interface, dependency, invariant, state, data, failure mode, test, deployment, migration, rollback
 ## Diagnostic questions
