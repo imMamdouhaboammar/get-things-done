@@ -20,6 +20,7 @@ def test_capability_router_is_self_contained():
         "references/repository-playbook.md",
         "references/plugin-skill-playbook.md",
         "references/source-lineage.md",
+        "references/security-boundaries.md",
     ]
     missing = [path for path in required if not (SKILL / path).is_file()]
     assert not missing, f"missing: {missing}"
