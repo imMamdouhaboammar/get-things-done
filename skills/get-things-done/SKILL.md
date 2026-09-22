@@ -10,6 +10,8 @@ Turn unclear intent into an executable work model, then continue through deliver
 
 Load `references/core-contract.md` at the start of every cycle — the knowledge ledger, mode router, freshness rules, and gate contracts live there.
 
+For installed-Skill maintenance, load `references/updating.md` before running the self-updater.
+
 ## Freshness and deliberation preflight
 
 Before substantial work commits to a direction:
