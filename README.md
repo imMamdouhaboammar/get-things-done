@@ -380,6 +380,8 @@ python scripts/gtd.py render-brief brief.json --out brief.md    # backward-compa
 python scripts/gtd.py export-brief brief.json --format all \
   --out dist/brief                                              # MD, JSON, TOON, Mermaid, graph JSON
 python scripts/gtd.py package --out dist                        # build distribution package
+python scripts/gtd.py update --check                           # check installed Skills for updates
+python scripts/gtd.py update                                   # update installed Skills from canonical GitHub
 ```
 
 ### Adapter CLI
@@ -575,6 +577,7 @@ pytest
 | [docs/quickstart.md](docs/quickstart.md) | First brief in five steps |
 | [docs/architecture.md](docs/architecture.md) | Runtime model, state machine, adapter tiers |
 | [docs/deliberation.md](docs/deliberation.md) | Freshness, challenge, direction gate, and backlog workflow |
+| [docs/updating.md](docs/updating.md) | Self-update channels, safety, rollback, and package-manager boundaries |
 | [docs/adapters.md](docs/adapters.md) | Full host adapter and companion documentation |
 | [docs/execution-brief.md](docs/execution-brief.md) | Brief schema, lifecycle, and handoff contract |
 | [docs/domain-packs.md](docs/domain-packs.md) | Built-in packs and authoring guide |
