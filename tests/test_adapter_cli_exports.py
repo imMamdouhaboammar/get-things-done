@@ -43,5 +43,7 @@ def test_packaged_openai_export_contains_manifest_and_skill(tmp_path):
     assert result.returncode == 0, result.stderr
     with zipfile.ZipFile(out / "chatgpt-plugin.zip") as zf:
         names = set(zf.namelist())
+    assert "plugin.json" in names
     assert ".codex-plugin/plugin.json" in names
     assert "skills/get-things-done/SKILL.md" in names
+    assert "adapter.json" not in names

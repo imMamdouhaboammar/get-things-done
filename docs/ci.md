@@ -22,7 +22,10 @@ CI installs the project through its own package metadata:
 python -m pip install -e ".[dev]"
 ```
 
-It then invokes `gtd --help` from the installed console entrypoint before running repository/Skill-specific commands. `doctor` remains a separate repository/Skill distribution check because the Python console package intentionally contains the CLI package rather than duplicating the canonical Skill payload.
+It then invokes `gtd --help` from the installed console entrypoint before running repository/Skill-specific commands. The same matrix builds the repository's Rust `chatgpt-skill` executable
+using the checked-in `Cargo.lock` before `pytest`, because ChatgptBridge
+integration tests depend on an actual runnable executable. They must not be
+skipped simply because the Rust component was absent. `doctor` remains a separate repository/Skill distribution check because the Python console package intentionally contains the CLI package rather than duplicating the canonical Skill payload.
 
 This catches packaging and console-entrypoint drift that a manual dependency install cannot detect.
 

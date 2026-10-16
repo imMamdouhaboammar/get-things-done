@@ -22,7 +22,7 @@ No documentation sections available yet.
 - **Files Documented**: 0
 - **Directories**: 0
 - **Coverage**: 0%
-- **Eligible Source Files**: 101
+- **Eligible Source Files**: 102
 - **Last Updated**: 2026-10-16
 
 ---

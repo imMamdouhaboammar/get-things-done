@@ -30,10 +30,10 @@ A named first-class adapter means GTD additionally verifies a host-specific path
 | Claude Code | first-class | `.claude-plugin/plugin.json` + canonical skills |
 | Claude Marketplace | first-class | `.claude-plugin/marketplace.json` |
 | Claude Cowork | first-class | Claude plugin/skill package |
-| ChatGPT Web | first-class | `.codex-plugin/plugin.json` + canonical skills |
-| ChatGPT Work | first-class | same OpenAI plugin package |
-| ChatGPT Plugin | first-class | same OpenAI plugin package |
-| Codex | first-class | OpenAI plugin + `.agents/skills` fallback |
+| ChatGPT Web | first-class | portable `plugin.json` + canonical skills; legacy `.codex-plugin/plugin.json` |
+| ChatGPT Work | first-class | same portable OpenAI Skills-only package |
+| ChatGPT Plugin | first-class | same portable OpenAI Skills-only package |
+| Codex | first-class | portable OpenAI plugin + compatibility overlay; `.agents/skills` fallback |
 | Cursor | first-class | `.cursor/skills` with `.agents/skills` portability fallback |
 | Kimi Code | first-class | `kimi.plugin.json` and `.kimi-code/skills` |
 | Grok Build | first-class | `.grok/skills` |
@@ -96,6 +96,23 @@ python scripts/adapters.py export-all --out dist/adapters --package --report dis
 Host packaging changes faster than the GTD reasoning contract.
 
 The adapter layer owns only discovery location, manifest shape, installation/package layout, host-specific metadata, and conformance checks.
+
+### ChatGPT and Codex package contract
+
+All four OpenAI adapters export the **same Skills-only plugin bytes**: root `plugin.json`
+with `extensions.com.openai.interface`, the compatibility
+`.codex-plugin/plugin.json`, and the four unmodified canonical `skills/`
+directories. The root manifest is authoritative; export fails if the
+compatibility interface drifts from it. The adapter intentionally excludes
+the repository's unrelated `.mcp.json`, app bindings, hooks, screenshots,
+and the adapter registry metadata from the OpenAI upload bundle.
+
+The package contains instructions and local scripts, not a hosted tool server.
+ChatGPT or Codex can act on a project only when the active host exposes and
+authorizes corresponding tools. This adapter does not itself grant shell,
+filesystem, GitHub, or network access; a verified plugin package is not
+evidence of Plugin Directory approval. Refer to
+[installation.md](installation.md) for the export commands.
 
 It must not duplicate the Execution Brief contract, domain packs, readiness rules, or completion semantics.
 

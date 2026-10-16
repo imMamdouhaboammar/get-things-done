@@ -269,24 +269,57 @@ def validate_manifests(root: Path = ROOT) -> list[str]:
             if ver != first_ver:
                 errors.append(f"{label}: version mismatch ({ver} != {first_ver})")
 
-    ap = parsed.get("plugin.json", {})
+    ap = parsed.get("plugin.json")
+    if not isinstance(ap, dict):
+        errors.append("plugin.json must contain a JSON object")
+        ap = {}
     if ap.get("$schema") != "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json":
         errors.append("plugin.json must declare Agent Plugins 1.0.0 schema")
     if ap.get("name") != "get-things-done":
         errors.append("plugin.json name mismatch")
-    codex = parsed.get(".codex-plugin/plugin.json", {})
+    codex = parsed.get(".codex-plugin/plugin.json")
+    if not isinstance(codex, dict):
+        errors.append(".codex-plugin/plugin.json must contain a JSON object")
+        codex = {}
     if codex.get("skills") != "./skills/":
         errors.append("OpenAI plugin must reference ./skills/")
     interface = codex.get("interface") if isinstance(codex.get("interface"), dict) else {}
     for key in ("displayName", "shortDescription", "longDescription", "developerName", "category"):
         if not interface.get(key):
             errors.append(f"OpenAI plugin interface missing {key}")
-    for key in ("composerIcon", "logo"):
-        value = interface.get(key)
-        if not isinstance(value, str) or not value.startswith("./"):
-            errors.append(f"OpenAI plugin {key} must be a relative ./ path")
-        elif not (root / value[2:]).is_file():
-            errors.append(f"OpenAI plugin {key} path does not exist: {value}")
+    # The portable manifest is authoritative. Keep the legacy Codex overlay in sync
+    # rather than depending on importer fallback or silently shipping stale copy.
+    extensions = ap.get("extensions")
+    openai = extensions.get("com.openai") if isinstance(extensions, dict) else None
+    if not isinstance(openai, dict):
+        errors.append("plugin.json missing extensions.com.openai")
+    else:
+        portable_interface = openai.get("interface")
+        if not isinstance(portable_interface, dict):
+            errors.append("plugin.json missing extensions.com.openai.interface")
+        elif portable_interface != interface:
+            errors.append("OpenAI interface drift between portable and compatibility manifests")
+        for forbidden in ("apps", "mcpServers", "hooks"):
+            if forbidden in openai:
+                errors.append(f"skills-only OpenAI plugin cannot declare {forbidden}")
+
+    if "screenshots" in interface:
+        errors.append("skills-only OpenAI plugin cannot declare screenshots")
+    short_description = interface.get("shortDescription")
+    if not isinstance(short_description, str) or not 0 < len(short_description) <= 30:
+        errors.append("OpenAI shortDescription must be between 1 and 30 characters")
+    for label, source_interface in (
+        ("plugin.json", openai.get("interface") if isinstance(openai, dict) else None),
+        (".codex-plugin/plugin.json", interface),
+    ):
+        if not isinstance(source_interface, dict):
+            continue
+        for key in ("composerIcon", "logo"):
+            value = source_interface.get(key)
+            if not isinstance(value, str) or not value.startswith("./") or not _safe_relative_path(value):
+                errors.append(f"{label}: unsafe OpenAI asset path for {key}: {value}")
+            elif not (root / value[2:]).is_file():
+                errors.append(f"{label}: OpenAI {key} path does not exist: {value}")
     kimi = parsed.get("kimi.plugin.json", {})
     if kimi.get("skills") != "./skills/":
         errors.append("Kimi plugin must reference ./skills/")
@@ -342,6 +375,7 @@ def export_adapter(adapter_id: str, out: Path, root: Path = ROOT) -> Path:
         shutil.copy2(root / "plugin.json", target / "plugin.json")
         _copy_skills(root, target / "skills")
     elif export_kind == "openai-plugin":
+        shutil.copy2(root / "plugin.json", target / "plugin.json")
         (target / ".codex-plugin").mkdir()
         shutil.copy2(root / ".codex-plugin" / "plugin.json", target / ".codex-plugin" / "plugin.json")
         _copy_skills(root, target / "skills")
@@ -375,7 +409,10 @@ def export_adapter(adapter_id: str, out: Path, root: Path = ROOT) -> Path:
     else:
         raise RuntimeError(f"unsupported export kind: {export_kind}")
 
-    (target / "adapter.json").write_text(json.dumps(adapter, indent=2) + "\n", encoding="utf-8")
+    # OpenAI package uploads should contain only the portable plugin and
+    # compatibility components; adapter diagnostics are not plugin behavior.
+    if export_kind != "openai-plugin":
+        (target / "adapter.json").write_text(json.dumps(adapter, indent=2) + "\n", encoding="utf-8")
     return target
 
 
