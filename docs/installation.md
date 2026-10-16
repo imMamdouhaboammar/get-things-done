@@ -110,7 +110,23 @@ python scripts/adapters.py export chatgpt-work --out dist/adapters --package
 python scripts/adapters.py export chatgpt-plugin --out dist/adapters --package
 ```
 
-Each package carries `.codex-plugin/plugin.json` plus the canonical skills.
+All four commands produce the same Skills-only package contents: portable
+`plugin.json` with OpenAI presentation metadata, a backward-compatible
+`.codex-plugin/plugin.json`, and all four canonical Skills. No MCP server,
+external app, hidden runtime, or credentials are bundled.
+
+Check the generated ZIP before trying to import it into ChatGPT or Codex:
+
+```bash
+python scripts/adapters.py validate
+unzip -l dist/adapters/chatgpt-plugin.zip
+```
+
+These are package exports, not automatic account installation or Plugin
+Directory publication. ChatGPT plugin installation must be performed through
+the supported plugin import flow; Codex can also install the canonical Skills
+using `./install.sh --target codex`. Filesystem edits, shell execution,
+and repository actions require host-provided, authorized capabilities.
 
 ## Codex
 
