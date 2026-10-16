@@ -50,5 +50,11 @@ brief.md
 analytics.md
 *.bak
 tmp/
+.chatgpt-state.json
+
 # Added by code-review-graph
 .code-review-graph/
+
+# Rust artifacts
+crates/**/target/
+target/

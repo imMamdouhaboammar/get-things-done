@@ -14,6 +14,18 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+_DIR = Path(__file__).resolve().parent
+if str(_DIR) not in sys.path:
+    sys.path.insert(0, str(_DIR))
+
+try:
+    from chatgpt_bridge import ChatgptBridge
+except ImportError:
+    try:
+        from .chatgpt_bridge import ChatgptBridge
+    except Exception:
+        ChatgptBridge = None
+
 STATUSES = {
     "captured",
     "clarifying",
@@ -344,7 +356,7 @@ def cmd_new_brief(args: argparse.Namespace) -> int:
     if out.exists() and not args.force:
         print(f"ERROR: exists: {out}", file=sys.stderr)
         return 2
-    if args.version == "2.0":
+    if getattr(args, "version", "1.0") == "2.0":
         namespace = _runtime_script(pack_root(args.root), "brief_v2.py")
         constructor = namespace.get("blank_brief_v2")
         if not callable(constructor):
@@ -1026,6 +1038,132 @@ def cmd_update(args: argparse.Namespace) -> int:
     )
 
 
+def _get_bridge(root_path: Path) -> Any:
+    if ChatgptBridge is None:
+        raise RuntimeError("ChatgptBridge module could not be imported")
+    return ChatgptBridge(root_path)
+
+
+def cmd_chatgpt_route(args: argparse.Namespace) -> int:
+    root = pack_root(args.root)
+    bridge = _get_bridge(root)
+    if not bridge.is_available():
+        print("ERROR: chatgpt-skill Rust engine binary not found. Build it with cargo build in crates/use-chatgpt-engine.", file=sys.stderr)
+        return 1
+
+    prompt = args.prompt
+    route_data = bridge.route_intent(prompt, format_type=args.format or "json")
+    if not route_data.get("success"):
+        print(f"ERROR: routing failed: {route_data.get('error')}", file=sys.stderr)
+        return 1
+
+    if args.into_brief:
+        brief_path = Path(args.into_brief).expanduser().resolve()
+        if brief_path.exists():
+            payload = read_json(brief_path)
+        else:
+            payload = blank_brief(prompt[:60], "software")
+        enriched = bridge.enrich_brief_with_route(payload, prompt)
+        brief_path.parent.mkdir(parents=True, exist_ok=True)
+        brief_path.write_text(json.dumps(enriched, indent=2) + "\n", encoding="utf-8")
+        print(f"HYDRATED: {brief_path}")
+        return 0
+
+    if args.json:
+        print(json.dumps(route_data, indent=2))
+    else:
+        print(f"Domain: {route_data.get('domain')}")
+        print("=== Routing Packet ===")
+        print(json.dumps(route_data.get("packet", {}), indent=2))
+        if route_data.get("dag"):
+            print("\n=== Execution DAG ===")
+            print(route_data.get("dag"))
+    return 0
+
+
+def cmd_bot_gate(args: argparse.Namespace) -> int:
+    root = pack_root(args.root)
+    bridge = _get_bridge(root)
+    if not bridge.is_available():
+        print("ERROR: chatgpt-skill Rust engine binary not found.", file=sys.stderr)
+        return 1
+
+    bot_data = bridge.inspect_bot_gate(pr=args.pr)
+    if not bot_data.get("success"):
+        print(f"ERROR: bot-gate failed: {bot_data.get('error')}", file=sys.stderr)
+        return 1
+
+    if args.into_brief:
+        brief_path = Path(args.into_brief).expanduser().resolve()
+        if not brief_path.exists():
+            print(f"ERROR: brief does not exist: {brief_path}", file=sys.stderr)
+            return 2
+        payload = read_json(brief_path)
+        enriched = bridge.enrich_brief_with_bot_gate(payload, pr=args.pr)
+        brief_path.write_text(json.dumps(enriched, indent=2) + "\n", encoding="utf-8")
+        print(f"INGESTED: bot-gate dispositions into {brief_path} ({bot_data.get('actionable_count')} actionable)")
+        return 0
+
+    if args.json:
+        print(json.dumps(bot_data, indent=2))
+    else:
+        print(bot_data.get("markdown", ""))
+    return 0
+
+
+def cmd_evidence_ladder(args: argparse.Namespace) -> int:
+    root = pack_root(args.root)
+    bridge = _get_bridge(root)
+    path = Path(args.path).expanduser().resolve()
+    try:
+        payload = read_json(path)
+    except Exception as exc:
+        print(f"INVALID: cannot read JSON: {exc}", file=sys.stderr)
+        return 1
+
+    if args.into_brief:
+        enriched = bridge.enrich_brief_with_evidence_ladder(payload)
+        path.write_text(json.dumps(enriched, indent=2) + "\n", encoding="utf-8")
+        print(f"GRADED: {path}")
+        return 0
+
+    evidence_items = payload.get("verification", {}).get("evidence", [])
+    eval_res = bridge.evaluate_evidence(evidence_items)
+    if args.json:
+        print(json.dumps(eval_res, indent=2))
+    else:
+        print(f"HIGHEST LEVEL: {eval_res.get('highest_level')}")
+        print(f"SUFFICIENT FOR DONE: {'YES' if eval_res.get('is_sufficient_for_done') else 'NO'}")
+        for item in eval_res.get("evaluated", []):
+            print(f"- [{item['level']}] {item['item']}")
+    return 0
+
+
+def cmd_macos_bridge(args: argparse.Namespace) -> int:
+    root = pack_root(args.root)
+    bridge = _get_bridge(root)
+    if args.notify:
+        ok = bridge.macos_notify(title=args.title or "GTD Notification", message=args.notify)
+        if ok:
+            print("NOTIFIED")
+            return 0
+        print("FAILED to notify", file=sys.stderr)
+        return 1
+    if args.copy:
+        ok = bridge.macos_copy(args.copy)
+        if ok:
+            print("COPIED")
+            return 0
+        print("FAILED to copy", file=sys.stderr)
+        return 1
+    if args.paste:
+        val = bridge.macos_paste()
+        print(val, end="")
+        return 0
+    print("No macOS action specified (--notify, --copy, or --paste)", file=sys.stderr)
+    return 2
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="gtd", description="Get Things Done skill pack utilities")
     sub = p.add_subparsers(dest="command", required=True)
@@ -1099,7 +1237,40 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--timeout", type=float, default=15.0, help="network timeout in seconds")
     x.add_argument("--root", help=argparse.SUPPRESS)
     x.set_defaults(func=cmd_update)
+
+    # Ultra-connected Use-ChatGPT & Rust Engine integration commands
+    x = sub.add_parser("chatgpt-route", help="Route intent via Rust engine and generate execution DAG")
+    x.add_argument("prompt", help="Natural language prompt or task to route")
+    x.add_argument("--into-brief", help="Optional path to Execution Brief to hydrate with routing packet")
+    x.add_argument("--format", default="json", choices=["json", "yaml"], help="Routing packet format")
+    x.add_argument("--json", action="store_true", help="Print structured JSON result")
+    x.add_argument("--root", help="Explicit pack root")
+    x.set_defaults(func=cmd_chatgpt_route)
+
+    x = sub.add_parser("bot-gate", help="Inspect PR bot comments and fence actionable items")
+    x.add_argument("--pr", type=int, help="Optional PR number")
+    x.add_argument("--into-brief", help="Optional path to Execution Brief to ingest actionable items")
+    x.add_argument("--json", action="store_true", help="Print structured JSON result")
+    x.add_argument("--root", help="Explicit pack root")
+    x.set_defaults(func=cmd_bot_gate)
+
+    x = sub.add_parser("evidence-ladder", help="Grade verification evidence against 5-Tier Trust Ladder")
+    x.add_argument("path", help="Path to Execution Brief JSON")
+    x.add_argument("--into-brief", action="store_true", help="Write graded evidence back into the brief")
+    x.add_argument("--json", action="store_true", help="Print structured JSON evaluation")
+    x.add_argument("--root", help="Explicit pack root")
+    x.set_defaults(func=cmd_evidence_ladder)
+
+    x = sub.add_parser("macos", help="Native macOS notification and clipboard bridge")
+    x.add_argument("--notify", help="Notification alert message")
+    x.add_argument("--title", default="GTD Alert", help="Notification alert title")
+    x.add_argument("--copy", help="Text to copy to clipboard")
+    x.add_argument("--paste", action="store_true", help="Print clipboard contents")
+    x.add_argument("--root", help="Explicit pack root")
+    x.set_defaults(func=cmd_macos_bridge)
+
     return p
+
 
 
 def main() -> int:

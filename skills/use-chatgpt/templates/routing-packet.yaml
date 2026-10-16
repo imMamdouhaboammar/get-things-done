@@ -1,0 +1,44 @@
+# Machine-Readable Capability Routing Packet Template
+
+mission:
+  title: "[MISSION TITLE]"
+  outcome: "[DESIRED OBSERVABLE FINISHED STATE]"
+  current_stage: "[CLASSIFY | RESTORE | INVESTIGATE | PLAN | EXECUTE | VERIFY | REVIEW | RELEASE | HANDOFF]"
+
+source_of_truth:
+  primary: "[@GitHub | Local Repository | @Supabase | Documentation]"
+  secondary: "[Optional Secondary Source]"
+
+ownership:
+  orchestrator: "[Single Primary Lifecycle Owner, e.g. @get-fable or @Superpowers]"
+  write_owner: "[Single Authoritative Write Owner, e.g. Codex Engineering Guardrails code-work]"
+  landing_owner: "[@PR Completion | Repository CI & Policy]"
+
+specialists:
+  - capability: "[@Context7 | @Codex Security | @Fallow]"
+    reason: "[Why this specialist is materially required]"
+    entry_trigger: "[Condition to enter]"
+    expected_output: "[Evidence or contract excerpt produced]"
+    continuation: "[Next step upon specialist completion]"
+
+verification:
+  executable:
+    - "[Specific unit/integration test command]"
+    - "[Clean compile/typecheck command]"
+  structural:
+    - "[Static analysis check, e.g. Fallow/linter]"
+  runtime:
+    - "[Browser E2E flow or API endpoint check]"
+
+review:
+  primary: "[@CodeRabbit | independent code-verification]"
+  optional_second_lens: "[@Codex Security (if trust boundaries changed)]"
+
+availability:
+  - capability: "[Named Tool]"
+    state: "CALLABLE" # CALLABLE | CONNECTED | INSTALLED_BUT_NOT_CALLABLE_HERE | KNOWN_NAME_UNRESOLVED | UNAVAILABLE | BLOCKED
+    block_reason: ""
+
+landing:
+  current_head_required: true
+  confirmation_rule: "[Explicit Human Confirmation | CI Required Checks Clean]"

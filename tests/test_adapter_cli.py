@@ -60,8 +60,8 @@ def test_companions_json_is_machine_readable():
     result = run("companions", "--json")
     assert result.returncode == 0, result.stderr
     payload = json.loads(result.stdout)
-    assert len(payload) == 5
-    assert {item["id"] for item in payload} == {"plugin-autopilot", "plugin-eval", "superpowers", "armorcodex", "context7"}
+    assert len(payload) == 6
+    assert {item["id"] for item in payload} == {"plugin-autopilot", "plugin-eval", "superpowers", "armorcodex", "context7", "use-chatgpt"}
 
 
 def test_interop_single_companion_is_json():
@@ -81,7 +81,7 @@ def test_validate_reports_adapter_and_companion_counts():
     result = run("validate")
     assert result.returncode == 0, result.stderr
     assert "20 adapter contracts" in result.stdout
-    assert "5 companion profiles" in result.stdout
+    assert "6 companion profiles" in result.stdout
 
 
 def test_export_all_package_builds_reproducible_archives(tmp_path):
@@ -98,7 +98,7 @@ def test_status_command_reports_summary_and_breakdown():
     result = run("status")
     assert result.returncode == 0, result.stderr
     assert "Adapters: 20" in result.stdout
-    assert "Companions: 5" in result.stdout
+    assert "Companions: 6" in result.stdout
     assert "first-class" in result.stdout
 
 
@@ -107,9 +107,10 @@ def test_status_json_command_returns_structured_metrics():
     assert result.returncode == 0, result.stderr
     payload = json.loads(result.stdout)
     assert payload["adapters_total"] == 20
-    assert payload["companions_total"] == 5
+    assert payload["companions_total"] == 6
     assert payload["support_counts"]["first-class"] >= 10
     assert payload["version"] == "1.4.0"
+
 
 
 def test_capabilities_command_lists_all_capabilities():

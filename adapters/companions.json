@@ -93,6 +93,25 @@
       "failure_policy": "fallback-to-local-source-inspection",
       "authority_boundary": "Context7 provides external reference context over MCP; repository source code and local governance remain primary authority.",
       "guardrails": ["source-of-truth", "repository-governance-wins", "no-runtime-dependency"]
+    },
+    {
+      "id": "use-chatgpt",
+      "label": "Use-ChatGPT & Rust Engine",
+      "kind": "orchestration",
+      "relationship": "complementary",
+      "companion_role": "agentic-routing-and-bot-gate",
+      "transport": "East-West CLI/IPC",
+      "ownership": {
+        "gtd": "execution-contract",
+        "companion": "routing-and-fencing"
+      },
+      "integration": "Use-ChatGPT pure Rust engine provides sub-millisecond intent classification, precedence routing DAG, Open-PR bot gate fencing, and native macOS CLI operations; GTD orchestrates the execution brief and completion contracts.",
+      "inputs": ["user-intent", "execution-brief", "pr-comments", "evidence-statements"],
+      "outputs": ["routing-packet", "execution-dag", "bot-dispositions", "evidence-grades"],
+      "evidence_contract": "Use-ChatGPT bot-gate classifications and Evidence Trust Ladder (Levels A-E) grades populate GTD verification and blocker tables directly.",
+      "failure_policy": "graceful-degradation-to-manual-gtd-brief",
+      "authority_boundary": "Use-ChatGPT fences bot noise and maps routing precedence; GTD defines task readiness, state transitions, and completion evidence.",
+      "guardrails": ["no-runtime-dependency", "preserve-gtd-completion-contract", "bot-is-neither-noise-nor-truth"]
     }
   ]
 }

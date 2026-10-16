@@ -22,6 +22,7 @@ def test_all_companions_comply_with_schema():
     "superpowers",
     "armorcodex",
     "context7",
+    "use-chatgpt",
 ])
 def test_companion_declares_mature_contract_fields(companion_id):
     companion = adapters.companions_by_id()[companion_id]

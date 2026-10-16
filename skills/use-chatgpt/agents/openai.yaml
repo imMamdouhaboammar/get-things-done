@@ -1,0 +1,19 @@
+schema_version: v1
+name: use-chatgpt
+display_name: Use-ChatGPT & Rust Engine
+short_description: Multi-plugin intent router, precedence DAG, PR bot fencer, and macOS CLI.
+default_prompt: 'Route this task and generate execution packet with verified evidence:'
+brand_color: '#10B981'
+categories:
+- developer-tools
+- workflow-automation
+- code-review
+interface:
+  display_name: "Use-ChatGPT & Rust Engine"
+  short_description: "Multi-plugin router & PR bot fencer"
+  icon_small: "./assets/small-logo.svg"
+  icon_large: "./assets/large-logo.svg"
+  brand_color: "#10B981"
+  default_prompt: "Use $use-chatgpt to classify intent, route specialists, fence bot reviews, and execute on macOS."
+policy:
+  allow_implicit_invocation: true

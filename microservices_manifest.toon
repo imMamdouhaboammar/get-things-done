@@ -1,0 +1,10 @@
+architecture_manifest: {verdict, allow_monolith, scale_score, domain_score, resource_score, composite_score}
+  microservices, false, 7.5, 8.5, 7.0, 7.78
+
+communication_standards: {boundary, protocol, transport, http_json_prohibited}
+  North-South (User / Agent -> GTD), Agent Skills & CLI, Stdio / Markdown / JSON (Schema v1.0), false
+  East-West (GTD <-> Rust Engine), Typed RPC & Protocol Buffers, gRPC / Structured Subprocess IPC (proto/gtd_chatgpt_bridge.proto), true
+
+services [2]: {name, domain, scenario, language, framework, runtime, role, port, grpc_port}
+  gtd-orchestrator, Work Modeling & Execution Briefs Lifecycle, 1, Python, GTD Core CLI, Python 3.10+, crud-engineer, 8080, 50051
+  use-chatgpt-engine, High-Performance Routing DAG & Bot Gate Fencer, 2, Rust, Pure Rust Binary, Rust 1.80+, systems-kernel-engineer, 8081, 50052

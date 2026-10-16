@@ -1,0 +1,48 @@
+# Evaluation Suite for use-chatgpt Skill
+
+eval_suite:
+  name: use-chatgpt-behavioral-evals
+  version: 1.0.0
+  cases:
+    - id: eval-001
+      name: direct-feature-routing
+      type: positive_trigger
+      prompt: "Build an auth endpoint and verify it with unit tests using our installed plugins"
+      expected:
+        orchestrator: "@Superpowers"
+        write_owner: "Codex Engineering Guardrails code-work"
+        verifier: "unit_tests"
+        reviewer: "@CodeRabbit"
+        state: "PLAN"
+
+    - id: eval-002
+      name: pr-repair-bot-routing
+      type: positive_trigger
+      prompt: "Inspect PR #42 and fix CodeRabbit and Bugbot review comments"
+      expected:
+        bot_gate_active: true
+        disposition_required: true
+        landing_owner: "@PR Completion"
+
+    - id: eval-003
+      name: negative-trivial-typo
+      type: negative_trigger
+      prompt: "Fix typo in line 4 of README.md"
+      expected:
+        trigger_skill: false
+        reason: "Trivial file edit does not require multi-tool coordination"
+
+    - id: eval-004
+      name: negative-general-q
+      type: negative_trigger
+      prompt: "What is the syntax for a Rust enum with data?"
+      expected:
+        trigger_skill: false
+        reason: "General syntax question"
+
+    - id: eval-005
+      name: evidence-trust-precedence
+      type: behavioral_invariant
+      scenario: "Reviewer gives thumbs-up, but unit test fails"
+      expected_verdict: "NOT_COMPLETE"
+      reason: "Level B test failure invalidates Level C reviewer sign-off"
