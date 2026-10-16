@@ -45,6 +45,7 @@ def test_each_openai_export_contains_both_manifests_and_canonical_skills(tmp_pat
         assert "skills/get-things-done/SKILL.md" in members
         assert ".app.json" not in members
         assert ".mcp.json" not in members
+        assert "adapter.json" not in members
 
 
 def test_metadata_drift_blocks_export(tmp_path):
@@ -74,3 +75,21 @@ def test_unsafe_portable_icon_path_is_rejected(tmp_path):
     path.write_text(json.dumps(doc), encoding="utf-8")
     errors = adapters.validate_manifests(copy)
     assert any("unsafe OpenAI asset path" in error for error in errors)
+
+def test_openai_exports_are_byte_identical_across_surfaces(tmp_path):
+    exported = [
+        adapters.package_directory(adapters.export_adapter(name, tmp_path / "output")).read_bytes()
+        for name in OPENAI_IDS
+    ]
+    assert all(archive == exported[0] for archive in exported[1:])
+
+
+def test_screenshots_are_not_allowed_for_skills_only_plugin(tmp_path):
+    copy = tmp_path / "repository"
+    shutil.copytree(ROOT, copy, ignore=shutil.ignore_patterns(".git", ".pytest_cache", "dist", "__pycache__"))
+    path = copy / ".codex-plugin/plugin.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    doc["interface"]["screenshots"] = []
+    path.write_text(json.dumps(doc), encoding="utf-8")
+    errors = adapters.validate_manifests(copy)
+    assert any("cannot declare screenshots" in error for error in errors)
