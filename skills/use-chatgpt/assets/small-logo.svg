@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bgGradChatGPT" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="100%" stop-color="#064E3B" />
+    </linearGradient>
+    <linearGradient id="glyphGradChatGPT" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="100%" stop-color="#A7F3D0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Squircle Base -->
+  <rect x="40" y="40" width="432" height="432" rx="96" fill="url(#bgGradChatGPT)" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="6" />
+
+  <!-- Rust Engine & Routing Glyph -->
+  <circle cx="256" cy="256" r="140" stroke="#A7F3D0" stroke-opacity="0.4" stroke-width="8" stroke-dasharray="24 16" />
+  <path d="M160 256 L230 326 L352 186" stroke="#FFFFFF" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M256 120 V160 M256 352 V392 M120 256 H160 M352 256 H392" stroke="#A7F3D0" stroke-width="14" stroke-linecap="round" />
+</svg>

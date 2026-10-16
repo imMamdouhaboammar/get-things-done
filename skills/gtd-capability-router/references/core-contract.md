@@ -188,6 +188,16 @@ Useful evidence includes
 
 Agent statements such as "done", "looks good", "should work", or "implemented" are not evidence
 
+### Evidence Trust Ladder
+
+Structure all verification evidence into the 5-Tier Evidence Trust Ladder:
+
+- **Level A (Highest)**: Deterministic Machine Proof — automated test suite execution (exit code 0, pytest, cargo test), compiler/typecheck output, cryptographic checksums.
+- **Level B**: Integration / Runtime Proof — live API HTTP responses, e2e browser interactions, running server output.
+- **Level C**: Observed Runtime / CLI Output — terminal traces, logs, manual CLI execution stdout/stderr.
+- **Level D**: Static Inspection — code review notes, inspected file contents, validated schema structures.
+- **Level E (Untrusted)**: Unverified Assertion — agent confidence statements ("looks good", "should work"). Level E alone never satisfies Definition of Done.
+
 ## 11. Definition of Done
 
 Work is Done only when all are true

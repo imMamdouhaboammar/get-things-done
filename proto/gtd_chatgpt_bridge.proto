@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package gtd.chatgpt.bridge.v1;
+
+option go_package = "gtd/chatgpt/bridge/v1;bridgev1";
+option java_package = "com.gtd.chatgpt.bridge.v1";
+
+// GtdChatgptBridge defines the East-West typed RPC contract between the GTD
+// Python Orchestration Gateway and the high-performance Rust Execution Kernel.
+service GtdChatgptBridge {
+  // RouteIntent accepts a natural language prompt, runs the Rust classifier and
+  // DAG builder, and returns a universal routing packet with execution graph.
+  rpc RouteIntent(RouteIntentRequest) returns (RouteIntentResponse);
+
+  // InspectBotGate inspects PR review bot comments and fences high-signal
+  // actionable findings from noise and stale commits.
+  rpc InspectBotGate(BotGateInspectRequest) returns (BotGateInspectResponse);
+
+  // EvaluateEvidence scores a set of verification items against the 5-Tier
+  // Evidence Trust Ladder (Level A to E).
+  rpc EvaluateEvidence(EvidenceEvaluateRequest) returns (EvidenceEvaluateResponse);
+
+  // ExecuteMacosAction triggers native macOS subsystem operations (clipboard,
+  // notifications, modal dialogs, keychain, URL opener).
+  rpc ExecuteMacosAction(MacosActionRequest) returns (MacosActionResponse);
+}
+
+message RouteIntentRequest {
+  string prompt = 1;
+  string format = 2;
+  bool include_dag = 3;
+}
+
+message RouteIntentResponse {
+  string classified_domain = 1;
+  RoutingPacket packet = 2;
+  string dag_mermaid = 3;
+}
+
+message Mission {
+  string title = 1;
+  string outcome = 2;
+  string current_stage = 3;
+}
+
+message Ownership {
+  string orchestrator = 1;
+  string write_owner = 2;
+  string landing_owner = 3;
+}
+
+message Specialist {
+  string capability = 1;
+  string reason = 2;
+  string entry_trigger = 3;
+  string expected_output = 4;
+  string continuation = 5;
+}
+
+message AvailabilityItem {
+  string name = 1;
+  string role = 2;
+  bool write_authority = 3;
+  string availability = 4;
+  string block_reason = 5;
+  string description = 6;
+}
+
+message LandingPolicy {
+  bool current_head_required = 1;
+  string confirmation_rule = 2;
+}
+
+message RoutingPacket {
+  Mission mission = 1;
+  repeated string source_of_truth = 2;
+  Ownership ownership = 3;
+  repeated Specialist specialists = 4;
+  repeated string verification_commands = 5;
+  string primary_reviewer = 6;
+  string optional_second_reviewer = 7;
+  repeated AvailabilityItem availability_snapshot = 8;
+  LandingPolicy landing_policy = 9;
+}
+
+message BotGateInspectRequest {
+  optional uint32 pr_number = 1;
+  string state_file = 2;
+}
+
+message BotCommentDisposition {
+  string author = 1;
+  string target_sha = 2;
+  string disposition = 3;
+  string justification = 4;
+}
+
+message BotGateInspectResponse {
+  string current_head = 1;
+  repeated BotCommentDisposition comments = 2;
+  uint32 actionable_count = 3;
+  string summary_markdown = 4;
+}
+
+message EvidenceEvaluateRequest {
+  repeated string evidence_items = 1;
+}
+
+message EvidenceItemEvaluation {
+  string evidence = 1;
+  string level = 2;
+  string grade_description = 3;
+}
+
+message EvidenceEvaluateResponse {
+  repeated EvidenceItemEvaluation items = 1;
+  string highest_level = 2;
+  string final_verdict = 3;
+}
+
+enum MacosActionType {
+  MACOS_ACTION_UNSPECIFIED = 0;
+  MACOS_ACTION_COPY = 1;
+  MACOS_ACTION_PASTE = 2;
+  MACOS_ACTION_NOTIFY = 3;
+  MACOS_ACTION_DIALOG = 4;
+  MACOS_ACTION_OPEN = 5;
+  MACOS_ACTION_KEYCHAIN = 6;
+}
+
+message MacosActionRequest {
+  MacosActionType action = 1;
+  string payload = 2;
+  string title = 3;
+  string subtitle = 4;
+}
+
+message MacosActionResponse {
+  bool success = 1;
+  string output = 2;
+  string error = 3;
+}

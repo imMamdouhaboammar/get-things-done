@@ -1,0 +1,42 @@
+# Prompt Contract Standard Template
+
+outcome:
+  description: "[Observable finished state description]"
+
+success_criteria:
+  - "[Verifiable criterion 1]"
+  - "[Verifiable criterion 2]"
+
+source_of_truth:
+  - "[Authoritative source, e.g. Git repository HEAD]"
+
+boundaries:
+  in_scope:
+    - "[Specific modules or features in scope]"
+  out_of_scope:
+    - "[Explicitly excluded items]"
+
+permissions:
+  allowed:
+    - "[Allowed file patterns / operations]"
+  confirmation_required:
+    - "[High-risk operations requiring user confirmation]"
+
+write_owner:
+  "[Designated single write owner]"
+
+tools:
+  source: "[Source tool]"
+  planner: "[Planning tool]"
+  executor: "[Execution engine]"
+  verifier: "[Verification runner]"
+  reviewer: "[Reviewer tool]"
+  landing: "[Landing authority]"
+
+evidence_required:
+  - "[Specific evidence artifacts required before completion]"
+
+stop_conditions:
+  - "COMPLETE: All criteria satisfied with Level A/B proof"
+  - "BLOCKED: External blocker encountered"
+  - "AUTHORITY_REQUIRED: Confirmation required for destructive action"
