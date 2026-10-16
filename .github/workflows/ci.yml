@@ -39,6 +39,19 @@ jobs:
         run: |
           gtd --help
 
+      - name: Set up Rust for the ChatGPT bridge
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/use-chatgpt-engine
+
+      - name: Build ChatGPT bridge CLI
+        run: |
+          cargo build --locked --manifest-path crates/use-chatgpt-engine/Cargo.toml
+          test -x crates/use-chatgpt-engine/target/debug/chatgpt-skill
+
       - name: Bytecode Compilation Check
         run: |
           python -m compileall scripts tests skills/get-things-done/scripts
@@ -87,6 +100,7 @@ jobs:
           test -f ./dist/adapters/cursor/.cursor/skills/get-things-done/SKILL.md
           test -f ./dist/adapters/antigravity/.gemini/config/skills/get-things-done/SKILL.md
           test -f ./dist/adapters/kimi/kimi.plugin.json
+          test -f ./dist/adapters/chatgpt-plugin/plugin.json
           test -f ./dist/adapters/chatgpt-plugin/.codex-plugin/plugin.json
           test -f ./dist/adapters/claude-marketplace/.claude-plugin/marketplace.json
           test -f ./dist/adapters/homebrew/Formula/get-things-done.rb
