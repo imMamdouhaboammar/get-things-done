@@ -1,0 +1,106 @@
+{
+  "name": "rea",
+  "purpose": "Reverse engineer native binaries, Electron/JavaScript apps, Android packages, .NET assemblies, firmware, network captures, and crashes using the REA framework with verifiable evidence.",
+  "baseline_failure": "Without this skill, agents get lost across 138 granular MCP tools, call disassemblers on JavaScript or ASAR targets, dump massive raw hex streams that consume context windows, fail to use summary-first Evidence graphs, fail when external engines (Hopper/Ghidra) are absent instead of using native layout/diagnostics or CLI fallbacks, and speculate without cited evidence.",
+  "triggers": {
+    "positive": [
+      "/rea",
+      "reverse engineer this binary or application",
+      "understand how this feature works in the binary, show evidence, and reconstruct it",
+      "analyze this Electron ASAR or JavaScript bundle",
+      "decompile function at address or symbol",
+      "inspect network capture HAR or APK package with rea"
+    ],
+    "negative": [
+      "review this git pull request diff for code quality",
+      "run playwright browser smoke tests on my web app",
+      "fix typescript compilation error in src/index.ts"
+    ]
+  },
+  "outputs": [
+    "Target Classification and Selected Analysis Pathway",
+    "Evidence-backed analysis report with confirmed symbols, offsets, and decompiled pseudocode",
+    "Reconstructed high-level implementation verified against observed behavior"
+  ],
+  "invariants": [
+    "Never hallucinate binary behavior; every architectural claim must cite concrete REA Evidence, offsets, or decompiled symbols",
+    "Summary-first: inspect overviews, symbols, and call graphs before requesting full decompilation or raw byte ranges",
+    "Static JavaScript/Electron analysis must never demand Hopper or Ghidra engines",
+    "CLI commands must prefer Bun execution (bunx rea-agents or local rea binary)"
+  ],
+  "workflow": [
+    {
+      "action": "Classify target type and determine analysis pathway (Native, Electron/JS, Android, .NET, Firmware, Web/HAR)",
+      "why": "Prevents invalid tool selection such as invoking native disassemblers on web bundles",
+      "freedom": "low"
+    },
+    {
+      "action": "Bind session or run target-free analysis using open_binary, analyze_javascript_application, or CLI",
+      "why": "Establishes a valid analysis session and verifies tool availability before probing",
+      "freedom": "low"
+    },
+    {
+      "action": "Perform summary-first exploration using binary_overview, search_strings, search_procedures, or application graph",
+      "why": "Prevents context exhaustion by locating candidate seeds before decompiling",
+      "freedom": "medium"
+    },
+    {
+      "action": "Trace candidate functions, xrefs, data flow, and extract pseudocode or boundary evidence",
+      "why": "Gathers definitive proof of how the feature operates under the hood",
+      "freedom": "medium"
+    },
+    {
+      "action": "Synthesize clean implementation and construct evidence ledger verifying the reconstructed logic",
+      "why": "Ensures the delivered code is authentic to the observed artifact with zero hallucinations",
+      "freedom": "high"
+    }
+  ],
+  "tools": [
+    "read",
+    "search",
+    "shell",
+    "rea"
+  ],
+  "resources": [
+    "references/target-routing.md",
+    "references/cli-recipes.md",
+    "references/evidence-contract.md"
+  ],
+  "host_targets": [
+    "agent-skills",
+    "claude-code",
+    "codex",
+    "custom:antigravity",
+    "custom:gemini_cli",
+    "custom:cursor"
+  ],
+  "evals": [
+    {
+      "name": "slash-rea-trigger",
+      "prompt": "/rea analyze the auth token extraction in this app",
+      "should_trigger": true,
+      "expected": [
+        "routes to correct target pathway",
+        "runs summary-first inspection"
+      ]
+    },
+    {
+      "name": "natural-language-reverse-engineering",
+      "prompt": "Understand how search works in the Notes app binary, show me the evidence, and build a similar feature",
+      "should_trigger": true,
+      "expected": [
+        "binds target binary",
+        "identifies search procedure",
+        "presents evidence ledger"
+      ]
+    },
+    {
+      "name": "near-miss-repo-review",
+      "prompt": "review this git pull request diff for code quality",
+      "should_trigger": false,
+      "expected": [
+        "does not invoke rea"
+      ]
+    }
+  ]
+}

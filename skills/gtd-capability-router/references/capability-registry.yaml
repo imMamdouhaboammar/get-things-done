@@ -167,3 +167,12 @@ capabilities:
     roles: [durable_project_context, session_handoff]
     writes: explicit_persistent_capture_only
     cannot: [replace_live_repository_state]
+  rea:
+    display_name: REA Reverse Engineering
+    surface: skill
+    availability: discover_at_runtime
+    roles: [reverse_engineering, binary_analysis, apk_inspection, bundle_analysis, clean_room_reconstruction]
+    writes: conditional
+    authority: binary_and_bundle_evidence
+    cannot: [hallucinate_behavior_without_cited_evidence]
+
