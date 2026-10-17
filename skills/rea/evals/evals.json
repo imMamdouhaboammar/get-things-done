@@ -1,0 +1,29 @@
+[
+  {
+    "name": "slash-rea-trigger",
+    "query": "/rea analyze the auth token extraction in this app",
+    "should_trigger": true,
+    "expected": [
+      "routes to correct target pathway",
+      "runs summary-first inspection"
+    ]
+  },
+  {
+    "name": "natural-language-reverse-engineering",
+    "query": "Understand how search works in the Notes app binary, show me the evidence, and build a similar feature",
+    "should_trigger": true,
+    "expected": [
+      "binds target binary",
+      "identifies search procedure",
+      "presents evidence ledger"
+    ]
+  },
+  {
+    "name": "near-miss-repo-review",
+    "query": "review this git pull request diff for code quality",
+    "should_trigger": false,
+    "expected": [
+      "does not invoke rea"
+    ]
+  }
+]

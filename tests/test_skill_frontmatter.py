@@ -8,7 +8,9 @@ SKILL_DIRS = [
     ROOT / "skills" / "building-gtd-domain-packs",
     ROOT / "skills" / "gtd-capability-router",
     ROOT / "skills" / "gtd-deliberation",
+    ROOT / "skills" / "rea",
 ]
+
 
 
 @pytest.mark.parametrize("skill_dir", SKILL_DIRS)
