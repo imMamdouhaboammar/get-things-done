@@ -12,6 +12,7 @@ SKILLS_DIR = ROOT / "skills"
     ("building-gtd-domain-packs", "#059669", "GTD Domain Pack Builder"),
     ("gtd-deliberation", "#7C3AED", "GTD Deliberation"),
     ("rea", "#E11D48", "REA Reverse Engineering"),
+    ("improve", "#0EA5E9", "Codebase Improve Advisor"),
 ])
 
 def test_skill_brand_assets_and_manifests_exist_and_conform(skill_name, expected_color, expected_display):

@@ -26,6 +26,14 @@ except ImportError:
     except Exception:
         ChatgptBridge = None
 
+try:
+    from improve_bridge import ImproveBridge
+except ImportError:
+    try:
+        from .improve_bridge import ImproveBridge
+    except Exception:
+        ImproveBridge = None
+
 STATUSES = {
     "captured",
     "clarifying",
@@ -1164,6 +1172,107 @@ def cmd_macos_bridge(args: argparse.Namespace) -> int:
     return 2
 
 
+def _get_improve_bridge(root_path: Path) -> Any:
+    if ImproveBridge is None:
+        raise RuntimeError("ImproveBridge module could not be imported")
+    return ImproveBridge(root_path)
+
+
+def cmd_improve_ingest(args: argparse.Namespace) -> int:
+    root = pack_root(args.root)
+    bridge = _get_improve_bridge(root)
+    path = Path(args.path).expanduser().resolve()
+    if not path.is_file():
+        print(f"ERROR: plan file not found: {path}", file=sys.stderr)
+        return 1
+
+    try:
+        text = path.read_text(encoding="utf-8")
+    except Exception as exc:
+        print(f"ERROR: cannot read plan file: {exc}", file=sys.stderr)
+        return 1
+
+    errors = bridge.validate_plan(text)
+    if errors and not args.force:
+        print("PLAN VALIDATION WARNINGS:", file=sys.stderr)
+        for err in errors:
+            print(f"- {err}", file=sys.stderr)
+
+    parsed = bridge.parse_plan(text)
+    brief = bridge.plan_to_brief(parsed, version=args.version or "1.0", domain=args.domain or "software")
+
+    if args.into_brief:
+        brief_path = Path(args.into_brief).expanduser().resolve()
+        brief_path.parent.mkdir(parents=True, exist_ok=True)
+        brief_path.write_text(json.dumps(brief, indent=2) + "\n", encoding="utf-8")
+        print(f"INGESTED: {brief_path}")
+        return 0
+
+    if args.out:
+        out_path = Path(args.out).expanduser().resolve()
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(json.dumps(brief, indent=2) + "\n", encoding="utf-8")
+        print(f"GENERATED: {out_path}")
+        return 0
+
+    if args.json:
+        print(json.dumps(brief, indent=2))
+    else:
+        print(f"=== Plan Ingestion: {brief.get('title')} ===")
+        print(f"Domain: {brief.get('domain')} | Status: {brief.get('status')} | Version: {brief.get('version')}")
+        print(f"Workstreams: {len(brief.get('workstreams', []))} | Done Criteria: {len(brief.get('verification', {}).get('success_criteria', brief.get('verification', {}).get('criteria', [])))}")
+        print(f"Next Action: {brief.get('next_action')}")
+    return 0
+
+
+def cmd_improve_validate(args: argparse.Namespace) -> int:
+    root = pack_root(args.root)
+    bridge = _get_improve_bridge(root)
+    path = Path(args.path).expanduser().resolve()
+    if not path.is_file():
+        print(f"ERROR: plan file not found: {path}", file=sys.stderr)
+        return 1
+
+    try:
+        text = path.read_text(encoding="utf-8")
+    except Exception as exc:
+        print(f"ERROR: cannot read plan file: {exc}", file=sys.stderr)
+        return 1
+
+    errors = bridge.validate_plan(text)
+    if errors:
+        print("INVALID", file=sys.stderr)
+        for err in errors:
+            print(f"- {err}", file=sys.stderr)
+        return 1
+
+    print("PASS: plan adheres to Improve Senior Advisor and GTD standards")
+    return 0
+
+
+def cmd_improve_plan(args: argparse.Namespace) -> int:
+    root = pack_root(args.root)
+    bridge = _get_improve_bridge(root)
+    scaffold = bridge.scaffold_plan(
+        title=args.title,
+        category=args.category or "tech-debt",
+        priority=args.priority or "P2",
+        effort=args.effort or "S",
+        risk=args.risk or "LOW",
+        in_scope=args.in_scope or None,
+    )
+
+    if args.out:
+        out_path = Path(args.out).expanduser().resolve()
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(scaffold, encoding="utf-8")
+        print(f"SCAFFOLDED: {out_path}")
+        return 0
+
+    print(scaffold, end="")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="gtd", description="Get Things Done skill pack utilities")
     sub = p.add_subparsers(dest="command", required=True)
@@ -1268,6 +1377,34 @@ def build_parser() -> argparse.ArgumentParser:
     x.add_argument("--paste", action="store_true", help="Print clipboard contents")
     x.add_argument("--root", help="Explicit pack root")
     x.set_defaults(func=cmd_macos_bridge)
+
+    # Improve Codebase Advisor integration commands
+    x = sub.add_parser("improve-ingest", help="Ingest an Improve implementation plan into a GTD Execution Brief")
+    x.add_argument("path", help="Path to Improve plan markdown file (plans/NNN-*.md)")
+    x.add_argument("--into-brief", help="Path to write or hydrate GTD Execution Brief")
+    x.add_argument("--out", help="Path to write output Execution Brief JSON")
+    x.add_argument("--version", choices=["1.0", "2.0"], default="1.0", help="Execution Brief schema version")
+    x.add_argument("--domain", default="software", help="Domain pack for Execution Brief")
+    x.add_argument("--force", action="store_true", help="Ingest despite plan validation warnings")
+    x.add_argument("--json", action="store_true", help="Print brief JSON to stdout")
+    x.add_argument("--root", help="Explicit pack root")
+    x.set_defaults(func=cmd_improve_ingest)
+
+    x = sub.add_parser("improve-validate", help="Validate an Improve implementation plan against advisor standards")
+    x.add_argument("path", help="Path to Improve plan markdown file")
+    x.add_argument("--root", help="Explicit pack root")
+    x.set_defaults(func=cmd_improve_validate)
+
+    x = sub.add_parser("improve-plan", help="Scaffold a new self-contained Improve implementation plan")
+    x.add_argument("--title", required=True, help="Imperative plan title")
+    x.add_argument("--category", default="tech-debt", help="Audit category")
+    x.add_argument("--priority", default="P2", choices=["P1", "P2", "P3"], help="Priority level")
+    x.add_argument("--effort", default="S", choices=["S", "M", "L"], help="Effort estimate")
+    x.add_argument("--risk", default="LOW", choices=["LOW", "MED", "HIGH"], help="Risk level")
+    x.add_argument("--in-scope", nargs="*", help="List of in-scope file paths")
+    x.add_argument("--out", help="Output file path (e.g. plans/001-slug.md)")
+    x.add_argument("--root", help="Explicit pack root")
+    x.set_defaults(func=cmd_improve_plan)
 
     return p
 

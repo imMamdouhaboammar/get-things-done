@@ -4,3 +4,4 @@
 {"id":"armorcodex-boundary","companion":"armorcodex","expected":"ArmorCodex security findings preserve their independent severity and validation semantics while GTD routes them as evidence, blockers, or follow-up tasks"}
 {"id":"context7-boundary","companion":"context7","expected":"Context7 supplies documentation context over MCP, but repository governance and current code remain authoritative for GTD decisions"}
 {"id":"use-chatgpt-boundary","companion":"use-chatgpt","expected":"Use-ChatGPT pure Rust engine provides intent routing, execution DAG, bot-gate fencing, and macOS CLI integration while GTD maintains the core workstream completion and readiness contracts"}
+{"id":"improve-boundary","companion":"improve","expected":"Improve conducts senior read-only codebase audits and produces self-contained implementation plans while GTD converts plans into execution briefs and enforces readiness, verification, and completion contracts"}

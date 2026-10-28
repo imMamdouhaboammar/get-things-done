@@ -23,6 +23,7 @@ def test_all_companions_comply_with_schema():
     "armorcodex",
     "context7",
     "use-chatgpt",
+    "improve",
 ])
 def test_companion_declares_mature_contract_fields(companion_id):
     companion = adapters.companions_by_id()[companion_id]
@@ -45,7 +46,7 @@ def test_companion_cannot_own_gtd_core():
 
 def test_interop_matrix_includes_mature_fields():
     matrix = adapters.interop_matrix()
-    for companion_id in ["plugin-autopilot", "plugin-eval", "superpowers", "armorcodex", "context7"]:
+    for companion_id in ["plugin-autopilot", "plugin-eval", "superpowers", "armorcodex", "context7", "improve"]:
         entry = matrix[companion_id]
         assert "inputs" in entry and len(entry["inputs"]) > 0
         assert "outputs" in entry and len(entry["outputs"]) > 0

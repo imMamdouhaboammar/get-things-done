@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ImprovePlan",
+  "type": "object",
+  "required": [
+    "number",
+    "title",
+    "status",
+    "why_this_matters",
+    "current_state",
+    "commands",
+    "scope",
+    "steps",
+    "test_plan",
+    "done_criteria",
+    "stop_conditions"
+  ],
+  "properties": {
+    "number": { "type": "string" },
+    "title": { "type": "string" },
+    "status": {
+      "type": "object",
+      "required": ["priority", "effort", "risk", "category", "planned_at"],
+      "properties": {
+        "priority": { "type": "string", "enum": ["P1", "P2", "P3"] },
+        "effort": { "type": "string", "enum": ["S", "M", "L"] },
+        "risk": { "type": "string", "enum": ["LOW", "MED", "HIGH"] },
+        "category": { "type": "string" },
+        "depends_on": { "type": "string" },
+        "planned_at": { "type": "string" },
+        "issue": { "type": "string" }
+      }
+    },
+    "why_this_matters": { "type": "string" },
+    "current_state": { "type": "string" },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["purpose", "command", "expected"],
+        "properties": {
+          "purpose": { "type": "string" },
+          "command": { "type": "string" },
+          "expected": { "type": "string" }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "required": ["in_scope", "out_of_scope"],
+      "properties": {
+        "in_scope": { "type": "array", "items": { "type": "string" } },
+        "out_of_scope": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step", "title", "action", "verify"],
+        "properties": {
+          "step": { "type": "integer" },
+          "title": { "type": "string" },
+          "action": { "type": "string" },
+          "verify": { "type": "string" }
+        }
+      }
+    },
+    "test_plan": { "type": "string" },
+    "done_criteria": { "type": "array", "items": { "type": "string" } },
+    "stop_conditions": { "type": "array", "items": { "type": "string" } },
+    "maintenance_notes": { "type": "string" }
+  }
+}
