@@ -1,0 +1,14 @@
+version: 1
+roles:
+  reverse_engineer:
+    display_name: "REA Reverse Engineer"
+    writes: conditional
+    primary_surfaces:
+      - "binary_inspection"
+      - "javascript_bundle_analysis"
+      - "clean_room_reconstruction"
+    forbidden:
+      - "hallucinating_unseen_symbols"
+      - "dumping_unbounded_raw_byte_streams"
+      - "ignoring_runtime_engine_fallbacks"
+    responsibility: "Inspect compiled binaries, JavaScript bundles, or Android packages with verifiable cryptographic and address-level evidence."

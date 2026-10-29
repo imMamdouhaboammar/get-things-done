@@ -11,7 +11,9 @@ SKILLS_DIR = ROOT / "skills"
     ("get-things-done", "#2563EB", "Get Things Done"),
     ("building-gtd-domain-packs", "#059669", "GTD Domain Pack Builder"),
     ("gtd-deliberation", "#7C3AED", "GTD Deliberation"),
+    ("rea", "#E11D48", "REA Reverse Engineering"),
 ])
+
 def test_skill_brand_assets_and_manifests_exist_and_conform(skill_name, expected_color, expected_display):
     skill_dir = SKILLS_DIR / skill_name
     assert skill_dir.is_dir(), f"Skill directory {skill_dir} missing"

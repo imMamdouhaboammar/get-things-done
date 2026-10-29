@@ -1,0 +1,19 @@
+schema_version: v1
+name: rea
+display_name: REA Reverse Engineering
+short_description: Reverse engineer binaries, apps, and JS with verifiable evidence
+default_prompt: 'Analyze this binary or application, extract verifiable evidence, and reconstruct logic cleanly:'
+brand_color: '#E11D48'
+categories:
+- developer-tools
+- security
+- workflow-automation
+interface:
+  display_name: "REA Reverse Engineering"
+  short_description: "Reverse engineer binaries & apps with verifiable evidence"
+  icon_small: "./assets/small-logo.svg"
+  icon_large: "./assets/large-logo.svg"
+  brand_color: "#E11D48"
+  default_prompt: "Use $rea to analyze binaries, bundles, or APKs with verifiable evidence."
+policy:
+  allow_implicit_invocation: true

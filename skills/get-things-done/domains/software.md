@@ -5,7 +5,8 @@ extends: gtd-core-v1
 ---
 # GTD Domain Pack: Software
 ## Selection signals
-Software features, codebases, APIs, services, data models, architecture, migrations, bugs, infrastructure, deployment, security, performance, developer tooling, multi-plugin routing, PR repair bot triage (use-chatgpt)
+Software features, codebases, APIs, services, data models, architecture, migrations, bugs, infrastructure, deployment, security, performance, developer tooling, multi-plugin routing, PR repair bot triage (use-chatgpt), reverse engineering and binary/bundle deconstruction (rea)
+
 
 Non-selection signal: Tasks that only mention technical objects while the requested outcome is research, marketing, design, operations, or another specialist decision rather than changing software behavior.
 ## Domain vocabulary

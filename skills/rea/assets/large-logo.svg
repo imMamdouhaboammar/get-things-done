@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" fill="none">
+<defs><linearGradient id="reaGradLarge" x1="72" y1="64" x2="440" y2="448" gradientUnits="userSpaceOnUse"><stop stop-color="#F43F5E"/><stop offset="1" stop-color="#881337"/></linearGradient></defs>
+<rect x="40" y="40" width="432" height="432" rx="96" fill="url(#reaGradLarge)"/>
+<circle cx="256" cy="256" r="142" stroke="#FECDD3" stroke-width="12" stroke-dasharray="18 18"/>
+<path d="M190 190L135 256L190 322" stroke="white" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M322 190L377 256L322 322" stroke="white" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M280 160L232 352" stroke="#FECDD3" stroke-width="22" stroke-linecap="round"/>
+<circle cx="256" cy="256" r="28" fill="#FFE4E6"/>
+<circle cx="256" cy="256" r="14" fill="#881337"/>
+</svg>
