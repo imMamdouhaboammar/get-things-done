@@ -39,6 +39,11 @@
       "name": "gtd-deliberation",
       "path": "../skills/gtd-deliberation",
       "description": "Challenge messy ideas with current evidence before planning and execution"
+    },
+    {
+      "name": "improve",
+      "path": "../skills/improve",
+      "description": "Senior codebase advisor — audits codebases in read-only mode and writes self-contained implementation plans"
     }
   ],
   "categories": [

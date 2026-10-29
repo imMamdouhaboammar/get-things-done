@@ -1,0 +1,19 @@
+schema_version: v1
+name: improve
+display_name: Codebase Improve Advisor
+short_description: Senior codebase auditor and plan architect.
+default_prompt: Use $improve to audit codebase health and produce implementation plans.
+brand_color: '#0EA5E9'
+categories:
+- developer-tools
+- workflow-automation
+- code-review
+interface:
+  display_name: "Codebase Improve Advisor"
+  short_description: "Senior codebase auditor and plan architect"
+  icon_small: "./assets/small-logo.svg"
+  icon_large: "./assets/large-logo.svg"
+  brand_color: "#0EA5E9"
+  default_prompt: "Use $improve to audit codebase health and produce implementation plans."
+policy:
+  allow_implicit_invocation: true

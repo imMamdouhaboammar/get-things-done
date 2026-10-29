@@ -9,6 +9,7 @@ SKILL_DIRS = [
     ROOT / "skills" / "gtd-capability-router",
     ROOT / "skills" / "gtd-deliberation",
     ROOT / "skills" / "rea",
+    ROOT / "skills" / "improve",
 ]
 
 

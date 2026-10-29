@@ -112,6 +112,25 @@
       "failure_policy": "graceful-degradation-to-manual-gtd-brief",
       "authority_boundary": "Use-ChatGPT fences bot noise and maps routing precedence; GTD defines task readiness, state transitions, and completion evidence.",
       "guardrails": ["no-runtime-dependency", "preserve-gtd-completion-contract", "bot-is-neither-noise-nor-truth"]
+    },
+    {
+      "id": "improve",
+      "label": "Improve Codebase Advisor",
+      "kind": "evaluation",
+      "relationship": "complementary",
+      "companion_role": "codebase-audit-and-planning",
+      "transport": "In-Process / CLI Bridge",
+      "ownership": {
+        "gtd": "execution-contract",
+        "companion": "codebase-audit-and-planning"
+      },
+      "integration": "Improve conducts senior read-only codebase audits and produces self-contained implementation plans; GTD converts and wraps these plans into executable Execution Briefs, enforcing Definition of Ready, Evidence Trust verification, and state transition governance.",
+      "inputs": ["codebase-context", "audit-category", "user-intent", "intent-docs"],
+      "outputs": ["audit-findings", "self-contained-plans", "plans-index", "direction-recommendations"],
+      "evidence_contract": "Improve audit findings and plan done-criteria populate GTD verification success criteria and Evidence Trust Ladder levels (Level A/B); Improve never executes fixes directly.",
+      "failure_policy": "graceful-degradation-to-manual-gtd-brief",
+      "authority_boundary": "Improve owns audit findings, leverage rankings, and implementation plan specifications; GTD defines task readiness, workstream state transitions, and completion evidence.",
+      "guardrails": ["no-runtime-dependency", "read-only-source-code", "self-contained-plans", "preserve-gtd-completion-contract"]
     }
   ]
 }

@@ -127,13 +127,15 @@ Adapters are strictly thin projection layers. They never duplicate or alter the 
 
 ## Companion interoperability architecture
 
-GTD defines machine-readable interoperability contracts for 5 companion tools in `adapters/companions.json`:
+GTD defines machine-readable interoperability contracts for companion tools in `adapters/companions.json`:
 
 - **Plugin Autopilot** (agent orchestration)
 - **Plugin Eval** (plugin/skill evaluation)
 - **Superpowers** (engineering methodology)
 - **ArmorCodex** (security review)
 - **Context7** (documentation retrieval)
+- **Use-ChatGPT** (multi-plugin routing DAG, bot gate fencer, Evidence Trust Ladder, macOS CLI)
+- **Improve** (senior codebase auditor and self-contained implementation plan architect)
 
 Companions never own GTD core behavior, cannot bypass exit gates, and do not become mandatory runtime dependencies. All companion interactions follow explicit inputs, outputs, evidence contracts, failure policies, and authority boundaries.
 
